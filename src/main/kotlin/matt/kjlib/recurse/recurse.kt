@@ -1,6 +1,6 @@
 package matt.kjlib.recurse
 
-import matt.kjlib.err
+import matt.kjlib.log.err
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract

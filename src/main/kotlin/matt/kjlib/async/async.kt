@@ -1,11 +1,14 @@
 package matt.kjlib.async
 
+import matt.kjlib.async.ThreadInterface.Canceller
 import matt.kjlib.date.Duration
 import matt.kjlib.date.globaltoc
-import matt.kjlib.massert
+import matt.kjlib.log.massert
 import java.lang.Thread.sleep
 import java.util.concurrent.Semaphore
 import kotlin.concurrent.thread
+import kotlin.contracts.InvocationKind.UNKNOWN
+import kotlin.contracts.contract
 
 // Check out FutureTasks too!
 
@@ -24,7 +27,6 @@ class QueueThread(
   }
 
   private val sleepPeriod = sleepPeriod.inMilliseconds
-
 
 
   private val queue = mutableListOf<Pair<Int, ()->Any?>>()
@@ -299,10 +301,10 @@ fun every(
   ////            println("DEBUG: $id is running")
   //            try { // Timer is designed to have a try statement in this run method. If an execption is thrown here, not only does the whole thread and all tasks stop, but THE ERROR MESSAGES ARE NOT INFORMATIVE AND MISLEAD AWAY FROM THE ACTUAL EXCEPTION. Therefore, there must be a try catch here.
   //                op()
-  //            } catch (e: Exception) {
+  //            } catch (matt.kjlib.jmath.e: Exception) {
   //                println("got exception in TimerTask. Cancelling TimerTask.")
-  //                println(e)
-  //                e.printStackTrace()
+  //                println(matt.kjlib.jmath.e)
+  //                matt.kjlib.jmath.e.printStackTrace()
   ////                cancel()
   //            }
   //
@@ -333,10 +335,10 @@ fun printStackTracesForASec() {
 	  val traces = Thread.getAllStackTraces()[t]!!
 
 	  if (traces.isEmpty()) {
-//		globaltoc("$t has no stacktrace")
+		//		globaltoc("$t has no stacktrace")
 	  } else {
 		println()
-//		globaltoc("stacktrace of $t")
+		//		globaltoc("stacktrace of $t")
 		println()
 		Thread.getAllStackTraces()[t]!!.forEach {
 		  println(it)
@@ -350,3 +352,57 @@ fun printStackTracesForASec() {
 	}
   }
 }
+
+class ThreadInterface {
+  val canceller = Canceller()
+  val sem = Semaphore(0)
+  private var complete = false
+  fun markComplete() {
+	complete = true
+	sem.release()
+  }
+
+  inner class Canceller {
+	var cancelled = false
+	fun cancel() {
+	  cancelled = true
+	}
+
+	fun cancelAndWait() {
+	  cancel()
+	  if (!complete) sem.acquire()
+	}
+  }
+}
+
+
+fun IntRange.oscillate(thread: Boolean = false, periodMs: Long? = null, op: (Int)->Unit): Canceller {
+  var i = start - step
+  var increasing = true
+  val inter = ThreadInterface()
+  val f = {
+	while (!inter.canceller.cancelled) {
+	  if (periodMs != null) sleep(periodMs)
+	  if (increasing) i += step else i -= step
+	  if (i >= endInclusive) increasing = false
+	  if (i <= start) increasing = true
+	  op(i)
+	}
+	inter.markComplete()
+  }
+  if (thread) thread { f() } else f()
+  return inter.canceller
+}
+
+
+
+
+fun sleep_until(system_ms: Long) {
+  val diff = system_ms - System.currentTimeMillis()
+  if (diff > 0) {
+	Thread.sleep(diff)
+  }
+}
+
+
+

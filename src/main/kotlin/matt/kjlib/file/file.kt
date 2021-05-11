@@ -1,10 +1,13 @@
 package matt.kjlib.file
 
 import matt.kjlib.async.every
+import matt.kjlib.byte.ByteSize
 import matt.kjlib.date.Duration
-import matt.kjlib.recursiveLastModified
+import matt.kjlib.recurse.recurse
+import matt.kjlib.stream.isIn
 import java.io.File
 import java.nio.file.FileSystems
+import java.nio.file.Files
 import java.nio.file.Path
 
 
@@ -41,3 +44,117 @@ fun Path.startsWithAny(atLeastOne: File, vararg more: File): Boolean {
   more.forEach { if (startsWith(it.toPath())) return true }
   return false
 }
+
+fun File.size() = ByteSize(Files.size(this.toPath()))
+
+fun File.clearIfTooBigThenAppendText(s: String) {
+  if (size().kilo > 10) {
+	writeText("cleared because over 10KB") /*got an out of memory error when limit was set as 100KB*/
+  }
+  appendText(s)
+
+}
+
+fun File.recursiveChildren() = recurse { it.listFiles()?.toList() ?: listOf() }
+
+fun File.deleteIfExists() {
+  if (exists()) {
+	if (isDirectory) {
+	  deleteRecursively()
+	} else {
+	  delete()
+	}
+  }
+}
+
+fun File.resRepExt(newExt: String) =
+	File(parentFile.absolutePath + File.separator + nameWithoutExtension + "." + newExt)
+
+
+fun File.recursiveLastModified(): Long {
+  var greatest = 0L
+  recurse { it: File -> it.listFiles()?.toList() ?: listOf<File>() }.forEach {
+	greatest = listOf(greatest, it.lastModified()).maxOrNull()!!
+  }
+  return greatest
+}
+
+
+fun File.next(): File {
+  var ii = 0
+  while (true) {
+	val f = File(absolutePath + ii.toString())
+	if (!f.exists()) {
+	  return f
+	}
+	ii += 1
+  }
+}
+
+fun File.doubleBackupWrite(s: String) {
+
+  parentFile.mkdirs()
+  createNewFile()
+
+  /*this is important. Extra security is always good.*/
+  /*now I'm backing up version before AND after the change. */
+  /*yes, there is redundancy. In some contexts redundancy is good. Safe.*/
+  /*Obviously this is a reaction to a mistake I made (that turned out ok in the end, but scared me a lot).*/
+
+  backup()
+  writeText(s)
+  backup()
+}
+
+
+fun File.backup() {
+
+
+  if (!this.exists()) {
+	throw Exception("cannot back up ${this}, which does not exist")
+  }
+
+
+  val backupFolder = File(this.absolutePath).parentFile.resolve("backups")
+  backupFolder.mkdir()
+  if (!backupFolder.isDirectory) {
+	throw Exception("backupFolder not a dir")
+  }
+
+  backupFolder
+	  .resolve(name)
+	  .getNextAndClearWhenMoreThan(100, extraExt = "backup")
+	  .text = readText()
+
+}
+
+fun File.getNextAndClearWhenMoreThan(n: Int, extraExt: String = "itr"): File {
+  val backupFolder = parentFile
+  val allPreviousBackupsOfThis = backupFolder
+	  .listFiles()!!.filter {
+		it.name.startsWith(this@getNextAndClearWhenMoreThan.name + ".${extraExt}")
+	  }.associateBy { it.name.substringAfterLast(".${extraExt}").toInt() }
+
+
+  val myBackupI = (allPreviousBackupsOfThis.keys.maxOrNull() ?: 0) + 1
+
+
+  allPreviousBackupsOfThis
+	  .filterKeys { it < (myBackupI - n) }
+	  .forEach { it.value.delete() }
+
+  return backupFolder.resolve("${this.name}.${extraExt}${myBackupI}")
+
+}
+
+
+val File.fname: String
+  get() = name
+
+operator fun File.get(item: String): File {
+  return resolve(item)
+}
+
+
+
+fun File.isImage() = extension.isIn("png", "jpg", "jpeg")

@@ -1,6 +1,6 @@
 package matt.kjlib.delegate
 
-import matt.kjlib.NEVER
+import matt.kjlib.log.NEVER
 import matt.kjlib.olist.BasicObservableList
 import matt.kjlib.olist.toBasicObservableList
 import matt.klibexport.klibexport.setAll

@@ -1,6 +1,7 @@
 package matt.kjlib.str
 
-import matt.kjlib.err
+import matt.kjlib.log.err
+import java.math.BigDecimal
 
 fun String.lineIndexOfIndex(i: Int): Int {
   if (length == 0) {
@@ -38,7 +39,7 @@ object CharCheck {
   init {
 	if (isKotlin1_4OrEarlier) {
 	  err("OPPOSITE OF THE FOLLOWING")
-	/*if (KotlinVersion.CURRENT.isAtLeast(1, 5)) {*/
+	  /*if (KotlinVersion.CURRENT.isAtLeast(1, 5)) {*/
 	  err("delete Char.code below")
 	  err("update decap")
 	  err("update cap")
@@ -85,7 +86,6 @@ fun String.startsWithAny(atLeastOne: String, vararg more: String): Boolean {
 }
 
 
-
 abstract class DelimiterAppender(s: String = "") {
   private val sb = StringBuilder(s)
   abstract val delimiter: String
@@ -93,9 +93,54 @@ abstract class DelimiterAppender(s: String = "") {
 	sb.append(delimiter)
 	sb.append(a)
   }
+
   operator fun plusAssign(a: Any?) = append(a)
   override fun toString() = sb.toString()
 }
+
 class LineAppender(s: String = ""): DelimiterAppender(s) {
   override val delimiter = "\n"
+}
+
+fun Number.sigfig(significantFigures: Int): Double {
+  return BigDecimal(this.toDouble()).toSignificantFigures(significantFigures).toDouble()
+}
+
+fun BigDecimal.toSignificantFigures(significantFigures: Int): BigDecimal {
+  val s = String.format("%." + significantFigures + "G", this)
+  return BigDecimal(s)
+}
+
+
+fun tab(a: Any) {
+  println("\t${a}")
+}
+
+fun taball(itr: Collection<*>) {
+  itr.forEach {
+	println("\t${it}")
+  }
+}
+
+fun taball(s: String, itr: Collection<*>) {
+  println("$s(len=${itr.size}):")
+  itr.forEach {
+	println("\t${it}")
+  }
+}
+
+fun Int.prependZeros(untilNumDigits: Int): String {
+  var s = this.toString()
+  while (s.length < untilNumDigits) {
+	s = "0$s"
+  }
+  return s
+}
+
+fun String.addSpacesUntilLengthIs(n: Int): String {
+  var s = this
+  while (s.length < n) {
+	s += " "
+  }
+  return s
 }

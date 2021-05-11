@@ -1,7 +1,14 @@
 package matt.kjlib.weak
 
-import matt.kjlib.err
+import matt.kjlib.log.err
 import java.lang.ref.WeakReference
+
+val immortals = mutableSetOf<Any>()
+fun <T: Any> T.immortal(): T {
+    immortals += this
+    return this
+}
+
 
 class WeakSet<T> : MutableSet<T> {
 
