@@ -42,3 +42,17 @@ fun Any.notContainedIn(list: List<*>) = !list.contains(this)
 fun Any.notContainedIn(array: Array<*>) = !array.contains(this)
 
 fun Any.isIn(vararg stuff: Any) = stuff.contains(this)
+
+fun <T> Sequence<T>.onEvery(ith: Int, action: (T)->Unit): Sequence<T> {
+  return mapIndexed { index, t ->
+	if (index%ith == 0) action(t)
+	t
+  }
+}
+
+fun <T> Sequence<T>.onEveryIndexed(ith: Int, action: (Int, T)->Unit): Sequence<T> {
+  return mapIndexed { index, t ->
+	if (index%ith == 0) action(index, t)
+	t
+  }
+}

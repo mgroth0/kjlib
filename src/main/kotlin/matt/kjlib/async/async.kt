@@ -2,13 +2,12 @@ package matt.kjlib.async
 
 import matt.kjlib.async.ThreadInterface.Canceller
 import matt.kjlib.date.Duration
-import matt.kjlib.date.globaltoc
 import matt.kjlib.log.massert
 import java.lang.Thread.sleep
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
 import java.util.concurrent.Semaphore
 import kotlin.concurrent.thread
-import kotlin.contracts.InvocationKind.UNKNOWN
-import kotlin.contracts.contract
 
 // Check out FutureTasks too!
 
@@ -395,8 +394,6 @@ fun IntRange.oscillate(thread: Boolean = false, periodMs: Long? = null, op: (Int
 }
 
 
-
-
 fun sleep_until(system_ms: Long) {
   val diff = system_ms - System.currentTimeMillis()
   if (diff > 0) {
@@ -405,4 +402,35 @@ fun sleep_until(system_ms: Long) {
 }
 
 
+val GLOBAL_POOL by lazy { Executors.newFixedThreadPool(4) }
+fun <T, R> Iterable<T>.parMap(op: (T)->R): List<R> {
+  return map {
+	GLOBAL_POOL.submit(Callable {
+	  op(it)
+	})
+  }.toList().map { it.get() }
+}
 
+fun <T, R> Iterable<T>.parMapIndexed(op: (Int, T)->R): List<R> {
+  return mapIndexed { i, it ->
+	GLOBAL_POOL.submit(Callable {
+	  op(i, it)
+	})
+  }.toList().map { it.get() }
+}
+
+fun <T, R> Sequence<T>.parMap(op: (T)->R): List<R> {
+  return map {
+	GLOBAL_POOL.submit(Callable {
+	  op(it)
+	})
+  }.toList().map { it.get() }
+}
+
+fun <T, R> Sequence<T>.parMapIndexed(op: (Int, T)->R): List<R> {
+  return mapIndexed { i, it ->
+	GLOBAL_POOL.submit(Callable {
+	  op(i, it)
+	})
+  }.toList().map { it.get() }
+}

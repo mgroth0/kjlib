@@ -122,8 +122,22 @@ fun taball(itr: Collection<*>) {
   }
 }
 
+
 fun taball(s: String, itr: Collection<*>) {
   println("$s(len=${itr.size}):")
+  itr.forEach {
+	println("\t${it}")
+  }
+}
+fun taball(s: String, itr: DoubleArray) {
+  println("$s(len=${itr.size}):")
+  itr.forEach {
+	println("\t${it}")
+  }
+}
+
+fun taball(s: String, itr: Iterable<*>) {
+  println("$s:")
   itr.forEach {
 	println("\t${it}")
   }
