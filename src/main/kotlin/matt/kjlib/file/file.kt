@@ -150,6 +150,8 @@ fun File.getNextAndClearWhenMoreThan(n: Int, extraExt: String = "itr"): File {
 
 val File.fname: String
   get() = name
+val File.abspath: String
+  get() = absolutePath
 
 operator fun File.get(item: String): File {
   return resolve(item)
