@@ -4,7 +4,6 @@ import matt.kjlib.log.NEVER
 import matt.kjlib.olist.BasicObservableList
 import matt.kjlib.olist.toBasicObservableList
 import matt.klibexport.klibexport.setAll
-import java.util.WeakHashMap
 import kotlin.reflect.KProperty
 
 sealed class SuperDelegateBase<T: Any, V>(
@@ -13,21 +12,21 @@ sealed class SuperDelegateBase<T: Any, V>(
   val setfun: ((V)->V)? = null,
   val getfun: ((V)->V)? = null
 ) {
-  companion object {
-	val instances = WeakHashMap<Any, MutableMap<String, SuperDelegateBase<*, *>>>()
-  }
+  /* companion object {
+	 val instances = WeakHashMap<Any, MutableMap<String, SuperDelegateBase<*, *>>>()
+   }
 
-  init {
-	if (thisRef == null || name == null) {
-	  //	  NOTE: assume this was used directly as the delagator.
-	} else {
-	  val thisRefMap = instances[thisRef]
-					   ?: mutableMapOf<String, SuperDelegateBase<*, *>>()
-						   .also { instances[thisRef] = it }
-	  thisRefMap[name] = this
-	}
+   init {
+	 if (thisRef == null || name == null) {
+	   //	  NOTE: assume this was used directly as the delagator.
+	 } else {
+	   val thisRefMap = instances[thisRef]
+						?: mutableMapOf<String, SuperDelegateBase<*, *>>()
+							.also { instances[thisRef] = it }
+	   thisRefMap[name] = this
+	 }
 
-  }
+   }*/
 
 
   private val listeners = mutableListOf<(V)->Unit>()
