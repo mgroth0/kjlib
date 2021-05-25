@@ -8,6 +8,7 @@ import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 import java.util.concurrent.Semaphore
 import kotlin.concurrent.thread
+import kotlin.contracts.contract
 
 // Check out FutureTasks too!
 
@@ -108,7 +109,10 @@ class QueueThread(
 }
 
 
-fun <T> Semaphore.with(op: ()->T): T {
+ fun < T> Semaphore.with(op: ()->T): T {
+  contract {
+	callsInPlace(op, kotlin.contracts.InvocationKind.EXACTLY_ONCE)
+  }
   acquire()
   val r = op()
   release()
@@ -309,7 +313,6 @@ fun every(
   //
   //        }
   //    }
-
 
 
   val task = MyTimerTask(op, name)

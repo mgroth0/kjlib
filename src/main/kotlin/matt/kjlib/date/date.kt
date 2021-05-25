@@ -1,5 +1,7 @@
 package matt.kjlib.date
 
+import matt.kjlib.async.every
+import matt.kjlib.async.with
 import matt.kjlib.jmath.roundToDecimal
 import matt.klib.math.BILLION
 import matt.klib.math.MILLION
@@ -8,6 +10,7 @@ import java.io.PrintWriter
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.Date
+import java.util.concurrent.Semaphore
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
@@ -29,6 +32,7 @@ class Duration private constructor(nanos: Long) {
 	fun ofMinutes(min: Number) = Duration((min.toDouble()*60*BILLION).toLong())
 	fun ofSeconds(sec: Number) = Duration((sec.toDouble()*BILLION).toLong())
 	fun ofMilliseconds(ms: Number) = Duration((ms.toDouble()*MILLION).toLong())
+	fun ofNanoseconds(nanos: Number) = Duration(nanos.toLong())
   }
 
 
@@ -92,7 +96,8 @@ operator fun Instant.minus(started: Date): Duration {
 fun println_withtime(s: String) {
   println(System.currentTimeMillis().toString() + ":" + s)
 }
-
+val Number.nanos
+  get() = Duration.ofNanoseconds(this)
 val Number.ms
   get() = Duration.ofMilliseconds(this)
 val Number.sec
@@ -105,11 +110,7 @@ val Number.days
   get() = Duration.ofDays(this)
 
 fun now() = System.currentTimeMillis().unixMS
-fun nowRelativeNanos() = System.nanoTime()
 
-class RelativeTimeNanos() {
-
-}
 
 @ExperimentalContracts
 fun <R> stopwatch(s: String, op: ()->R): R {
@@ -117,9 +118,9 @@ fun <R> stopwatch(s: String, op: ()->R): R {
 	callsInPlace(op, EXACTLY_ONCE)
   }
   println("timing ${s}...")
-  val start = nowRelativeNanos()
+  val start = System.nanoTime()
   val r = op()
-  val stop = nowRelativeNanos()
+  val stop = System.nanoTime()
   val dur = Duration(start, stop)
   println("$s took $dur")
   return r
@@ -128,11 +129,11 @@ fun <R> stopwatch(s: String, op: ()->R): R {
 data class Stopwatch(
   val startRelativeNanos: Long,
   val enabled: Boolean = true,
-  val printWriter: PrintWriter? = null
+  val printWriter: PrintWriter? = null,
 ) {
   fun toc(s: String) {
 	if (enabled) {
-	  val stop = nowRelativeNanos()
+	  val stop = System.nanoTime()
 	  val dur = Duration(startRelativeNanos, stop)
 	  if (printWriter == null) {
 		println("$dur\t$s")
@@ -144,13 +145,43 @@ data class Stopwatch(
   }
 }
 
+private val ticSem = Semaphore(1)
+val keysForNestedStuffUsedRecently = mutableMapOf<String, Int>().apply {
+  every(2.sec, ownTimer = true) {
+	ticSem.with {
+	  clear()
+	}
+  }
+}
+
 fun tic(
   enabled: Boolean = true,
-  printWriter: PrintWriter? = null
+  printWriter: PrintWriter? = null,
+  keyForNestedStuff: String? = null,
+  nestLevel: Int = 1
 ): Stopwatch {
-  val start = nowRelativeNanos()
-  val sw = Stopwatch(start, enabled = enabled, printWriter = printWriter)
-  println() /*to visually space this stopwatch print statements*/
+  var realEnabled = enabled
+  if (enabled) {
+	ticSem.with {
+	  if (keyForNestedStuff in keysForNestedStuffUsedRecently && nestLevel == keysForNestedStuffUsedRecently[keyForNestedStuff]) {
+		realEnabled = false
+	  } else if (keyForNestedStuff != null) {
+		if (keyForNestedStuff in keysForNestedStuffUsedRecently) {
+		  keysForNestedStuffUsedRecently[keyForNestedStuff] = keysForNestedStuffUsedRecently[keyForNestedStuff]!! + 1
+		} else {
+		  keysForNestedStuffUsedRecently[keyForNestedStuff] = 1
+		}
+	  }
+	}
+  }
+  val start = System.nanoTime()
+  val sw = Stopwatch(start, enabled = realEnabled, printWriter = printWriter)
+  if (realEnabled) {
+	println() /*to visually space this stopwatch print statements*/
+  }
+
+
+
   return sw
 }
 
