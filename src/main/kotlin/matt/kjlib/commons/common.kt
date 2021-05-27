@@ -16,5 +16,5 @@ val SETTINGS_FOLDER = DATA_FOLDER["settings"]
 val VAR_JSON = DATA_FOLDER["VAR.json"]
 val VAL_JSON = DATA_FOLDER["VAL.json"]
 
-fun ismac() = System.getProperty("os.name").startsWith("Mac")
+
 val runtime = Runtime.getRuntime()!!
