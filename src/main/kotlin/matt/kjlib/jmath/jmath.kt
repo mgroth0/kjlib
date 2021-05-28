@@ -2,6 +2,7 @@ package matt.kjlib.jmath
 
 import matt.kjlib.jmath.bgdecimal.BigDecimalMath
 import matt.kjlib.stream.forEachNested
+import matt.klib.math.sq
 import org.jetbrains.kotlinx.multik.ndarray.data.D2
 import org.jetbrains.kotlinx.multik.ndarray.data.MultiArray
 import org.jetbrains.kotlinx.multik.ndarray.data.get
@@ -129,4 +130,7 @@ infix fun MultiArray<Double, D2>.dot(other: MultiArray<Double, D2>): Double {
   /*return DotProductGPU(stim.flatMat, flatMat).calc()*/
 
 }
-fun nextUnitDouble() = nextDouble() * 2 - 1
+
+fun nextUnitDouble() = nextDouble()*2 - 1
+fun sigmoid(x: Double): Double = 1/(1 + e.pow(-x))
+fun sigmoidDerivative(x: Double): Double = e.pow(-x).let { it/(1 + it).sq() }
