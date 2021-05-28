@@ -56,3 +56,15 @@ fun <T> Sequence<T>.onEveryIndexed(ith: Int, action: (Int, T)->Unit): Sequence<T
 	t
   }
 }
+
+inline fun <T> Array<out T>.applyEach(action: T.()->Unit) {
+  for (element in this) action.invoke(element)
+}
+
+inline fun <T> Iterable<T>.applyEach(action: T.()->Unit) {
+  for (element in this) action.invoke(element)
+}
+
+inline fun <T> Sequence<T>.applyEach(action: T.()->Unit) {
+  for (element in this) action.invoke(element)
+}

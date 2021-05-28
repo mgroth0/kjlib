@@ -1,6 +1,10 @@
 package matt.kjlib.jmath
 
 import matt.kjlib.jmath.bgdecimal.BigDecimalMath
+import matt.kjlib.stream.forEachNested
+import org.jetbrains.kotlinx.multik.ndarray.data.D2
+import org.jetbrains.kotlinx.multik.ndarray.data.MultiArray
+import org.jetbrains.kotlinx.multik.ndarray.data.get
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
@@ -78,3 +82,51 @@ fun List<BigDecimal>.geometricMean() = fold(BigDecimal.ONE) { acc, d -> acc*d }
 	}
 
 fun Sequence<BigDecimal>.geometricMean() = toList().geometricMean()
+
+
+infix fun MultiArray<Double, D2>.dot(other: MultiArray<Double, D2>): Double {
+  require(this.shape[0] == this.shape[1] && this.shape[0] == other.shape[0] && this.shape[1] == other.shape[1])
+  var ee = 0.0
+  (0 until this.shape[0]).forEachNested { x, y ->
+	ee += this[x][y]*other[x][y]
+  }
+  return ee
+
+
+  /*this is a different calculation...*/
+  /*val d = mk.linalg.dot(stim.mat, mat).sum()*/
+
+  /*	//	val dottic = tic()
+	  //	dottic.toc("starting regular dot product")*/
+
+  /*	//	dottic.toc("finished regular dot product: $e")
+
+	  //	dottic.toc("finished GPU dot product")
+	  //	val flatStimMat = stim.mat.flatten()
+	  //	val flatMat = mat.flatten()*/
+
+
+  /*val ensureCreatedFirst = stim.flatMat
+  val ensureCreatedFirst2 = flatMat
+  val result = DoubleArray(field.size2D)
+  val k = object: Kernel() {
+	override fun run() {
+	  result[globalId] = stim.flatMat[globalId]*flatMat[globalId]
+	}
+  }
+  k.execute(Range.create(field.size2D))*/
+  //	val s = result.sum()
+  //	dottic.toc("finished GPU dot product: $s")
+
+  /*val best = KernelManager.instance().bestDevice()
+  println("best:${best}")*/
+
+
+  /*exitProcess(0)*/
+
+
+  /*return result.sum()*/
+  /*return DotProductGPU(stim.flatMat, flatMat).calc()*/
+
+}
+fun nextUnitDouble() = nextDouble() * 2 - 1
