@@ -96,6 +96,7 @@ operator fun Instant.minus(started: Date): Duration {
 fun println_withtime(s: String) {
   println(System.currentTimeMillis().toString() + ":" + s)
 }
+
 val Number.nanos
   get() = Duration.ofNanoseconds(this)
 val Number.ms
@@ -196,4 +197,15 @@ fun globaltoc(s: String) {
   } else {
 	globalsw!!.toc(s)
   }
+}
+
+inline fun <R> withStopwatch(s: String, op: (Stopwatch)->R): R {
+  contract {
+	callsInPlace(op, EXACTLY_ONCE)
+  }
+  val t = tic()
+  t.toc("starting stopwatch: $s")
+  val r = op(t)
+  t.toc("finished stopwatch: $s")
+  return r
 }

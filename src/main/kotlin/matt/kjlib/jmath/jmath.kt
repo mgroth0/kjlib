@@ -70,6 +70,9 @@ fun orth(degrees: Double): Double {
 
 fun <T> Iterable<T>.meanOf(op: (T)->Double) = map { op(it) }.mean()
 fun List<Double>.mean() = sum()/size
+fun DoubleArray.mean() = sum()/size
+fun IntArray.intMean() = (sum()/size.toDouble()).roundToInt()
+fun IntArray.doubleMean() = (sum()/size.toDouble())
 fun Sequence<Double>.mean() = toList().mean()
 fun List<BigDecimal>.mean() = fold(BigDecimal.ZERO) { acc, b -> acc + b }/BigDecimal.valueOf(size.toLong())
 
