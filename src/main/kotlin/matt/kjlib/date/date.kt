@@ -131,15 +131,17 @@ data class Stopwatch(
   val startRelativeNanos: Long,
   val enabled: Boolean = true,
   val printWriter: PrintWriter? = null,
+  val prefix: String? = null
 ) {
+  val prefixS = if (prefix != null) "$prefix\t" else ""
   fun toc(s: String) {
 	if (enabled) {
 	  val stop = System.nanoTime()
 	  val dur = Duration(startRelativeNanos, stop)
 	  if (printWriter == null) {
-		println("$dur\t$s")
+		println("$dur\t$prefixS$s")
 	  } else {
-		printWriter.println("$dur    $s")
+		printWriter.println("$dur\t$prefixS$s")
 	  }
 
 	}
@@ -159,7 +161,8 @@ fun tic(
   enabled: Boolean = true,
   printWriter: PrintWriter? = null,
   keyForNestedStuff: String? = null,
-  nestLevel: Int = 1
+  nestLevel: Int = 1,
+  prefix: String? = null
 ): Stopwatch {
   var realEnabled = enabled
   if (enabled) {
@@ -176,7 +179,7 @@ fun tic(
 	}
   }
   val start = System.nanoTime()
-  val sw = Stopwatch(start, enabled = realEnabled, printWriter = printWriter)
+  val sw = Stopwatch(start, enabled = realEnabled, printWriter = printWriter, prefix = prefix)
   if (realEnabled) {
 	println() /*to visually space this stopwatch print statements*/
   }
