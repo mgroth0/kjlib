@@ -75,7 +75,7 @@ val Number.unixMS: Date
 
 
 private val stupid = "Have to keep it as a different name than Duration.format since they are in the same package???"
-fun Date.formatDate(): String = SimpleDateFormat("EEE, MMM d, h:m a").format(this)
+fun Date.formatDate(): String = SimpleDateFormat("EEE, MMM d, h:mm a").format(this)
 
 operator fun Date.minus(started: Date): Duration {
   return this.toInstant() - started.toInstant()
