@@ -2,6 +2,8 @@ package matt.kjlib.str
 
 import matt.kjlib.log.err
 import java.math.BigDecimal
+import java.net.MalformedURLException
+import java.net.URL
 
 fun String.lineIndexOfIndex(i: Int): Int {
   if (length == 0) {
@@ -129,6 +131,7 @@ fun taball(s: String, itr: Collection<*>) {
 	println("\t${it}")
   }
 }
+
 fun taball(s: String, itr: DoubleArray) {
   println("$s(len=${itr.size}):")
   itr.forEach {
@@ -158,3 +161,4 @@ fun String.addSpacesUntilLengthIs(n: Int): String {
   }
   return s
 }
+
