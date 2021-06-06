@@ -4,6 +4,7 @@ import matt.kjlib.jmath.bgdecimal.BigDecimalMath
 import matt.kjlib.jmath.times
 import matt.kjlib.log.err
 import matt.kjlib.stream.forEachNested
+import matt.klib.math.sq
 import org.apfloat.Apcomplex
 import org.apfloat.Apfloat
 import org.apfloat.ApfloatMath
@@ -123,7 +124,7 @@ const val DOUBLE_ONE = 1.0
 
 
 fun List<Apfloat>.geometricMean() = fold(1.0.toApfloat()) { acc, d ->
- acc*d
+  acc*d
 }.pow(DOUBLE_ONE/size)
 
 fun List<Double>.geometricMean(bump: Double = 1.0) = fold(1.0) { acc, d ->
@@ -264,8 +265,10 @@ infix fun MultiArray<Apcomplex, D2>.dot(other: MultiArray<Apcomplex, D2>): Apflo
 
 
 fun nextUnitDouble() = nextDouble()*2 - 1
-fun sigmoid(x: Apfloat): Apfloat = 1.toApint()/(1.toApint() + Ae.pow(-x))
-fun sigmoidDerivative(x: Apfloat): Apfloat = Ae.pow(-x).let { it/(1.toApint() + it).sq() }
+fun sigmoid(x: Double): Double = 1/(1 + e.pow(-x))
+fun sigmoidDerivative(x: Double): Double = e.pow(-x).let { it/(1 + it).sq() }
+fun Asigmoid(x: Apfloat): Apfloat = 1.toApint()/(1.toApint() + Ae.pow(-x))
+fun AsigmoidDerivative(x: Apfloat): Apfloat = Ae.pow(-x).let { it/(1.toApint() + it).sq() }
 
 /**
  * Shortest distance (angular) between two angles.
