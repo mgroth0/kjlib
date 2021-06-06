@@ -1,8 +1,13 @@
 package matt.kjlib.jmath
 
 import matt.kjlib.jmath.bgdecimal.BigDecimalMath
+import matt.kjlib.jmath.times
+import matt.kjlib.log.err
 import matt.kjlib.stream.forEachNested
-import matt.klib.math.sq
+import org.apfloat.Apcomplex
+import org.apfloat.Apfloat
+import org.apfloat.ApfloatMath
+import org.apfloat.Apint
 import org.jetbrains.kotlinx.multik.api.empty
 import org.jetbrains.kotlinx.multik.api.mk
 import org.jetbrains.kotlinx.multik.ndarray.data.D2
@@ -16,15 +21,22 @@ import org.jetbrains.kotlinx.multik.ndarray.operations.times
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
+import java.math.RoundingMode.HALF_UP
+import java.math.RoundingMode.UNNECESSARY
 import kotlin.math.abs
 import kotlin.math.exp
+import kotlin.math.floor
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.random.Random.Default.nextDouble
 
-const val EULER = Math.E
-const val e = EULER
-val BIG_E: BigDecimal = BigDecimal.valueOf(e)
+const val e = Math.E
+val Ae = /*EULER*/ ApfloatMath.euler(20)
+val PI = Math.PI
+val API = ApfloatMath.pi(20)
+/*val BIG_E: BigDecimal = BigDecimal.valueOf(e)*/
+
+fun Double.floorInt() = floor(this).toInt()
 
 fun Double.sigFigs(n: Int): Double {
   var bd = BigDecimal(this)
@@ -32,16 +44,30 @@ fun Double.sigFigs(n: Int): Double {
   return bd.toDouble()
 }
 
+
+fun Apfloat.sigFigs(n: Int): Double {
+  var bd = BigDecimal(this.toDouble())
+  bd = bd.round(MathContext(n))
+  return bd.toDouble()
+}
+
+
+fun Apfloat.roundToInt() = Apint(ApfloatMath.round(this, 20, HALF_UP).toString())
+
+
 @Suppress("unused")
 fun Double.roundToDecimal(n: Int): Double {
+
   val temp = this*(n*10)
   val tempInt = temp.roundToInt().toDouble()
   return tempInt/(n*10)
 }
 
 
+fun Apfloat.getPoisson() = toDouble().getPoisson()
+
 /*https://stackoverflow.com/questions/1241555/algorithm-to-generate-poisson-and-binomial-random-numbers*/
-fun Double.getPoisson(): Int {
+fun Double.getPoisson(): Apint {
   /*val lambda = this*/
   val L = exp(-this)
   var p = 1.0
@@ -50,7 +76,7 @@ fun Double.getPoisson(): Int {
 	k++
 	p *= nextDouble()
   } while (p > L)
-  return k - 1
+  return (k - 1).toApint()
 
 
 }
@@ -76,6 +102,12 @@ fun orth(degrees: Double): Double {
   else degrees - 90.0
 }
 
+fun orth(degrees: Apfloat): Apfloat {
+  require(degrees.toDouble() in 0.0..180.0)
+  return if (degrees < 90.0) degrees + 90.0
+  else degrees - 90.0
+}
+
 fun <T> Iterable<T>.meanOf(op: (T)->Double) = map { op(it) }.mean()
 fun List<Double>.mean() = sum()/size
 fun DoubleArray.mean() = sum()/size
@@ -90,10 +122,15 @@ fun List<BigDecimal>.mean() = fold(BigDecimal.ZERO) { acc, b -> acc + b }/BigDec
 const val DOUBLE_ONE = 1.0
 
 
-fun List<Double>.geometricMean(bump: Double = 1.0) = fold(1.0) { acc, d ->
-  acc*d*bump
+fun List<Apfloat>.geometricMean() = fold(1.0.toApfloat()) { acc, d ->
+ acc*d
 }.pow(DOUBLE_ONE/size)
 
+fun List<Double>.geometricMean(bump: Double = 1.0) = fold(1.0) { acc, d ->
+  val v = acc*d*bump
+  println("v=$v")
+  v
+}.pow(DOUBLE_ONE/size)
 
 fun Sequence<Double>.geometricMean() = toList().geometricMean()
 
@@ -112,7 +149,6 @@ infix fun DoubleArray.dot(other: DoubleArray): Double {
 	val second = other[x]
 	if (!first.isNaN() && !second.isNaN()) {
 	  val r = this[x]*other[x]
-	  /*println("dot:${this[x]} * ${other[x]} = $r")*/
 	  ee += r
 	}
   }
@@ -128,6 +164,63 @@ infix fun MultiArray<Double, D2>.dot(other: MultiArray<Double, D2>): Double {
 	val second = other[x][y]
 	if (!first.isNaN() && !second.isNaN()) {
 	  ee += this[x][y]*other[x][y]
+	}
+  }
+  return ee
+
+
+}
+
+val Apcomplex.hasImag: Boolean get() = imag() == Apcomplex.ZERO
+
+infix fun Array<Apcomplex>.dot(other: Array<Apcomplex>): Apfloat {
+  require(this.size == other.size)
+  var ee = 0.0.toApfloat()
+  (0 until this.size).forEach { x ->
+	val first = this[x]
+	val second = other[x]
+	if (!first.hasImag && !second.hasImag) {
+	  val r = this[x]*other[x]
+	  ee += r
+	}
+  }
+  return ee
+
+}
+
+infix fun Array<Apfloat>.dot(other: Array<Apfloat>): Apfloat {
+  require(this.size == other.size)
+  var ee = 0.0.toApfloat()
+  (0 until this.size).forEach { x ->
+	val first = this[x]
+	val second = other[x]
+	if (!first.hasImag && !second.hasImag) {
+	  val r = this[x]*other[x]
+	  ee += r
+	}
+  }
+  return ee
+}
+
+infix fun MultiArray<Apfloat, D2>.dot(other: MultiArray<Apfloat, D2>): Apfloat {
+  require(this.shape[0] == this.shape[1] && this.shape[0] == other.shape[0] && this.shape[1] == other.shape[1])
+  var ee = 0.0.toApfloat()
+  (0 until this.shape[0]).forEachNested { x, y ->
+	ee += this[x][y]*other[x][y]
+  }
+  return ee
+
+}
+
+@JvmName("dotApcomplexD2")
+infix fun MultiArray<Apcomplex, D2>.dot(other: MultiArray<Apcomplex, D2>): Apfloat {
+  require(this.shape[0] == this.shape[1] && this.shape[0] == other.shape[0] && this.shape[1] == other.shape[1])
+  var ee = 0.0.toApfloat()
+  (0 until this.shape[0]).forEachNested { x, y ->
+	val first = this[x][y]
+	val second = other[x][y]
+	if (!first.hasImag && !second.hasImag) {
+	  ee += first*second
 	}
   }
   return ee
@@ -167,12 +260,12 @@ infix fun MultiArray<Double, D2>.dot(other: MultiArray<Double, D2>): Double {
 
   /*return result.sum()*/
   /*return DotProductGPU(stim.flatMat, flatMat).calc()*/
-
 }
 
+
 fun nextUnitDouble() = nextDouble()*2 - 1
-fun sigmoid(x: Double): Double = 1/(1 + e.pow(-x))
-fun sigmoidDerivative(x: Double): Double = e.pow(-x).let { it/(1 + it).sq() }
+fun sigmoid(x: Apfloat): Apfloat = 1.toApint()/(1.toApint() + Ae.pow(-x))
+fun sigmoidDerivative(x: Apfloat): Apfloat = Ae.pow(-x).let { it/(1.toApint() + it).sq() }
 
 /**
  * Shortest distance (angular) between two angles.
@@ -201,3 +294,112 @@ fun <N: Number> NDArray<N, D2>.convolve(kernel: NDArray<Double, D2>): NDArray<Do
   }
   return result
 }
+
+
+fun Double.toApfloat() = Apfloat(this)
+fun Int.toApint() = Apint(this.toLong())
+fun Long.toApint() = Apint(this)
+operator fun <A: Apfloat> A.times(other: Number): Apfloat = when (other) {
+  is Int     -> this.multiply(other.toApint())
+  is Double  -> this.multiply(other.toApfloat())
+  is Apfloat -> this.multiply(other)
+  else       -> err("how to do Apfloat.times(${other::class.simpleName})?")
+}
+
+operator fun <A: Apfloat> A.rem(other: Number): Apfloat = when (other) {
+  is Int     -> ApfloatMath.fmod(this, other.toApint())
+  is Double  -> ApfloatMath.fmod(this, other.toApfloat())
+  is Apfloat -> ApfloatMath.fmod(this, other)
+  else       -> err("how to do Apfloat.rem(${other::class.simpleName})?")
+}
+
+operator fun <A: Apfloat> A.plus(other: Number): Apfloat = when (other) {
+  is Int     -> this.add(other.toApint())
+  is Double  -> this.add(other.toApfloat())
+  is Apfloat -> this.add(other)
+  else       -> err("how to do Apfloat.plus(${other::class.simpleName})?")
+}
+
+operator fun <A: Apfloat> A.minus(other: Number): Apfloat = when (other) {
+  is Int     -> this.subtract(other.toApint())
+  is Double  -> this.subtract(other.toApfloat())
+  is Apfloat -> this.subtract(other)
+  else       -> err("how to do Apfloat.minus(${other::class.simpleName})?")
+}
+
+operator fun <A: Apfloat> A.div(other: Number): Apfloat = when (other) {
+  is Int     -> this.divide(other.toApint())
+  is Double  -> this.divide(other.toApfloat())
+  is Apfloat -> this.divide(other)
+  else       -> err("how to do Apfloat.div(${other::class.simpleName})?")
+}
+
+fun Apfloat.sq() = ApfloatMath.pow(this, 2)
+fun Apfloat.cubed() = ApfloatMath.pow(this, 3)
+
+operator fun Apfloat.unaryMinus(): Apfloat = this.negate()
+
+fun min(one: Apfloat, two: Apfloat) = ApfloatMath.min(one, two)
+fun max(one: Apfloat, two: Apfloat) = ApfloatMath.max(one, two)
+
+fun List<Apfloat>.max(): Apfloat? {
+  if (size == 0) return null
+  if (size == 1) return first()
+  if (size == 2) return max(first(), this[1])
+  var r = first()
+  (1..size - 2).forEach {
+	r = max(r, this[it])
+  }
+  return r
+}
+
+fun List<Apfloat>.min(): Apfloat? {
+  if (size == 0) return null
+  if (size == 1) return first()
+  if (size == 2) return min(first(), this[1])
+  var r = first()
+  (1..size - 2).forEach {
+	r = min(r, this[it])
+  }
+  return r
+}
+
+fun List<Apfloat>.sum(): Apfloat? {
+  if (size == 0) return null
+  var r = 0.0.toApfloat()
+  forEach {
+	r += it
+  }
+  return r
+}
+
+fun List<Apfloat>.mean(): Apfloat? {
+  if (size == 0) return null
+  return sum()!!/size
+}
+
+infix fun Apfloat.pow(other: Number): Apfloat = when (other) {
+  is Int     -> ApfloatMath.pow(this, other.toApint())
+  is Double  -> ApfloatMath.pow(this, other.toApfloat())
+  is Apfloat -> ApfloatMath.pow(this, other)
+  else       -> err("how to do Apfloat.pow(${other::class.simpleName})?")
+}
+
+operator fun Apfloat.compareTo(other: Number): Int = when (other) {
+  is Int     -> this.compareTo(other.toApint())
+  is Double  -> this.compareTo(other.toApfloat())
+  is Apfloat -> this.compareTo(other)
+  else       -> err("how to do Apfloat.compareTo(${other::class.simpleName})?")
+}
+
+fun cos(n: Apfloat) = ApfloatMath.cos(n)
+fun sin(n: Apfloat) = ApfloatMath.sin(n)
+fun sqrt(n: Apfloat) = ApfloatMath.sqrt(n)
+fun floor(n: Apfloat) = ApfloatMath.floor(n)
+
+
+val AP_TWO = Apint.ONE.multiply(Apint(2))
+val AP_360 = Apint.ONE.multiply(Apint(360))
+
+fun Apfloat.assertRound() = ApfloatMath.round(this, 20, UNNECESSARY).truncate()
+
