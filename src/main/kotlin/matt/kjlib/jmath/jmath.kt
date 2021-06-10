@@ -27,6 +27,7 @@ import java.math.RoundingMode.UNNECESSARY
 import kotlin.math.abs
 import kotlin.math.exp
 import kotlin.math.floor
+import kotlin.math.ln
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.random.Random.Default.nextDouble
@@ -68,7 +69,7 @@ fun Double.roundToDecimal(n: Int): Double {
 fun Apfloat.getPoisson() = toDouble().getPoisson()
 
 /*https://stackoverflow.com/questions/1241555/algorithm-to-generate-poisson-and-binomial-random-numbers*/
-fun Double.getPoisson(): Apint {
+fun Double.getPoisson(): Int {
   /*val lambda = this*/
   val L = exp(-this)
   var p = 1.0
@@ -77,7 +78,7 @@ fun Double.getPoisson(): Apint {
 	k++
 	p *= nextDouble()
   } while (p > L)
-  return (k - 1).toApint()
+  return (k - 1)
 
 
 }
@@ -95,6 +96,19 @@ fun Int.simpleFactorial(): BigInteger {
   //	}
   //  }
   //  return r
+}
+
+/*log (5*4*3*2*1) = log (5) + log(4) ...*/
+fun Int.logFactorial(): Double {
+  require(this > -1)
+  if (this == 0) return 0.0
+  var i = this
+  var r = 0.0
+  while (i > 0) {
+	r += ln(i.toDouble())
+	i -= 1
+  }
+  return r
 }
 
 fun orth(degrees: Double): Double {
@@ -122,16 +136,19 @@ fun List<BigDecimal>.mean() = fold(BigDecimal.ZERO) { acc, b -> acc + b }/BigDec
 
 const val DOUBLE_ONE = 1.0
 
+fun List<Double>.logSum() = fold(0.0) { acc, d ->
+  acc + ln(d)
+}
+
 
 fun List<Apfloat>.geometricMean() = fold(1.0.toApfloat()) { acc, d ->
   acc*d
 }.pow(DOUBLE_ONE/size)
 
 fun List<Double>.geometricMean(bump: Double = 1.0) = fold(1.0) { acc, d ->
-  val v = acc*d*bump
-  println("v=$v")
-  v
+  acc*d*bump
 }.pow(DOUBLE_ONE/size)
+
 
 fun Sequence<Double>.geometricMean() = toList().geometricMean()
 
