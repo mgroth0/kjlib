@@ -10,6 +10,13 @@ import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 
+infix fun File.withExtension(ext: String): File {
+  return when (this.extension) {
+	ext  -> this
+	""   -> File(this.path + "." + ext)
+	else -> File(this.path.replace("." + this.extension, ".$ext"))
+  }
+}
 
 fun File.onModify(checkFreq: Duration, op: ()->Unit) {
   var last_modified = recursiveLastModified()
@@ -156,7 +163,6 @@ val File.abspath: String
 operator fun File.get(item: String): File {
   return resolve(item)
 }
-
 
 
 fun File.isImage() = extension.isIn("png", "jpg", "jpeg")
