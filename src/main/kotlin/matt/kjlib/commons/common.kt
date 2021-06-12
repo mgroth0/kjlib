@@ -17,5 +17,7 @@ val SETTINGS_FOLDER = DATA_FOLDER["settings"]
 val VAR_JSON = DATA_FOLDER["VAR.json"]
 val VAL_JSON = DATA_FOLDER["VAL.json"]
 
+val SCREENSHOT_FOLDER = REGISTERED_FOLDER["screenshots"]
+
 
 val runtime = Runtime.getRuntime()!!
