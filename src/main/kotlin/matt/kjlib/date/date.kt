@@ -9,6 +9,13 @@ import matt.klib.math.THOUSAND
 import java.io.PrintWriter
 import java.text.SimpleDateFormat
 import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.OffsetDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.concurrent.Semaphore
 import kotlin.contracts.ExperimentalContracts
@@ -75,7 +82,21 @@ val Number.unixMS: Date
 
 
 private val stupid = "Have to keep it as a different name than Duration.format since they are in the same package???"
-fun Date.formatDate(): String = SimpleDateFormat("EEE, MMM d, h:mm a").format(this)
+
+val myDateFormatStr = "EEE, MMM d, h:mm a"
+val myDateTimeFormat = DateTimeFormatter.ofPattern(myDateFormatStr)
+fun Date.formatDate(): String = SimpleDateFormat(myDateFormatStr).format(this)
+fun today() = LocalDate.now()
+fun tomorrow() = today().plus(1, ChronoUnit.DAYS)
+fun nowDateTime() = today().atTime(LocalTime.now())
+
+fun localDateTimeOfEpochMilli(ms: Long) = LocalDateTime.ofInstant(Instant.ofEpochMilli(ms), ZoneId.systemDefault())
+
+fun milli() = System.currentTimeMillis()
+
+fun LocalDateTime.atTime(hour: Int, min: Int) = toLocalDate().atTime(hour, min)
+private val OFFSET = OffsetDateTime.now().offset
+fun LocalDateTime.toEpochMilli() = toEpochSecond(OFFSET)*1000
 
 operator fun Date.minus(started: Date): Duration {
   return this.toInstant() - started.toInstant()
