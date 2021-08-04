@@ -9,7 +9,6 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
-import java.util.concurrent.FutureTask
 
 fun proc(
   wd: File?,
@@ -33,15 +32,30 @@ fun exec(wd: File?, vararg args: String) = proc(wd, *args).waitFor() == 0
 fun execReturn(vararg args: String) = execReturn(null, *args)
 fun execPython(s: String) = execReturn("/usr/bin/python", "-c", s)
 
-fun execReturn(wd: File?, vararg args: String) = proc(wd, *args).streams.joinToString("") {
-  FutureTask {
-	it
-		.bufferedReader()
-		.lines()
-		.toList()
-		.joinToString("\n")
-  }.get()
-}
+fun execReturn(wd: File?, vararg args: String) = proc(wd, *args)
+	.apply {
+	  println("debug1: ${wd} ${args}")
+	}
+	.streams.joinToString("") {
+	  println("debug2: ${wd} ${args}")
+	  	  /*FutureTask {*/ /*no idea why i did this... it caused blocking i think*/
+	  it.apply {
+		println("debug2.1: ${wd} ${args}")
+	  }
+		  .bufferedReader().apply {
+			println("debug2.2: ${wd} ${args}")
+		  }
+		  .lines().apply {
+			println("debug2.3: ${wd} ${args}")
+		  }
+		  .toList().apply {
+			println("debug2.4: ${wd} ${args}")
+		  }
+		  .joinToString("\n")
+	/*  	  }.get().apply {
+	  		println("debug3: ${wd} ${args}")
+	  	  }*/
+	}
 
 val Process.streams: List<InputStream>
   get() {
