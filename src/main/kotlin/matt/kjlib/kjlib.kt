@@ -2,9 +2,21 @@ package matt.kjlib
 
 import matt.kjlib.byte.ByteSize
 import matt.kjlib.commons.runtime
+import matt.kjlib.log.err
+import matt.kjlib.str.taball
 import kotlin.contracts.InvocationKind.AT_LEAST_ONCE
 import kotlin.contracts.contract
 
+
+fun <T> Iterable<T>.debugFirst(pred: (T)->Boolean): T {
+  println("debugFirst1")
+  taball("iterable", this)
+  for (thing in this) {
+	if (pred(thing)) return thing
+  }
+  println("debugFirst2")
+  err("could not find first")
+}
 
 data class Geometry(
   val x: Double,
