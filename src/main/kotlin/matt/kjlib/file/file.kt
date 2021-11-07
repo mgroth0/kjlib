@@ -9,6 +9,7 @@ import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.concurrent.thread
 
 infix fun File.withExtension(ext: String): File {
   return when (this.extension) {
@@ -98,7 +99,7 @@ fun File.next(): File {
   }
 }
 
-fun File.doubleBackupWrite(s: String) {
+fun File.doubleBackupWrite(s: String, thread: Boolean = false) {
 
   parentFile.mkdirs()
   createNewFile()
@@ -108,19 +109,32 @@ fun File.doubleBackupWrite(s: String) {
   /*yes, there is redundancy. In some contexts redundancy is good. Safe.*/
   /*Obviously this is a reaction to a mistake I made (that turned out ok in the end, but scared me a lot).*/
 
-  backup()
-  writeText(s)
-  backup()
+  val old = readText()
+  val work1 = backupWork(text = old)
+  val work2 = backupWork(text = old)
+
+  val work = {
+	work1()
+	writeText(s)
+	work2()
+  }
+
+  if (thread) {
+	thread {
+	  work()
+	}
+  } else {
+	work()
+  }
+
 }
 
 
-fun File.backup() {
-
+fun File.backupWork(thread: Boolean = false, text: String? = null): ()->Unit {
 
   if (!this.exists()) {
 	throw Exception("cannot back up ${this}, which does not exist")
   }
-
 
   val backupFolder = File(this.absolutePath).parentFile.resolve("backups")
   backupFolder.mkdir()
@@ -128,11 +142,26 @@ fun File.backup() {
 	throw Exception("backupFolder not a dir")
   }
 
-  backupFolder
+  val backupFile = backupFolder
 	  .resolve(name)
 	  .getNextAndClearWhenMoreThan(100, extraExt = "backup")
-	  .text = readText()
 
+  val realText = text ?: readText()
+
+  return { backupFile.text = realText }
+
+}
+
+fun File.backup(thread: Boolean = false, text: String? = null) {
+
+  val work = backupWork(thread = thread, text = text)
+  if (thread) {
+	thread {
+	  work()
+	}
+  } else {
+	work()
+  }
 }
 
 fun File.getNextAndClearWhenMoreThan(n: Int, extraExt: String = "itr"): File {
