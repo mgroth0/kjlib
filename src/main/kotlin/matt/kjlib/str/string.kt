@@ -161,8 +161,8 @@ fun String.addSpacesUntilLengthIs(n: Int): String {
 }
 
 
-fun String.substringAfterIth(c: Char, num: Int): String {
-  if (this.count { it == c } < num) {
+fun String.substringAfterIth(c: Char, num: Number): String {
+  if (this.count { it == c } < num.toInt()) {
 	return this
   } else {
 	var next = 0
