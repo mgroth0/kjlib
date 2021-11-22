@@ -162,16 +162,26 @@ fun String.addSpacesUntilLengthIs(n: Int): String {
 
 
 fun String.substringAfterIth(c: Char, num: Number): String {
-  if (this.count { it == c } < num.toInt()) {
+  val intNum = num.toInt()
+  if (this.count { it == c } < intNum) {
 	return this
   } else {
 	var next = 0
+	println("this=${this}")
+	println("num=${intNum}")
+	println("c=${c}")
 	this.forEachIndexed { index, char ->
 	  if (char == c) {
 		next++
 	  }
-	  if (next == num) {
+	  println("char=${char}")
+	  println("index=${index}")
+	  println("next=${next}")
+	  if (next == intNum) {
+		println("returning!")
 		return this.substring(index + 1)
+	  } else {
+		println("not returning")
 	  }
 	}
 	err("should never get here")
