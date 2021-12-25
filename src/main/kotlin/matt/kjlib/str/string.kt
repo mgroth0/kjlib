@@ -2,8 +2,6 @@ package matt.kjlib.str
 
 import matt.kjlib.log.err
 import java.math.BigDecimal
-import java.net.MalformedURLException
-import java.net.URL
 
 fun String.lineIndexOfIndex(i: Int): Int {
   if (length == 0) {
@@ -162,3 +160,30 @@ fun String.addSpacesUntilLengthIs(n: Int): String {
   return s
 }
 
+
+fun String.substringAfterIth(c: Char, num: Number): String {
+  val intNum = num.toInt()
+  if (this.count { it == c } < intNum) {
+	return this
+  } else {
+	var next = 0
+	println("this=${this}")
+	println("num=${intNum}")
+	println("c=${c}")
+	this.forEachIndexed { index, char ->
+	  if (char == c) {
+		next++
+	  }
+	  println("char=${char}")
+	  println("index=${index}")
+	  println("next=${next}")
+	  if (next == intNum) {
+		println("returning!")
+		return this.substring(index + 1)
+	  } else {
+		println("not returning")
+	  }
+	}
+	err("should never get here")
+  }
+}

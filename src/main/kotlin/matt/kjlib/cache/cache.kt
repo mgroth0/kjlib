@@ -1,5 +1,6 @@
 package matt.kjlib.cache
 
+import matt.kjlib.log.err
 import kotlin.contracts.ExperimentalContracts
 import kotlin.reflect.KClass
 
@@ -39,5 +40,16 @@ class LRUCache<K, V>(private val cacheSize: Int): LinkedHashMap<K, V>(16, 0.75f,
 
   override fun removeEldestEntry(eldest: Map.Entry<K, V>): Boolean {
 	return size >= cacheSize
+  }
+}
+
+class AssertCache<K, V>(private val cacheSize: Int): LinkedHashMap<K, V>(16, 0.75f, true) {
+
+  override fun removeEldestEntry(eldest: Map.Entry<K, V>): Boolean {
+	return (size >= cacheSize).apply {
+	  if (this) {
+		err("No. This program apparently can't handle a true LRU cache.")
+	  }
+	}
   }
 }
