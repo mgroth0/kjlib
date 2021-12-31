@@ -3,7 +3,6 @@ package matt.kjlib.commons
 import matt.kjlib.file.get
 import matt.kjlib.resourceTxt
 import matt.reflect.isNewMac
-import matt.reflect.ismac
 import java.io.File
 
 val USER_HOME = File(System.getProperty("user.home"))
