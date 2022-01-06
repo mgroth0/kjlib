@@ -33,29 +33,17 @@ fun execReturn(vararg args: String) = execReturn(null, *args)
 fun execPython(s: String) = execReturn("/usr/bin/python", "-c", s)
 
 fun execReturn(wd: File?, vararg args: String) = proc(wd, *args)
-	.apply {
-	  println("debug1: ${wd} ${args}")
-	}
-	.streams.joinToString("") {
-	  println("debug2: ${wd} ${args}")
-	  	  /*FutureTask {*/ /*no idea why i did this... it caused blocking i think*/
-	  it.apply {
-		println("debug2.1: ${wd} ${args}")
-	  }
-		  .bufferedReader().apply {
-			println("debug2.2: ${wd} ${args}")
-		  }
-		  .lines().apply {
-			println("debug2.3: ${wd} ${args}")
-		  }
-		  .toList().apply {
-			println("debug2.4: ${wd} ${args}")
-		  }
-		  .joinToString("\n")
+  .streams.joinToString("") {
+	/*FutureTask {*/ /*no idea why i did this... it caused blocking i think*/
+	it
+	  .bufferedReader()
+	  .lines()
+	  .toList()
+	  .joinToString("\n")
 	/*  	  }.get().apply {
 	  		println("debug3: ${wd} ${args}")
 	  	  }*/
-	}
+  }
 
 val Process.streams: List<InputStream>
   get() {
@@ -73,8 +61,8 @@ fun obliterate(pid: Long) {
 }
 
 val START_FORMAT: DateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
-	.withLocale(Locale.ENGLISH)
-	.withZone(ZoneId.systemDefault())
+  .withLocale(Locale.ENGLISH)
+  .withZone(ZoneId.systemDefault())
 
 fun Process.startInstant(): String? = info().startInstant().orElseGet { null }?.let {
   START_FORMAT.format(it)
