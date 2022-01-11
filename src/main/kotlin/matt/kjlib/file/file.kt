@@ -57,9 +57,9 @@ fun File.size() = ByteSize(Files.size(this.toPath()))
 
 fun File.clearIfTooBigThenAppendText(s: String) {
   if (size().kilo > 10) {
-	writeText("cleared because over 10KB") /*got an out of memory error when limit was set as 100KB*/
+	write("cleared because over 10KB") /*got an out of memory error when limit was set as 100KB*/
   }
-  appendText(s)
+  append(s)
 
 }
 
@@ -195,3 +195,16 @@ operator fun File.get(item: String): File {
 
 
 fun File.isImage() = extension.isIn("png", "jpg", "jpeg")
+
+fun File.append(s: String,mkdirs: Boolean=true) {
+  if (mkdirs) {
+	parentFile.mkdirs()
+  }
+  appendText(s)
+}
+fun File.write(s: String,mkdirs: Boolean=true) {
+  if (mkdirs) {
+	parentFile.mkdirs()
+  }
+  writeText(s)
+}

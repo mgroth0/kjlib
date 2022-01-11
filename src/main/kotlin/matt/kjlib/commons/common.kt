@@ -9,6 +9,7 @@ val USER_HOME = File(System.getProperty("user.home"))
 val REGISTERED_FOLDER = File(USER_HOME.resolve(".registeredDir.txt").readText().trim())
 val ROOT_FOLDER = USER_HOME.resolve(resourceTxt("rootFolder.txt")?.let { File(it) }
         ?: (if (isNewMac) REGISTERED_FOLDER["flow"] else REGISTERED_FOLDER["todo/flow"]))
+val LOG_FOLDER = ROOT_FOLDER.resolve("log").apply { mkdir() }
 val USER_DIR = File(System.getProperty("user.dir"))
 val TEMP_DIR = USER_DIR["tmp"].apply { mkdir() }
 val DNN_FOLDER = REGISTERED_FOLDER["todo/science/dnn"]
