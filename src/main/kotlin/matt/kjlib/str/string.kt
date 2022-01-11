@@ -187,3 +187,7 @@ fun String.substringAfterIth(c: Char, num: Number): String {
 	err("should never get here")
   }
 }
+
+
+val String.hasWhiteSpace
+  get() = " " in this || "\n" in this || "\r" in this
