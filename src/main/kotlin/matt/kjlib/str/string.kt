@@ -23,13 +23,13 @@ fun String.lineNumOfIndex(i: Int) = lineIndexOfIndex(i) + 1
 
 /*kinda how JetBrains wants us to do it*/
 fun String.cap() =
-	replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+  replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
 /*if I go back to 1.4: this.capitalize()*/
 
 
 /*kinda how JetBrains wants us to do it*/
 fun String.decap() =
-	replaceFirstChar { it.lowercase() }
+  replaceFirstChar { it.lowercase() }
 /*if I go back to 1.4: this.decapitalize()*/
 
 
@@ -191,3 +191,7 @@ fun String.substringAfterIth(c: Char, num: Number): String {
 
 val String.hasWhiteSpace
   get() = " " in this || "\n" in this || "\r" in this
+
+fun String.toIntOrNullIfBlank() = if (isBlank()) null else this.toInt()
+fun String.toDoubleOrNullIfBlank() = if (isBlank()) null else this.toDouble()
+fun String.toBooleanOrNullIfBlank() = if (isBlank()) null else this.toBoolean()
