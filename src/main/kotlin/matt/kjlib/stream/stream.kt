@@ -68,3 +68,21 @@ inline fun <T> Iterable<T>.applyEach(action: T.()->Unit) {
 inline fun <T> Sequence<T>.applyEach(action: T.()->Unit) {
   for (element in this) action.invoke(element)
 }
+
+/*does not duplicate a pairing, even considering other orders. ie if A,B has been found, B,A will not be found*/
+inline fun <T> Sequence<T>.forEachPairing(action: Pair<T, T>.()->Unit) {
+  val unique = toSet().toList()
+  var i = -1
+  unique.forEach { a ->
+	i += 1
+	unique.subList(i + 1, unique.size).forEach { b ->
+	  (a to b).action()
+	}
+  }
+}
+/*does not duplicate a pairing, even considering other orders. ie if A,B has been found, B,A will not be found*/
+inline fun <T> Iterable<T>.forEachPairing(action: Pair<T, T>.()->Unit) {
+  asSequence().forEachPairing(action)
+}
+
+
