@@ -116,7 +116,18 @@ fun tab(a: Any) {
   println("\t${a}")
 }
 
-fun taball(itr: Collection<*>) {
+
+fun taball(itr: DoubleArray) {
+  itr.forEach {
+	println("\t${it}")
+  }
+}
+fun taball(itr: Array<*>) {
+  itr.forEach {
+	println("\t${it}")
+  }
+}
+fun taball(itr: Iterable<*>) {
   itr.forEach {
 	println("\t${it}")
   }

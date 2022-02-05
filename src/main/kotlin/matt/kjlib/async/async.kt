@@ -1,14 +1,24 @@
 package matt.kjlib.async
 
+import com.aparapi.Kernel
+import com.aparapi.Range
+import com.aparapi.internal.kernel.KernelManager
+import com.aparapi.internal.opencl.OpenCLPlatform
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import matt.kjlib.async.ThreadInterface.Canceller
+import matt.kjlib.commons.runtime
 import matt.kjlib.date.Duration
 import matt.kjlib.log.massert
+import matt.kjlib.str.taball
 import java.lang.Thread.sleep
 import java.util.concurrent.Callable
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.Semaphore
 import kotlin.concurrent.thread
 import kotlin.contracts.contract
+import kotlin.random.Random
 
 // Check out FutureTasks too!
 
@@ -109,7 +119,7 @@ class QueueThread(
 }
 
 
- fun < T> Semaphore.with(op: ()->T): T {
+fun <T> Semaphore.with(op: ()->T): T {
   contract {
 	callsInPlace(op, kotlin.contracts.InvocationKind.EXACTLY_ONCE)
   }
@@ -406,8 +416,8 @@ fun sleep_until(system_ms: Long) {
   }
 }
 
-
-val GLOBAL_POOL by lazy { Executors.newFixedThreadPool(4) }
+val GLOBAL_POOL_SIZE = runtime.availableProcessors()
+val GLOBAL_POOL by lazy { Executors.newFixedThreadPool(GLOBAL_POOL_SIZE) }
 fun <T, R> Iterable<T>.parMap(op: (T)->R): List<R> {
   return map {
 	GLOBAL_POOL.submit(Callable {
@@ -438,4 +448,103 @@ fun <T, R> Sequence<T>.parMapIndexed(op: (Int, T)->R): List<R> {
 	  op(i, it)
 	})
   }.toList().map { it.get() }
+}
+
+fun <K, V> Sequence<K>.parAssociateWith(numThreads: Int? = null, op: (K)->V): Map<K, V> {
+  val pool = numThreads?.let { Executors.newFixedThreadPool(it) } ?: GLOBAL_POOL
+  val r = ConcurrentHashMap<K, V>()
+  map {
+	pool.submit(Callable {
+	  r[it] = op(it)
+	})
+  }.toList().map { it.get() }
+  return r
+}
+
+fun <K, V> Sequence<K>.parChunkAssociateWith(numThreads: Int? = null, op: (K)->V): Map<K, V> {
+  /*ArrayList(this.toList()).spliterator().*/
+  val r = ConcurrentHashMap<K, V>()
+  val list = this.toList()
+  list.chunked(kotlin.math.ceil(list.size.toDouble()/(numThreads ?: GLOBAL_POOL_SIZE)).toInt()).map {
+	thread {
+	  it.forEach {
+		r[it] = op(it)
+	  }
+	}
+  }.forEach {
+	it.join()
+  }
+  return r
+}
+
+fun <K, V> Sequence<K>.coAssociateWith(
+  numThreads: Int? = null,
+  op: (K)->V,
+): Map<K, V> {
+  val r = ConcurrentHashMap<K, V>()
+  runBlocking {
+	forEach {
+	  launch {
+		r[it] = op(it)
+	  }
+	}
+  }
+  return r
+}
+
+fun aparAPITest() {
+
+
+  println("com.aparapi.examples.info.Main")
+  val platforms = OpenCLPlatform().openCLPlatforms
+  println("Machine contains " + platforms.size + " OpenCL platforms")
+  var platformc = 0
+  for (platform in platforms) {
+	println("Platform $platformc{")
+	println("   Name    : \"" + platform.name + "\"")
+	println("   Vendor  : \"" + platform.vendor + "\"")
+	println("   Version : \"" + platform.version + "\"")
+	val devices = platform.openCLDevices
+	println("   Platform contains " + devices.size + " OpenCL devices")
+	var devicec = 0
+	for (device in devices) {
+	  println("   Device $devicec{")
+	  println("       Type                  : " + device.type)
+	  println("       GlobalMemSize         : " + device.globalMemSize)
+	  println("       LocalMemSize          : " + device.localMemSize)
+	  println("       MaxComputeUnits       : " + device.maxComputeUnits)
+	  println("       MaxWorkGroupSizes     : " + device.maxWorkGroupSize)
+	  println("       MaxWorkItemDimensions : " + device.maxWorkItemDimensions)
+	  println("   }")
+	  devicec++
+	}
+	println("}")
+	platformc++
+  }
+  val preferences = KernelManager.instance().defaultPreferences
+  println("\nDevices in preferred order:\n")
+  for (device in preferences.getPreferredDevices(null)) {
+	println(device)
+	println()
+  }
+
+
+  val bestDevice = KernelManager.instance().bestDevice()
+  println("bestDevice:${bestDevice}")
+  val inA = (1..100).map { Random.nextDouble() }.toDoubleArray()
+  val inB = (1..100).map { Random.nextDouble() }.toDoubleArray()
+  val result = DoubleArray(100)
+
+  val kernel: Kernel = object: Kernel() {
+	override fun run() {
+	  val i = globalId
+	  result[i] = inA[i] + inB[i]
+	}
+  }
+
+  val range: Range = Range.create(result.size)
+  kernel.execute(range)
+  println("aparapi result:")
+  taball(result)
+
 }
