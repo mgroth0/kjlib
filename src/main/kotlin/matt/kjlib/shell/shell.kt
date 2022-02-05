@@ -40,9 +40,6 @@ fun execReturn(wd: File?, vararg args: String) = proc(wd, *args)
 	  .lines()
 	  .toList()
 	  .joinToString("\n")
-	/*  	  }.get().apply {
-	  		println("debug3: ${wd} ${args}")
-	  	  }*/
   }
 
 val Process.streams: List<InputStream>
