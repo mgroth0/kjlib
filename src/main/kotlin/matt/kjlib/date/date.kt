@@ -3,6 +3,7 @@ package matt.kjlib.date
 import matt.kjlib.async.every
 import matt.kjlib.async.with
 import matt.kjlib.jmath.roundToDecimal
+import matt.kjlib.str.addSpacesUntilLengthIs
 import matt.klib.math.BILLION
 import matt.klib.math.MILLION
 import matt.klib.math.THOUSAND
@@ -152,21 +153,32 @@ fun <R> stopwatch(s: String, op: ()->R): R {
 
 data class Stopwatch(
   val startRelativeNanos: Long,
-  val enabled: Boolean = true,
+  var enabled: Boolean = true,
   val printWriter: PrintWriter? = null,
-  val prefix: String? = null
+  val prefix: String? = null,
 ) {
+  var i = 0
+  fun <R> sampleEvery(period: Int, op: Stopwatch.()->R): R {
+	i++
+	enabled = i == period
+	val r = this.op()
+	if (enabled) {
+	  i = 0
+	}
+	return r
+  }
+
   val prefixS = if (prefix != null) "$prefix\t" else ""
   fun toc(s: String): Duration? {
 	if (enabled) {
 	  val stop = System.nanoTime()
 	  val dur = Duration(startRelativeNanos, stop)
 	  if (simplePrinting) {
-		println("$dur\t$s")
+		println("${dur.format().addSpacesUntilLengthIs(10)}\t$s")
 	  } else if (printWriter == null) {
-		println("$dur\t$prefixS$s")
+		println("${dur.format().addSpacesUntilLengthIs(10)}\t$prefixS$s")
 	  } else {
-		printWriter.println("$dur\t$prefixS$s")
+		printWriter.println("${dur.format().addSpacesUntilLengthIs(10)}\t$prefixS$s")
 	  }
 	  return dur
 	}
@@ -188,8 +200,10 @@ fun tic(
   printWriter: PrintWriter? = null,
   keyForNestedStuff: String? = null,
   nestLevel: Int = 1,
-  prefix: String? = null
+  prefix: String? = null,
+  samplePeriod: Int = 1
 ): Stopwatch {
+  var i = 0
   var realEnabled = enabled
   if (enabled) {
 	ticSem.with {
@@ -205,7 +219,8 @@ fun tic(
 	}
   }
   val start = System.nanoTime()
-  val sw = Stopwatch(start, enabled = realEnabled, printWriter = printWriter, prefix = prefix)
+  val sw =
+	Stopwatch(start, enabled = realEnabled, printWriter = printWriter, prefix = prefix)
   if (realEnabled && !simplePrinting) {
 	println() /*to visually space this stopwatch print statements*/
   }

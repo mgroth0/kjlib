@@ -295,7 +295,6 @@ fun every(
   name: String? = null,
   op: MyTimerTask.()->Unit,
 ): MyTimerTask {
-
   massert(!(ownTimer && timer != null))
 
   //    if (!ownTimer && !usedTimer) {
@@ -478,8 +477,7 @@ fun <K, V> Sequence<K>.parChunkAssociateWith(numThreads: Int? = null, op: (K)->V
 }
 
 fun <K, V> Sequence<K>.coAssociateWith(
-  numThreads: Int? = null,
-  op: (K)->V,
+  op: (K)->V
 ): Map<K, V> {
   val r = ConcurrentHashMap<K, V>()
   runBlocking {
@@ -491,6 +489,21 @@ fun <K, V> Sequence<K>.coAssociateWith(
   }
   return r
 }
+
+/*fun <K, V> Sequence<K>.tfAssociateWith(
+  op: (K)->V
+): Map<K, V> {
+  val r = ConcurrentHashMap<K, V>()
+  runBlocking {
+	forEach {
+	  launch {
+		r[it] = op(it)
+	  }
+	}
+  }
+  return r
+}*/
+
 
 fun aparAPITest() {
 
