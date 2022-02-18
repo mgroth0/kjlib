@@ -80,9 +80,19 @@ inline fun <T> Sequence<T>.forEachPairing(action: Pair<T, T>.()->Unit) {
 	}
   }
 }
+
 /*does not duplicate a pairing, even considering other orders. ie if A,B has been found, B,A will not be found*/
 inline fun <T> Iterable<T>.forEachPairing(action: Pair<T, T>.()->Unit) {
   asSequence().forEachPairing(action)
 }
 
 
+fun Array<FloatArray>.flatten() = FloatArray(this.map { it.size }.sum()).also { r ->
+  var i = 0
+  forEach {
+	it.forEach {
+	  r[i] = it
+	  i++
+	}
+  }
+}

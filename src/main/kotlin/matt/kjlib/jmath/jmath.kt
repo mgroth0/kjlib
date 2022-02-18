@@ -33,9 +33,9 @@ import kotlin.math.roundToInt
 import kotlin.random.Random.Default.nextDouble
 import kotlin.random.Random.Default.nextFloat
 
-const val e = Math.E
+val ApE = ApfloatMath.euler(100)
+val e = Math.E
 const val eFloat = Math.E.toFloat()
-
 val Ae = /*EULER*/ ApfloatMath.euler(20)
 val PI = Math.PI
 val PIFloat = PI.toFloat()
@@ -151,6 +151,7 @@ fun orth(degrees: Float): Float {
   return if (degrees < 90.0f) degrees + 90.0f
   else degrees - 90.0f
 }
+
 fun orth(degrees: Double): Double {
   require(degrees in 0.0..180.0)
   return if (degrees < 90.0) degrees + 90.0
@@ -234,6 +235,50 @@ infix fun DoubleArray.dot(other: DoubleArray): Double {
 
 }
 
+infix fun Array<out Apfloat?>.dotA(other: Array<out Apfloat?>): Apfloat {
+  require(this.size == other.size)
+  var ee = 0.0.toApfloat()
+  (0 until this.size).forEach { x ->
+	val first = this[x]
+	val second = other[x]
+	if (first != null && second != null) {
+	  val r = first*second
+	  ee += r
+	}
+  }
+  return ee
+
+}
+infix fun Array<out Float?>.dot(other: Array<out Float?>): Float {
+  require(this.size == other.size)
+  var ee = 0.0f
+  (0 until this.size).forEach { x ->
+	val first = this[x]
+	val second = other[x]
+	if (first != null && second != null) {
+	  val r = first*second
+	  ee += r
+	}
+  }
+  return ee
+
+}
+
+/*infix fun FloatArray.dot(other: FloatArray): Float {
+  require(this.size == other.size)
+  var ee = 0.0f
+  (0 until this.size).forEach { x ->
+	val first = this[x]
+	val second = other[x]
+	if (first != Float.NaN && second != Float.NaN) {
+	  val r = first*second
+	  ee += r
+	}
+  }
+  return ee
+
+}*/
+
 infix fun MultiArray<Float, D2>.dot(other: MultiArray<Float, D2>): Float {
   require(this.shape[0] == this.shape[1] && this.shape[0] == other.shape[0] && this.shape[1] == other.shape[1])
   var ee = 0.0.toFloat()
@@ -255,6 +300,45 @@ infix fun MultiArray<Double, D2>.dot(other: MultiArray<Double, D2>): Double {
 	val second = other[x][y]
 	if (!first.isNaN() && !second.isNaN()) {
 	  ee += this[x][y]*other[x][y]
+	}
+  }
+  return ee
+}
+
+infix fun Array<Array<Apfloat?>>.dot(other: Array<Array<Apfloat?>>): Apfloat {
+  require(this.size == this[0].size && this.size == other.size && this[0].size == other[0].size)
+  var ee = 0.0.toApfloat()
+  (0 until this.size).forEachNested { x, y ->
+	val first = this[x][y]
+	val second = other[x][y]
+	if (first != null && second != null) {
+	  ee += first*second
+	}
+  }
+  return ee
+}
+
+infix fun Array<Array<Double?>>.dot(other: Array<Array<Double?>>): Apfloat {
+  require(this.size == this[0].size && this.size == other.size && this[0].size == other[0].size)
+  var ee = 0.0.toApfloat()
+  (0 until this.size).forEachNested { x, y ->
+	val first = this[x][y]
+	val second = other[x][y]
+	if (first != null && second != null) {
+	  ee += first*second
+	}
+  }
+  return ee
+}
+
+infix fun Array<Array<Float?>>.dot(other: Array<Array<Float?>>): Float {
+  require(this.size == this[0].size && this.size == other.size && this[0].size == other[0].size)
+  var ee = 0.0f
+  (0 until this.size).forEachNested { x, y ->
+	val first = this[x][y]
+	val second = other[x][y]
+	if (first != null && second != null) {
+	  ee += first*second
 	}
   }
   return ee
@@ -394,6 +478,7 @@ fun Long.toApint() = Apint(this)
 operator fun <A: Apfloat> A.times(other: Number): Apfloat = when (other) {
   is Int     -> this.multiply(other.toApint())
   is Double  -> this.multiply(other.toApfloat())
+  is Float   -> this.multiply(other.toApfloat())
   is Apfloat -> this.multiply(other)
   else       -> err("how to do Apfloat.times(${other::class.simpleName})?")
 }

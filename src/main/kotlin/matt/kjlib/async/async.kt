@@ -182,9 +182,18 @@ class MyTimerTask(private val op: MyTimerTask.()->Unit, val name: String? = null
   var cancelled = false
 	private set
 
-  fun run() = op()
+  fun run() {
+	invokationI += 1
+	op()
+  }
+
   fun cancel() {
 	cancelled = true
+  }
+
+  var invokationI = 0L
+  fun onEvery(period: Int, op: MyTimerTask.()->Unit) {
+	if (invokationI%period == 0L) op()
   }
 
 }
@@ -450,13 +459,49 @@ fun <T, R> Sequence<T>.parMapIndexed(op: (Int, T)->R): List<R> {
 }
 
 fun <K, V> Sequence<K>.parAssociateWith(numThreads: Int? = null, op: (K)->V): Map<K, V> {
+  val listForCapacity = this.toList()
   val pool = numThreads?.let { Executors.newFixedThreadPool(it) } ?: GLOBAL_POOL
-  val r = ConcurrentHashMap<K, V>()
-  map {
+  /*  val r = ConcurrentHashMap<K, V>(
+	  listForCapacity.size,
+	  loadFactor =
+	)*/
+  val r = mutableMapOf<K, V>()
+  val sem = Semaphore(1)
+  listForCapacity.map { k ->
+
+	/*
+	this is so buggy. and worst of all, it usually just blocks and doesn't raise an exception. but when it does raise an exception its very ugly and not found anywhere on the internet:
+	*
+	* java.lang.ClassCastException: class java.util.LinkedHashMap$Entry cannot be cast to class java.util.HashMap$TreeNode (java.util.LinkedHashMap$Entry and java.util.HashMap$TreeNode are in module java.base of loader 'bootstrap'
+	*
+	*
+
+	I am hoping that setting an initial capacity above fixes this, as the javadoc advises to do this
+
+	god this class is so complex and heavy... just gonna use a regular map + sem
+
+	* */
 	pool.submit(Callable {
-	  r[it] = op(it)
+	  op(k).let { v ->
+		sem.with {
+		  r[k] = v
+		}
+	  }
 	})
-  }.toList().map { it.get() }
+  }.toList()/*.apply {
+	*//*sleep(5000)
+	while (any{ !it.isDone}) {
+	  sleep(500)
+	}*//*
+  }*/
+	.map {
+	  /*while (true) {
+		sleep(1000)
+	  }*/
+	  /*println("waiting on ${it}")*/
+	  it.get()
+	  /*println("got ${it}")*/
+	}
   return r
 }
 

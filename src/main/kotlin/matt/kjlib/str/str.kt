@@ -1,6 +1,7 @@
 package matt.kjlib.str
 
 import matt.kjlib.log.err
+import java.io.File
 import java.math.BigDecimal
 
 fun String.lineIndexOfIndex(i: Int): Int {
@@ -122,11 +123,13 @@ fun taball(itr: DoubleArray) {
 	println("\t${it}")
   }
 }
+
 fun taball(itr: Array<*>) {
   itr.forEach {
 	println("\t${it}")
   }
 }
+
 fun taball(itr: Iterable<*>) {
   itr.forEach {
 	println("\t${it}")
@@ -206,3 +209,19 @@ val String.hasWhiteSpace
 fun String.toIntOrNullIfBlank() = if (isBlank()) null else this.toInt()
 fun String.toDoubleOrNullIfBlank() = if (isBlank()) null else this.toDouble()
 fun String.toBooleanOrNullIfBlank() = if (isBlank()) null else this.toBoolean()
+
+fun String.writeToFile(f: File, mkdirs: Boolean = true) {
+  if (mkdirs) {
+	f.parentFile.mkdirs()
+  }
+  f.writeText(this)
+}
+
+fun String.truncate(maxChars: Int): String {
+  if (length <= maxChars) return this
+  else return this.substring(0, maxChars)
+}
+fun String.truncateWithElipses(maxChars: Int): String {
+  if (length <= maxChars) return this
+  else return this.substring(0, maxChars) + " ..."
+}

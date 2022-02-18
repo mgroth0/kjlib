@@ -4,6 +4,7 @@ import matt.kjlib.async.every
 import matt.kjlib.async.with
 import matt.kjlib.jmath.roundToDecimal
 import matt.kjlib.str.addSpacesUntilLengthIs
+import matt.klib.dmap.withStoringDefault
 import matt.klib.math.BILLION
 import matt.klib.math.MILLION
 import matt.klib.math.THOUSAND
@@ -151,6 +152,8 @@ fun <R> stopwatch(s: String, op: ()->R): R {
   return r
 }
 
+val prefixSampleIs = mutableMapOf<String?, Int>().withStoringDefault { 0 }
+
 data class Stopwatch(
   val startRelativeNanos: Long,
   var enabled: Boolean = true,
@@ -164,6 +167,20 @@ data class Stopwatch(
 	val r = this.op()
 	if (enabled) {
 	  i = 0
+	}
+	return r
+  }
+
+  fun <R> sampleEveryByPrefix(period: Int, onlyIf: Boolean = true, op: Stopwatch.()->R): R {
+	if (onlyIf) {
+	  prefixSampleIs[prefix]++
+	  enabled = prefixSampleIs[prefix] == period
+	}
+	val r = this.op()
+	if (onlyIf) {
+	  if (enabled) {
+		prefixSampleIs[prefix] = 0
+	  }
 	}
 	return r
   }
@@ -201,9 +218,7 @@ fun tic(
   keyForNestedStuff: String? = null,
   nestLevel: Int = 1,
   prefix: String? = null,
-  samplePeriod: Int = 1
 ): Stopwatch {
-  var i = 0
   var realEnabled = enabled
   if (enabled) {
 	ticSem.with {
@@ -219,11 +234,10 @@ fun tic(
 	}
   }
   val start = System.nanoTime()
-  val sw =
-	Stopwatch(start, enabled = realEnabled, printWriter = printWriter, prefix = prefix)
-  if (realEnabled && !simplePrinting) {
-	println() /*to visually space this stopwatch print statements*/
-  }
+  val sw = Stopwatch(start, enabled = realEnabled, printWriter = printWriter, prefix = prefix)
+  /*if (realEnabled && !simplePrinting) {
+	println() *//*to visually space this stopwatch print statements*//*
+  }*/
 
 
 
