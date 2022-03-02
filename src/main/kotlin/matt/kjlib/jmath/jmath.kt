@@ -29,6 +29,7 @@ import kotlin.math.exp
 import kotlin.math.floor
 import kotlin.math.ln
 import kotlin.math.pow
+import kotlin.math.round
 import kotlin.math.roundToInt
 import kotlin.random.Random.Default.nextDouble
 import kotlin.random.Random.Default.nextFloat
@@ -168,6 +169,7 @@ fun <T> Iterable<T>.meanOf(op: (T)->Double) = map { op(it) }.mean()
 fun List<Float>.mean() = sum()/size
 fun FloatArray.mean() = sum()/size
 fun List<Double>.mean() = sum()/size
+fun List<Double>.median() = if (this.size == 0) null else this.sorted()[round(this.size/2.0).toInt() - 1]
 fun DoubleArray.mean() = sum()/size
 fun IntArray.intMean() = (sum()/size.toDouble()).roundToInt()
 fun IntArray.doubleMean() = (sum()/size.toDouble())
@@ -249,6 +251,7 @@ infix fun Array<out Apfloat?>.dotA(other: Array<out Apfloat?>): Apfloat {
   return ee
 
 }
+
 infix fun Array<out Float?>.dot(other: Array<out Float?>): Float {
   require(this.size == other.size)
   var ee = 0.0f

@@ -2,8 +2,11 @@ package matt.kjlib.date
 
 import matt.kjlib.async.every
 import matt.kjlib.async.with
+import matt.kjlib.jmath.mean
+import matt.kjlib.jmath.median
 import matt.kjlib.jmath.roundToDecimal
 import matt.kjlib.str.addSpacesUntilLengthIs
+import matt.kjlib.str.tab
 import matt.klib.dmap.withStoringDefault
 import matt.klib.math.BILLION
 import matt.klib.math.MILLION
@@ -154,17 +157,27 @@ fun <R> stopwatch(s: String, op: ()->R): R {
 
 val prefixSampleIs = mutableMapOf<String?, Int>().withStoringDefault { 0 }
 
-data class Stopwatch(
-  val startRelativeNanos: Long,
+class Stopwatch(
+  startRelativeNanos: Long,
   var enabled: Boolean = true,
   val printWriter: PrintWriter? = null,
   val prefix: String? = null,
+  val silent: Boolean = false
 ) {
+
+  var startRelativeNanos: Long = startRelativeNanos
+	private set
+
+  fun reset() {
+	startRelativeNanos = System.nanoTime()
+  }
+
   companion object {
 	val globalInstances = mutableMapOf<String, Stopwatch>()
   }
 
   var i = 0
+
   fun <R> sampleEvery(period: Int, op: Stopwatch.()->R): R {
 	i++
 	enabled = i == period
@@ -194,12 +207,14 @@ data class Stopwatch(
 	if (enabled) {
 	  val stop = System.nanoTime()
 	  val dur = Duration(startRelativeNanos, stop)
-	  if (simplePrinting) {
-		println("${dur.format().addSpacesUntilLengthIs(10)}\t$s")
-	  } else if (printWriter == null) {
-		println("${dur.format().addSpacesUntilLengthIs(10)}\t$prefixS$s")
-	  } else {
-		printWriter.println("${dur.format().addSpacesUntilLengthIs(10)}\t$prefixS$s")
+	  if (!silent) {
+		if (simplePrinting) {
+		  println("${dur.format().addSpacesUntilLengthIs(10)}\t$s")
+		} else if (printWriter == null) {
+		  println("${dur.format().addSpacesUntilLengthIs(10)}\t$prefixS$s")
+		} else {
+		  printWriter.println("${dur.format().addSpacesUntilLengthIs(10)}\t$prefixS$s")
+		}
 	  }
 	  return dur
 	}
@@ -222,6 +237,7 @@ fun tic(
   keyForNestedStuff: String? = null,
   nestLevel: Int = 1,
   prefix: String? = null,
+  silent: Boolean = false
 ): Stopwatch {
   var realEnabled = enabled
   if (enabled) {
@@ -238,7 +254,7 @@ fun tic(
 	}
   }
   val start = System.nanoTime()
-  val sw = Stopwatch(start, enabled = realEnabled, printWriter = printWriter, prefix = prefix)
+  val sw = Stopwatch(start, enabled = realEnabled, printWriter = printWriter, prefix = prefix, silent = silent)
   /*if (realEnabled && !simplePrinting) {
 	println() *//*to visually space this stopwatch print statements*//*
   }*/
@@ -270,4 +286,38 @@ inline fun <R> withStopwatch(s: String, op: (Stopwatch)->R): R {
   val r = op(t)
   t.toc("finished stopwatch: $s")
   return r
+}
+
+
+class ProfiledBlock(val key: String, val onlyDeepest: Boolean = true) {
+  companion object {
+	val instances = mutableMapOf<String, ProfiledBlock>().withStoringDefault { ProfiledBlock(key = it) }
+	operator fun get(s: String) = instances[s]
+	fun reportAll() {
+	  instances.forEach {
+		it.value.report()
+	  }
+	}
+  }
+
+  val times = mutableListOf<Duration>()
+  var lastTic: Stopwatch? = null
+  inline fun <R> with(op: ()->R): R {
+	val t = tic(silent = true)
+	lastTic = t
+	val r = op()
+	if (!onlyDeepest || t == lastTic) {
+	  times += t.toc("")!!
+	}
+	return r
+  }
+
+  fun report() {
+	println("${ProfiledBlock::class.simpleName} $key Report")
+	tab("count\t${times.count()}")
+	tab("min\t${times.minOfOrNull { it.inMilliseconds }}")
+	tab("mean\t${times.map { it.inMilliseconds }.mean()}")
+	tab("median\t${times.map { it.inMilliseconds }.median()}")
+	tab("max\t${times.maxOfOrNull { it.inMilliseconds }}")
+  }
 }
