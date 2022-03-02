@@ -190,7 +190,7 @@ data class Stopwatch(
   }
 
   val prefixS = if (prefix != null) "$prefix\t" else ""
-  fun toc(s: String): Duration? {
+  infix fun toc(s: String): Duration? {
 	if (enabled) {
 	  val stop = System.nanoTime()
 	  val dur = Duration(startRelativeNanos, stop)
