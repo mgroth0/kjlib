@@ -160,6 +160,10 @@ data class Stopwatch(
   val printWriter: PrintWriter? = null,
   val prefix: String? = null,
 ) {
+  companion object {
+	val globalInstances = mutableMapOf<String, Stopwatch>()
+  }
+
   var i = 0
   fun <R> sampleEvery(period: Int, op: Stopwatch.()->R): R {
 	i++
