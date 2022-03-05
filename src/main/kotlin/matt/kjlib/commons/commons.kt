@@ -2,12 +2,14 @@ package matt.kjlib.commons
 
 import matt.kjlib.file.get
 import matt.kjlib.resourceTxt
+import matt.reflect.Machine
 import matt.reflect.isNewMac
+import matt.reflect.thisMachine
 import java.io.File
 
 val USER_HOME = File(System.getProperty("user.home"))
 val REGISTERED_FOLDER = File(USER_HOME.resolve(".registeredDir.txt").readText().trim())
-val FLOW_FOLDER = USER_HOME.resolve(resourceTxt("rootFolder.txt")?.let { File(it) }
+val FLOW_FOLDER = if (thisMachine == Machine.WINDOWS) File("C:\\Users\\mgrot\\IdeaProjects\\MyDesktop") else USER_HOME.resolve(resourceTxt("rootFolder.txt")?.let { File(it) }
   ?: (if (isNewMac) REGISTERED_FOLDER["flow"] else REGISTERED_FOLDER["todo/flow"]))
 val LOG_FOLDER = FLOW_FOLDER.resolve("log").apply { mkdir() }
 val USER_DIR = File(System.getProperty("user.dir"))
