@@ -32,15 +32,20 @@ fun exec(wd: File?, vararg args: String) = proc(wd, *args).waitFor() == 0
 fun execReturn(vararg args: String) = execReturn(null, *args)
 fun execPython(s: String) = execReturn("/usr/bin/python", "-c", s)
 
-fun execReturn(wd: File?, vararg args: String) = proc(wd, *args)
-  .streams.joinToString("") {
-	/*FutureTask {*/ /*no idea why i did this... it caused blocking i think*/
-	it
-	  .bufferedReader()
-	  .lines()
-	  .toList()
-	  .joinToString("\n")
+fun execReturn(wd: File?, vararg args: String, verbose: Boolean = false): String {
+  if (verbose) {
+	println("running ${args.joinToString(" ")}")
   }
+  return proc(wd, *args)
+	.streams.joinToString("") {
+	  /*FutureTask {*/ /*no idea why i did this... it caused blocking i think*/
+	  it
+		.bufferedReader()
+		.lines()
+		.toList()
+		.joinToString("\n")
+	}
+}
 
 val Process.streams: List<InputStream>
   get() {
