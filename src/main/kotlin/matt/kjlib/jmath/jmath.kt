@@ -1,7 +1,6 @@
 package matt.kjlib.jmath
 
 import matt.kjlib.jmath.bgdecimal.BigDecimalMath
-import matt.kjlib.jmath.times
 import matt.kjlib.log.err
 import matt.kjlib.stream.forEachNested
 import matt.klib.math.sq
@@ -595,4 +594,14 @@ public inline fun <T> Iterable<T>.sumOf(selector: (T)->Float): Float {
 	sum += selector(element)
   }
   return sum
+}
+
+fun randomAngleInDegrees() = nextDouble() * 360.0
+
+data class Sides(val adj: Double, val opp: Double)
+fun dirAndHypToAdjAndOpp(dirInDegrees: Double, hyp: Double): Sides {
+    val rads = Math.toRadians(dirInDegrees)
+    val opposite = kotlin.math.sin(rads) * hyp
+    val adj = kotlin.math.cos(rads) * hyp
+    return Sides(adj = adj, opp = opposite)
 }

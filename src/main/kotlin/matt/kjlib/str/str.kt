@@ -225,3 +225,32 @@ fun String.truncateWithElipses(maxChars: Int): String {
   if (length <= maxChars) return this
   else return this.substring(0, maxChars) + " ..."
 }
+
+val ALPHABET = arrayOf(
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'I',
+    'J',
+    'K',
+    'L',
+    'M',
+    'N',
+    'O',
+    'P',
+    'Q',
+    'R',
+    'S',
+    'T',
+    'U',
+    'V',
+    'W',
+    'X',
+    'Y',
+    'Z'
+)
