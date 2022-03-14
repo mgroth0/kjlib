@@ -3,6 +3,8 @@ package matt.kjlib.delegate
 import matt.kjlib.log.NEVER
 import matt.kjlib.olist.BasicObservableList
 import matt.kjlib.olist.toBasicObservableList
+import matt.kjlib.oset.BasicObservableSet
+import matt.kjlib.oset.toBasicObservableSet
 import matt.klibexport.klibexport.setAll
 import kotlin.reflect.KProperty
 
@@ -129,6 +131,10 @@ class SuperDelegate<T: Any, V>(
 }
 
 object NO_DEFAULT
+
+
+
+
 class SuperListDelegate<T: Any, V>(
   name: String? = null,
   thisRef: T? = null,
@@ -172,6 +178,56 @@ class SuperListDelegate<T: Any, V>(
 	  setAll(default as Collection<*>)
 	}
   }
+
+
+}
+
+
+
+
+class SuperSetDelegate<T: Any, V>(
+	name: String? = null,
+	thisRef: T? = null,
+	val default: Any? = NO_DEFAULT,
+): SuperDelegateBase<T, V>(thisRef, name) {
+
+	operator fun provideDelegate(
+		thisRef: T,
+		prop: KProperty<*>
+	): SuperSetDelegate<T, V> {
+		return SuperSetDelegate(thisRef = thisRef, name = prop.name, default = default)
+	}
+
+	var was_set = false
+
+
+	override var field: BasicObservableSet<*>? = null
+
+
+	override fun set(vvv: Any?) {
+		require(!was_set)
+		require(vvv is List<*>)
+		field = vvv.toBasicObservableSet()
+		was_set = true
+		(field as BasicObservableSet).onChange {
+			@Suppress("UNCHECKED_CAST")
+			change(field as V)
+		}
+	}
+
+	fun setAll(c: Collection<*>) {
+		if (!was_set) {
+			set(setOf<V>())
+		}
+		@Suppress("UNCHECKED_CAST")
+		(field as MutableSet<Any>).setAll(c as Collection<Any>)
+	}
+
+	init {
+		if (default != NO_DEFAULT) {
+			setAll(default as Collection<*>)
+		}
+	}
 
 
 }
