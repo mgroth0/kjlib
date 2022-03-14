@@ -1,5 +1,7 @@
 package matt.kjlib.oset
 
+import matt.kjlib.str.taball
+
 
 fun <E> Collection<E>.toBasicObservableSet(): BasicObservableSet<E> {
     return BasicObservableSet(this)
@@ -56,6 +58,7 @@ class BasicObservableSet<E>(c: Collection<E>) : MutableSet<E> {
 
             override fun remove() {
                 mitr.remove()
+//                println("set mitr remove")
                 change()
             }
         }
@@ -63,6 +66,7 @@ class BasicObservableSet<E>(c: Collection<E>) : MutableSet<E> {
 
     override fun add(element: E): Boolean {
         val b = theSet.add(element)
+//        println("BasicObservableSet.add(${element})")
         if (b) {
             change()
         }
@@ -71,23 +75,27 @@ class BasicObservableSet<E>(c: Collection<E>) : MutableSet<E> {
 
     override fun addAll(elements: Collection<E>): Boolean {
         val b = theSet.addAll(elements)
+//        taball("set addAll",elements)
         if (b) change()
         return b
     }
 
     override fun clear() {
+//        println("BasicObservableSet.clear")
         theSet.clear()
         change()
     }
 
     override fun remove(element: E): Boolean {
         val b = theSet.remove(element)
+//        println("BasicObservableSet.remove(${element})")
         if (b) change()
         return b
     }
 
     override fun removeAll(elements: Collection<E>): Boolean {
         val b = theSet.removeAll(elements)
+//        taball("set removeAll",elements)
         if (b) change()
         return b
     }
@@ -95,6 +103,7 @@ class BasicObservableSet<E>(c: Collection<E>) : MutableSet<E> {
 
     override fun retainAll(elements: Collection<E>): Boolean {
         val b = theSet.retainAll(elements)
+//        taball("set retainAll",elements)
         if (b) change()
         return b
     }
