@@ -226,6 +226,18 @@ fun String.truncateWithElipses(maxChars: Int): String {
   else return this.substring(0, maxChars) + " ..."
 }
 
+fun String.truncateOrAddSpaces(exactNumChars: Int): String {
+  if (length <= exactNumChars) return this.addSpacesUntilLengthIs(exactNumChars)
+  else return this.substring(0, exactNumChars)
+}
+const val elipses = " ..."
+fun String.truncateWithElipsesOrAddSpaces(exactNumChars: Int): String {
+  val numCharsBeforeElipses = exactNumChars - 4
+  require(numCharsBeforeElipses >= 0)
+  if (length <= exactNumChars) return this.addSpacesUntilLengthIs(exactNumChars)
+  else return this.substring(0, numCharsBeforeElipses) + elipses
+}
+
 val ALPHABET = arrayOf(
     'A',
     'B',
