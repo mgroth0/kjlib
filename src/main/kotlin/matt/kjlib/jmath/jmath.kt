@@ -1,7 +1,6 @@
 package matt.kjlib.jmath
 
 import matt.kjlib.jmath.bgdecimal.BigDecimalMath
-import matt.kjlib.jmath.times
 import matt.kjlib.log.err
 import matt.kjlib.stream.forEachNested
 import matt.klib.math.sq
@@ -29,6 +28,7 @@ import kotlin.math.exp
 import kotlin.math.floor
 import kotlin.math.ln
 import kotlin.math.pow
+import kotlin.math.round
 import kotlin.math.roundToInt
 import kotlin.random.Random.Default.nextDouble
 import kotlin.random.Random.Default.nextFloat
@@ -170,6 +170,7 @@ fun <T> Iterable<T>.meanOf(op: (T)->Double) = map { op(it) }.mean()
 fun List<Float>.mean() = sum()/size
 fun FloatArray.mean() = sum()/size
 fun List<Double>.mean() = sum()/size
+fun List<Double>.median() = if (this.size == 0) null else this.sorted()[round(this.size/2.0).toInt() - 1]
 fun DoubleArray.mean() = sum()/size
 fun IntArray.intMean() = (sum()/size.toDouble()).roundToInt()
 fun IntArray.doubleMean() = (sum()/size.toDouble())
@@ -595,4 +596,14 @@ public inline fun <T> Iterable<T>.sumOf(selector: (T)->Float): Float {
 	sum += selector(element)
   }
   return sum
+}
+
+fun randomAngleInDegrees() = nextDouble() * 360.0
+
+data class Sides(val adj: Double, val opp: Double)
+fun dirAndHypToAdjAndOpp(dirInDegrees: Double, hyp: Double): Sides {
+    val rads = Math.toRadians(dirInDegrees)
+    val opposite = kotlin.math.sin(rads) * hyp
+    val adj = kotlin.math.cos(rads) * hyp
+    return Sides(adj = adj, opp = opposite)
 }
