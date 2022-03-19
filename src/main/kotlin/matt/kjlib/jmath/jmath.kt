@@ -33,10 +33,12 @@ import kotlin.math.roundToInt
 import kotlin.random.Random.Default.nextDouble
 import kotlin.random.Random.Default.nextFloat
 
-val ApE = ApfloatMath.euler(100)
+val ApE = ApfloatMath.exp(Apfloat.ONE.precision(100)).apply {
+  println("could just use ApfloatMath.exp, which is probably faster?")
+}
 val e = Math.E
 const val eFloat = Math.E.toFloat()
-val Ae = /*EULER*/ ApfloatMath.euler(20)
+val Ae = /*EULER*/ ApE
 val PI = Math.PI
 val PIFloat = PI.toFloat()
 val API = ApfloatMath.pi(20)
@@ -249,6 +251,7 @@ infix fun Array<out Apfloat?>.dotA(other: Array<out Apfloat?>): Apfloat {
   return ee
 
 }
+
 infix fun Array<out Float?>.dot(other: Array<out Float?>): Float {
   require(this.size == other.size)
   var ee = 0.0f
