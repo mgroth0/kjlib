@@ -15,6 +15,13 @@ inline fun <E> Iterable<E>.iterate(op: Iterator<E>.(E)->Unit) {
   return iterator().whileHasNext(op)
 }
 
+fun <T> Iterable<T>.filterNotIn(vararg matches: T): List<T> {
+  return filterTo(ArrayList()) { it !in matches }
+}
+
+fun <T> Iterable<T>.filterIn(vararg matches: T): List<T> {
+  return filterTo(ArrayList()) { it in matches }
+}
 
 inline fun <E, I: Iterator<E>> I.whileHasNext(op: I.(E)->Unit) {
   contract {
@@ -29,6 +36,13 @@ inline fun <E, I: Iterator<E>> I.whileHasNext(op: I.(E)->Unit) {
 inline fun <T> Iterable<T>.forEachNested(action: (T, T)->Unit): Unit {
   for (element1 in this) for (element2 in this) action(element1, element2)
 }
+
+inline fun <T,R> Iterable<T>.mapNested(converter: (T, T)->R): List<R> {
+  val r = mutableListOf<R>()
+  for (element1 in this) for (element2 in this) r += converter(element1, element2)
+  return r
+}
+
 //inline fun <T,R> Iterable<T>.mapNested(action: (T, T)->R): List<R> {
 //  for (element1 in this) for (element2 in this) action(element1, element2)
 //  listOf<Int>().map {  }
