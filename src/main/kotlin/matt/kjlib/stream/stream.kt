@@ -3,6 +3,12 @@ package matt.kjlib.stream
 import kotlin.contracts.InvocationKind.UNKNOWN
 import kotlin.contracts.contract
 
+inline fun <T> Iterable<T>.first(errorMessage: String, predicate: (T) -> Boolean): T {
+  for (element in this) if (predicate(element)) return element
+  throw NoSuchElementException("Collection contains no element matching the predicate (${errorMessage}).")
+}
+
+
 inline fun <E> MutableList<E>.iterateM(op: MutableListIterator<E>.(E)->Unit) {
   return listIterator().whileHasNext(op)
 }
