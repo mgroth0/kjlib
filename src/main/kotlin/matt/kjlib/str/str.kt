@@ -221,6 +221,7 @@ fun String.truncate(maxChars: Int): String {
   if (length <= maxChars) return this
   else return this.substring(0, maxChars)
 }
+
 fun String.truncateWithElipses(maxChars: Int): String {
   if (length <= maxChars) return this
   else return this.substring(0, maxChars) + " ..."
@@ -230,6 +231,7 @@ fun String.truncateOrAddSpaces(exactNumChars: Int): String {
   if (length <= exactNumChars) return this.addSpacesUntilLengthIs(exactNumChars)
   else return this.substring(0, exactNumChars)
 }
+
 const val elipses = " ..."
 fun String.truncateWithElipsesOrAddSpaces(exactNumChars: Int): String {
   val numCharsBeforeElipses = exactNumChars - 4
@@ -239,30 +241,33 @@ fun String.truncateWithElipsesOrAddSpaces(exactNumChars: Int): String {
 }
 
 val ALPHABET = arrayOf(
-    'A',
-    'B',
-    'C',
-    'D',
-    'E',
-    'F',
-    'G',
-    'H',
-    'I',
-    'J',
-    'K',
-    'L',
-    'M',
-    'N',
-    'O',
-    'P',
-    'Q',
-    'R',
-    'S',
-    'T',
-    'U',
-    'V',
-    'W',
-    'X',
-    'Y',
-    'Z'
+  'A',
+  'B',
+  'C',
+  'D',
+  'E',
+  'F',
+  'G',
+  'H',
+  'I',
+  'J',
+  'K',
+  'L',
+  'M',
+  'N',
+  'O',
+  'P',
+  'Q',
+  'R',
+  'S',
+  'T',
+  'U',
+  'V',
+  'W',
+  'X',
+  'Y',
+  'Z'
 )
+
+val VOWELS = arrayOf('A', 'E', 'I', 'O', 'U', 'Y')
+val CONSENENTS = ALPHABET.filter { it !in VOWELS }.toTypedArray()
