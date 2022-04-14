@@ -174,6 +174,9 @@ fun String.addSpacesUntilLengthIs(n: Int): String {
   return s
 }
 
+val DOWN_ARROW = "↓"
+val UP_ARROW = "↑"
+
 
 fun String.substringAfterIth(c: Char, num: Number): String {
   val intNum = num.toInt()

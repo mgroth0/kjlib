@@ -29,7 +29,7 @@ import kotlin.contracts.contract
 
 var simplePrinting = false
 
-class Duration private constructor(nanos: Long) {
+class Duration private constructor(nanos: Long): Comparable<Duration> {
 
   constructor(startNanos: Number, stopNanos: Number): this(
 	(stopNanos.toDouble() - startNanos.toDouble()).toLong()
@@ -76,6 +76,10 @@ class Duration private constructor(nanos: Long) {
 	  else                  -> "${inNanoseconds.roundToDecimal(2)} ns"
 
 	}
+  }
+
+  override fun compareTo(other: Duration): Int {
+	return this.stupidDur.compareTo(other.stupidDur)
   }
 
   override fun toString() = format()

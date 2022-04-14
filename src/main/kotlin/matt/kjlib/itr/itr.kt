@@ -1,10 +1,28 @@
 package matt.kjlib.itr
 
+import matt.kjlib.log.err
+
 
 fun <E> List<E>.loopIterator() = LoopIterator(this)
 fun <E> MutableList<E>.loopIterator() = MutableLoopIterator(this)
 fun <E> List<E>.loopListIterator() = LoopListIterator(this)
 fun <E> MutableList<E>.loopListIterator() = MutableLoopListIterator(this)
+
+
+class FakeMutableIterator<E>(val itr: Iterator<E>): MutableIterator<E> {
+  override fun hasNext(): Boolean {
+	return itr.hasNext()
+  }
+
+  override fun next(): E {
+	return itr.next()
+  }
+
+  override fun remove() {
+	err("tried remove in ${FakeMutableIterator::class.simpleName}")
+  }
+
+}
 
 
 interface LoopIteratorFun<E>: Iterator<E> {
