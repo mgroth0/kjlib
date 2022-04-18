@@ -346,7 +346,7 @@ private var usedTimer = false
 fun every(
   d: Duration,
   ownTimer: Boolean = false,
-  timer: FullDelayBeforeEveryExecutionTimer? = null,
+  timer: MattTimer? = null,
   name: String? = null,
   zeroDelayFirst: Boolean = false,
   op: MyTimerTask.()->Unit,
