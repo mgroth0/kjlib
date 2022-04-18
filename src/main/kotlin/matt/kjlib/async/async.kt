@@ -224,6 +224,16 @@ class FullDelayBeforeEveryExecutionTimer(val name: String? = null) {
 	}
   }
 
+  fun scheduleWithZeroDelayFirst(task: MyTimerTask, delayMillis: Long) = schedulingSem.with {
+	delays[task] = delayMillis
+	var next = System.currentTimeMillis()
+	while (nexts.containsKey(next)) next += 1
+	nexts[next] = task
+	if (delays.size == 1) {
+	  start()
+	}
+  }
+
   fun start() {
 	daemon {
 	  while (delays.isNotEmpty()) {
@@ -302,6 +312,7 @@ fun every(
   ownTimer: Boolean = false,
   timer: FullDelayBeforeEveryExecutionTimer? = null,
   name: String? = null,
+  zeroDelayFirst: Boolean = false,
   op: MyTimerTask.()->Unit,
 ): MyTimerTask {
   massert(!(ownTimer && timer != null))
@@ -334,15 +345,25 @@ fun every(
 
 
   val task = MyTimerTask(op, name)
-  (if (ownTimer) {
+  val timer = (if (ownTimer) {
 	//        Timer(true)
 	FullDelayBeforeEveryExecutionTimer()
   } else if (timer != null) {
 	timer
   } else {
 	mainTimer
-  }).schedule(task, d.inMilliseconds.toLong())
+  })
+
+
+
+  if (zeroDelayFirst) {
+	timer.scheduleWithZeroDelayFirst(task, d.inMilliseconds.toLong())
+  } else {
+	timer.schedule(task, d.inMilliseconds.toLong())
+  }
+
   return task
+
 }
 
 
