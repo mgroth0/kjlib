@@ -311,20 +311,27 @@ class AccurateTimer(name: String? = null, debug: Boolean = false): MattTimer(nam
 			  tab("\t${(it.key - now)/1000.0}")
 			}
 		  }
-		  if (now <= nextKey!!) {
+		  if (now >= nextKey!!) {
 			n
 		  } else {
 			sleep(waitTime)
 			null
 		  }
 		}?.apply {
+		  if (debug) {tab("applying")}
 		  if (!checkCancel(this, nextKey!!)) {
+			if (debug) {tab("running")}
 			run()
 			if (!checkCancel(this, nextKey!!)) {
+			  if (debug) {tab("rescheduling")}
 			  schedulingSem.with {
-				nexts.remove(nextKey!!)
+				if (debug) {tab("nextKey=${nextKey}")}
+				val removed = nexts.remove(nextKey!!)
+				if (debug) {tab("removed=${removed}")}
 				var next = delays[this]!! + System.currentTimeMillis()
+				if (debug) {tab("next=${next}")}
 				while (nexts.containsKey(next)) next += 1
+				if (debug) {tab("next=${next}")}
 				nexts[next] = this
 			  }
 			}
