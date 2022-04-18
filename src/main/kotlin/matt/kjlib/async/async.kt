@@ -10,6 +10,7 @@ import matt.kjlib.async.ThreadInterface.Canceller
 import matt.kjlib.commons.runtime
 import matt.kjlib.date.Duration
 import matt.kjlib.log.massert
+import matt.kjlib.str.tab
 import matt.kjlib.str.taball
 import java.lang.Thread.sleep
 import java.util.concurrent.Callable
@@ -198,10 +199,7 @@ class MyTimerTask(private val op: MyTimerTask.()->Unit, val name: String? = null
 
 }
 
-// Not at all for accurate frequencies. The purpose of this is to be as little demanding as possible.
-
-class FullDelayBeforeEveryExecutionTimer(val name: String? = null) {
-
+abstract class MattTimer(val name: String? = null, val debug: Boolean = false) {
   override fun toString(): String {
 	return if (name != null) {
 	  "Timer:${name}"
@@ -210,9 +208,9 @@ class FullDelayBeforeEveryExecutionTimer(val name: String? = null) {
 	}
   }
 
-  private val schedulingSem = Semaphore(1)
-  private val delays = mutableMapOf<MyTimerTask, Long>()
-  private val nexts = sortedMapOf<Long, MyTimerTask>()
+  protected val schedulingSem = Semaphore(1)
+  protected val delays = mutableMapOf<MyTimerTask, Long>()
+  protected val nexts = sortedMapOf<Long, MyTimerTask>()
 
   fun schedule(task: MyTimerTask, delayMillis: Long) = schedulingSem.with {
 	delays[task] = delayMillis
@@ -234,20 +232,47 @@ class FullDelayBeforeEveryExecutionTimer(val name: String? = null) {
 	}
   }
 
-  fun start() {
+  abstract fun start()
+
+  fun checkCancel(task: MyTimerTask, nextKey: Long): Boolean = schedulingSem.with {
+	if (task.cancelled) {
+	  delays.remove(task)
+	  nexts.remove(nextKey)
+	  true
+	} else {
+	  false
+	}
+  }
+
+}
+
+/*Not at all for accurate frequencies. The purpose of this is to be as little demanding as possible.*/
+class FullDelayBeforeEveryExecutionTimer(name: String? = null, debug: Boolean = false): MattTimer(name, debug) {
+  override fun start() {
 	daemon {
 	  while (delays.isNotEmpty()) {
 		var nextKey: Long? = null
 		schedulingSem.with {
 		  nextKey = nexts.firstKey()
-		  nexts[nextKey]!!
+		  val n = nexts[nextKey]!!
+		  if (debug) {
+			println("DEBUGGING $this")
+
+			val now = System.currentTimeMillis()
+
+			tab("nextKey(rel to now, in sec)=${(nextKey!! - now)/1000.0}")
+			tab("nexts (rel to now, in sec):")
+
+			nexts.forEach {
+			  tab("\t${(it.key - now)/1000.0}")
+			}
+		  }
+		  n
 		}.apply {
 		  if (!checkCancel(this, nextKey!!)) {
 			sleep(delays[this]!!)
 			if (!checkCancel(this, nextKey!!)) {
-			  //                            debug("${this@FullDelayBeforeEveryExecutionTimer} about to run: $this")
 			  run()
-			  //                            debug("${this@FullDelayBeforeEveryExecutionTimer} finished running: $this")
 			  if (!checkCancel(this, nextKey!!)) {
 				schedulingSem.with {
 				  nexts.remove(nextKey!!)
@@ -262,17 +287,52 @@ class FullDelayBeforeEveryExecutionTimer(val name: String? = null) {
 	  }
 	}
   }
+}
 
-  fun checkCancel(task: MyTimerTask, nextKey: Long): Boolean = schedulingSem.with {
-	if (task.cancelled) {
-	  delays.remove(task)
-	  nexts.remove(nextKey)
-	  true
-	} else {
-	  false
+class AccurateTimer(name: String? = null, debug: Boolean = false): MattTimer(name, debug) {
+  val waitTime = 100L
+  override fun start() {
+	daemon {
+	  while (delays.isNotEmpty()) {
+		var nextKey: Long? = null
+		schedulingSem.with {
+		  nextKey = nexts.firstKey()
+		  val n = nexts[nextKey]!!
+		  val now = System.currentTimeMillis()
+		  if (debug) {
+			println("DEBUGGING $this")
+
+
+
+			tab("nextKey(rel to now, in sec)=${(nextKey!! - now)/1000.0}")
+			tab("nexts (rel to now, in sec):")
+
+			nexts.forEach {
+			  tab("\t${(it.key - now)/1000.0}")
+			}
+		  }
+		  if (now <= nextKey!!) {
+			n
+		  } else {
+			sleep(waitTime)
+			null
+		  }
+		}?.apply {
+		  if (!checkCancel(this, nextKey!!)) {
+			run()
+			if (!checkCancel(this, nextKey!!)) {
+			  schedulingSem.with {
+				nexts.remove(nextKey!!)
+				var next = delays[this]!! + System.currentTimeMillis()
+				while (nexts.containsKey(next)) next += 1
+				nexts[next] = this
+			  }
+			}
+		  }
+		}
+	  }
 	}
   }
-
 }
 
 
@@ -282,30 +342,6 @@ private val mainTimer = FullDelayBeforeEveryExecutionTimer("MAIN_TIMER")
 
 private var usedTimer = false
 
-//fun every(d: Duration, ownTimer: Boolean = false, op: () -> Unit): TimerTask {
-//    return every(d, ownTimer) {
-//        op()
-//    }
-//}
-//
-//@ExperimentalTime
-//fun every(d: kotlin.time.Duration, ownTimer: Boolean = false, op: () -> Unit): TimerTask {
-//    return every(d.toJavaDuration(), ownTimer) {
-//        op()
-//    } as
-//}
-
-//@OptIn(ExperimentalTime::class)
-//@ExperimentalTime
-//fun every(
-//    d: kotlin.time.Duration,
-//    d: java.time.Duration,
-//    ownTimer: Boolean = false,
-//    timer: FullDelayBeforeEveryExecutionTimer? = null,
-//    name: String? = null,
-//    op: MyTimerTask.() -> Unit
-//) =
-//    every(d.toJavaDuration(), ownTimer, timer, name, op)
 
 fun every(
   d: Duration,
@@ -317,42 +353,10 @@ fun every(
 ): MyTimerTask {
   massert(!(ownTimer && timer != null))
 
-  //    if (!ownTimer && !usedTimer) {
-  //        usedTimer = true // make sure this is before, or recursion death awaits
-  //        every(10.seconds()) {
-  ////            println("matt.klib.log.debug: running dummy task")
-  ////    this is to ensure timer thread is never killed for having "nothing matt.klib.fxlib.left to do". Obviously not elegant. But I'm curious if it will work.
-  //        }
-  //    }
-  //    val task =
-  //    val task = object : MyTimerTask(op)
-
-  //    {
-  //        val id = Random().nextInt(10000)
-  //        override fun run() {
-  ////            println("DEBUG: $id is running")
-  //            try { // Timer is designed to have a try statement in this run method. If an execption is thrown here, not only does the whole thread and all tasks stop, but THE ERROR MESSAGES ARE NOT INFORMATIVE AND MISLEAD AWAY FROM THE ACTUAL EXCEPTION. Therefore, there must be a try catch here.
-  //                op()
-  //            } catch (matt.kjlib.jmath.e: Exception) {
-  //                println("got exception in TimerTask. Cancelling TimerTask.")
-  //                println(matt.kjlib.jmath.e)
-  //                matt.kjlib.jmath.e.printStackTrace()
-  ////                cancel()
-  //            }
-  //
-  //        }
-  //    }
-
-
   val task = MyTimerTask(op, name)
   val timer = (if (ownTimer) {
-	//        Timer(true)
 	FullDelayBeforeEveryExecutionTimer()
-  } else if (timer != null) {
-	timer
-  } else {
-	mainTimer
-  })
+  } else timer ?: mainTimer)
 
 
 
