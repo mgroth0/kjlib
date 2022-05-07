@@ -1,9 +1,16 @@
 package matt.kjlib.log
 
+import matt.kjlib.commons.FLOW_FOLDER
+import matt.kjlib.file.get
+import matt.klib.log.warn
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.io.PrintWriter
 import java.nio.charset.StandardCharsets
+
+val exceptionFolder = FLOW_FOLDER["log"]["errorReports"]
+
+
 
 fun err(s: String = ""): Nothing {
   throw RuntimeException(s)
