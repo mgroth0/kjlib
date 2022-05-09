@@ -139,8 +139,12 @@ val Number.min
   get() = Duration.ofMinutes(this)
 val Number.hours
   get() = Duration.ofHours(this)
+val Number.hour
+  get() = hours
 val Number.days
   get() = Duration.ofDays(this)
+val Number.day
+  get() = days
 
 fun now() = System.currentTimeMillis().unixMS
 
