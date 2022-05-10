@@ -36,15 +36,16 @@ fun execReturn(wd: File?, vararg args: String, verbose: Boolean = false): String
   if (verbose) {
 	println("running ${args.joinToString(" ")}")
   }
-  return proc(wd, *args)
-	.streams.joinToString("") {
-	  /*FutureTask {*/ /*no idea why i did this... it caused blocking i think*/
-	  it
-		.bufferedReader()
-		.lines()
-		.toList()
-		.joinToString("\n")
-	}
+  return proc(wd, *args).allStdOutAndStdErr()
+}
+
+fun Process.allStdOutAndStdErr() = streams.joinToString("") {
+  /*FutureTask {*/ /*no idea why i did this... it caused blocking i think*/
+  it
+	.bufferedReader()
+	.lines()
+	.toList()
+	.joinToString("\n")
 }
 
 val Process.streams: List<InputStream>
