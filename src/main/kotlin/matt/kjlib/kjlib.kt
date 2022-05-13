@@ -55,3 +55,9 @@ inline fun whileTrue(op: ()->Boolean) {
 private class Thing
 
 fun resourceTxt(name: String) = Thing()::class.java.classLoader.getResourceAsStream(name)?.bufferedReader()?.readText()
+
+
+inline fun <T> Iterable<T>.firstOrErr(msg:  String,predicate: (T) -> Boolean): T {
+  for (element in this) if (predicate(element)) return element
+  err(msg)
+}
