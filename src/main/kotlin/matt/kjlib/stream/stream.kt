@@ -3,7 +3,10 @@ package matt.kjlib.stream
 import kotlin.contracts.InvocationKind.UNKNOWN
 import kotlin.contracts.contract
 
-inline fun <T> Iterable<T>.first(errorMessage: String, predicate: (T) -> Boolean): T {
+fun <T> mutableListsOf(num: Int) = (0 until num).map { mutableListOf<T>() }
+fun <T> listsOf(num: Int) = (0 until num).map { listOf<T>() }
+
+inline fun <T> Iterable<T>.first(errorMessage: String, predicate: (T)->Boolean): T {
   for (element in this) if (predicate(element)) return element
   throw NoSuchElementException("Collection contains no element matching the predicate (${errorMessage}).")
 }
@@ -43,7 +46,7 @@ inline fun <T> Iterable<T>.forEachNested(action: (T, T)->Unit): Unit {
   for (element1 in this) for (element2 in this) action(element1, element2)
 }
 
-inline fun <T,R> Iterable<T>.mapNested(converter: (T, T)->R): List<R> {
+inline fun <T, R> Iterable<T>.mapNested(converter: (T, T)->R): List<R> {
   val r = mutableListOf<R>()
   for (element1 in this) for (element2 in this) r += converter(element1, element2)
   return r
