@@ -5,6 +5,11 @@ dependencies {
     implementation(libs.apfloat)
     implementation(libs.aparapi)
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+
+
+    api(libs.oshi)
+
+
     /*api("org.tensorflow:tensorflow-core-api:0.4.0")*/
     /*implementation("org.tensorflow:tensorflow-core-api:0.4.0")*/
     /*implementation("org.tensorflow:tensorflow-core-platform:0.4.0")*/

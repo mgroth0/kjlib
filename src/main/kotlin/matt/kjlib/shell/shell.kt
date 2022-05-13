@@ -2,6 +2,7 @@ package matt.kjlib.shell
 
 
 import matt.kjlib.commons.runtime
+import oshi.software.os.OSProcess
 import java.io.File
 import java.io.InputStream
 import java.time.Duration
@@ -104,3 +105,47 @@ fun ProcessHandle.directDescendents(): List<ProcessHandle> {
 fun Int.seconds() = Duration.ofSeconds(toLong())
 fun Long.seconds() = Duration.ofSeconds(this)
 
+/*I think the oshi impl of this doesnt work*/
+val OSProcess.command: String?
+  get() {
+	val handle = java.lang.ProcessHandle.of(processID.toLong()).orElseGet { null }
+	return if (handle == null) {
+	  null
+	} else {
+	  val com = handle.info().command()
+	  if (com.isPresent) {
+		com.get()
+	  } else {
+		null
+	  }
+	}
+  }
+
+val OSProcess.workingCommandLine: String?
+  get() {
+	val handle = java.lang.ProcessHandle.of(processID.toLong()).orElseGet { null }
+	return if (handle == null) {
+	  null
+	} else {
+	  val com = handle.info().commandLine()
+	  if (com.isPresent) {
+		com.get()
+	  } else {
+		null
+	  }
+	}
+  }
+val OSProcess.arguments: List<String>?
+  get() {
+	val handle = java.lang.ProcessHandle.of(processID.toLong()).orElseGet { null }
+	return if (handle == null) {
+	  null
+	} else {
+	  val com = handle.info().arguments()
+	  if (com.isPresent) {
+		com.get().toList()
+	  } else {
+		null
+	  }
+	}
+  }
