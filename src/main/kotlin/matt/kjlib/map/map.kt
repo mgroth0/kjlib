@@ -1,9 +1,9 @@
 package matt.kjlib.map
 
 import matt.kjlib.itr.FakeMutableIterator
-import matt.kjlib.log.NEVER
 import matt.kjlib.log.err
 import matt.kjlib.str.lower
+import matt.klib.dmap.withStoringDefault
 import kotlin.collections.MutableMap.MutableEntry
 
 
@@ -158,4 +158,9 @@ class MutableCaseInsensitiveMap<V>: CaseInsensitiveMap<V>(), MutableMap<String, 
 	return map.remove(key.lower())
   }
 
+}
+
+
+fun <K, V> lazyMap(getter: (K)->V): Map<K, V> {
+  return mutableMapOf<K, V>().withStoringDefault(getter)
 }

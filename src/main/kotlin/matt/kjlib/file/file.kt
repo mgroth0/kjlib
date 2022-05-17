@@ -65,6 +65,9 @@ fun File.clearIfTooBigThenAppendText(s: String) {
 
 fun File.recursiveChildren() = recurse { it.listFiles()?.toList() ?: listOf() }
 
+fun Iterable<File>.filterHasExtenion(ext: String) = filter { it.extension == ext }
+fun Sequence<File>.filterHasExtenion(ext: String) = filter { it.extension == ext }
+
 fun File.deleteIfExists() {
   if (exists()) {
 	if (isDirectory) {
@@ -76,7 +79,7 @@ fun File.deleteIfExists() {
 }
 
 fun File.resRepExt(newExt: String) =
-	File(parentFile.absolutePath + File.separator + nameWithoutExtension + "." + newExt)
+  File(parentFile.absolutePath + File.separator + nameWithoutExtension + "." + newExt)
 
 
 fun File.recursiveLastModified(): Long {
@@ -143,8 +146,8 @@ fun File.backupWork(thread: Boolean = false, text: String? = null): ()->Unit {
   }
 
   val backupFile = backupFolder
-	  .resolve(name)
-	  .getNextAndClearWhenMoreThan(100, extraExt = "backup")
+	.resolve(name)
+	.getNextAndClearWhenMoreThan(100, extraExt = "backup")
 
   val realText = text ?: readText()
 
@@ -167,17 +170,17 @@ fun File.backup(thread: Boolean = false, text: String? = null) {
 fun File.getNextAndClearWhenMoreThan(n: Int, extraExt: String = "itr"): File {
   val backupFolder = parentFile
   val allPreviousBackupsOfThis = backupFolder
-	  .listFiles()!!.filter {
-		it.name.startsWith(this@getNextAndClearWhenMoreThan.name + ".${extraExt}")
-	  }.associateBy { it.name.substringAfterLast(".${extraExt}").toInt() }
+	.listFiles()!!.filter {
+	  it.name.startsWith(this@getNextAndClearWhenMoreThan.name + ".${extraExt}")
+	}.associateBy { it.name.substringAfterLast(".${extraExt}").toInt() }
 
 
   val myBackupI = (allPreviousBackupsOfThis.keys.maxOrNull() ?: 0) + 1
 
 
   allPreviousBackupsOfThis
-	  .filterKeys { it < (myBackupI - n) }
-	  .forEach { it.value.delete() }
+	.filterKeys { it < (myBackupI - n) }
+	.forEach { it.value.delete() }
 
   return backupFolder.resolve("${this.name}.${extraExt}${myBackupI}")
 
@@ -196,13 +199,14 @@ operator fun File.get(item: String): File {
 
 fun File.isImage() = extension.isIn("png", "jpg", "jpeg")
 
-fun File.append(s: String,mkdirs: Boolean=true) {
+fun File.append(s: String, mkdirs: Boolean = true) {
   if (mkdirs) {
 	parentFile.mkdirs()
   }
   appendText(s)
 }
-fun File.write(s: String,mkdirs: Boolean=true) {
+
+fun File.write(s: String, mkdirs: Boolean = true) {
   if (mkdirs) {
 	parentFile.mkdirs()
   }

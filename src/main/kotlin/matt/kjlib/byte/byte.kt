@@ -36,45 +36,24 @@ class ByteSize(val bytes: Long) {
   }
 }
 
-
-// these lead to an error since Pipe streams are supposed to be atomic and single threaded, not continuous and multithreaded
-//fun redirectOut(): BufferedReader {
-//    val (ps, inPipe) = pipedPrintStream()
-//    System.setOut(ps)
-//    return inPipe.bufferedReader()
-//}
-//
-//fun redirectErr(): BufferedReader {
-//    val (ps, inPipe) = pipedPrintStream()
-//    System.setErr(ps)
-//    return inPipe.bufferedReader()
-//}
-private const val DUPLICATED_WHEN_REDIRECT = true
-fun redirectOut(op: (String)->Unit) {
+fun redirectOut(duplicate: Boolean = true, op: (String)->Unit) {
   val old = System.out
-  val re = if (DUPLICATED_WHEN_REDIRECT) {
-	redirect2Core {
-	  op(it)
-	  old.println(it)
-	}
-  } else {
-	redirect2Core(op)
-  }
+  val re = if (duplicate) redirect2Core {
+	op(it)
+	old.println(it)
+  } else redirect2Core(op)
   System.setOut(re)
 }
 
-fun redirectErr(op: (String)->Unit) {
+fun redirectErr(duplicate: Boolean = true, op: (String)->Unit) {
   val old = System.err
-  val re = if (DUPLICATED_WHEN_REDIRECT) {
-	redirect2Core {
-	  op(it)
-	  old.println(it)
-	}
-  } else {
-	redirect2Core(op)
-  }
+  val re = if (duplicate) redirect2Core {
+	op(it)
+	old.println(it)
+  } else redirect2Core(op)
   System.setErr(re)
 }
+
 
 fun redirect2Core(op: (String)->Unit): PrintStream {
   return PrintStream(object: ByteArrayOutputStream() {

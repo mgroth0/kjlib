@@ -210,7 +210,7 @@ class Stopwatch(
 	return r
   }
 
-  val prefixS = if (prefix != null) "$prefix\t" else ""
+  private val prefixS = if (prefix != null) "$prefix\t" else ""
   infix fun toc(s: String): Duration? {
 	if (enabled) {
 	  val stop = System.nanoTime()

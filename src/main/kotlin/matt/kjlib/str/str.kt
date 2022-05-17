@@ -274,3 +274,7 @@ val ALPHABET = arrayOf(
 
 val VOWELS = arrayOf('A', 'E', 'I', 'O', 'U', 'Y')
 val CONSENENTS = ALPHABET.filter { it !in VOWELS }.toTypedArray()
+
+
+operator fun String.get(intRange: IntRange) = subSequence(intRange.first,intRange.last + 1)
+fun String.throttled() = "THROTTLED STRING OF LENGTH $length (\"${this[0..100]}\"...)"
