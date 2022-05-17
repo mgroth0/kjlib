@@ -1413,7 +1413,7 @@ object BigDecimalMath {
 		val xhalf = x.divide(two)
 		val resul = sinh(xhalf).multiply(cosh(xhalf)).multiply(two)
 		/* The error in the result is set by the error in x itself.
-                 * The first derivative of sinh(x) is cosh(x), so the absolute error
+                 * The first matt.kjlib.jmath.point.derivative of sinh(x) is cosh(x), so the absolute error
                  * in the result is cosh(x)*errx, and the relative error is coth(x)*errx = errx/tanh(x)
                  */
 		val eps = Math.tanh(x.toDouble())

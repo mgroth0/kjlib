@@ -1,9 +1,11 @@
 package matt.kjlib.jmath
 
 import matt.kjlib.jmath.bgdecimal.BigDecimalMath
+import matt.kjlib.log.NEVER
 import matt.kjlib.log.err
 import matt.kjlib.stream.forEachNested
 import matt.klib.math.sq
+import org.apache.commons.math3.special.Gamma
 import org.apfloat.Apcomplex
 import org.apfloat.Apfloat
 import org.apfloat.ApfloatMath
@@ -42,7 +44,10 @@ val Ae = /*EULER*/ ApE
 val PI = Math.PI
 val PIFloat = PI.toFloat()
 val API = ApfloatMath.pi(20)
+
 /*val BIG_E: BigDecimal = BigDecimal.valueOf(e)*/
+val AZERO = Apfloat.ZERO
+val AZERO_FLOAT = Apfloat.ZERO.toApfloat()
 
 fun Double.floorInt() = floor(this).toInt()
 
@@ -474,8 +479,16 @@ fun <N: Number> NDArray<N, D2>.convolve(kernel: NDArray<Double, D2>): NDArray<Do
   return result
 }
 
-fun Float.toApfloat() = Apfloat(this)
-fun Double.toApfloat() = Apfloat(this)
+//fun Float.toApfloat() = Apfloat(this)
+//fun Double.toApfloat() = Apfloat(this)
+fun Number.toApfloat() = when (this) {
+  is Int    -> Apfloat(this.toDouble())
+  is Long   -> Apfloat(this)
+  is Short  -> Apfloat(this.toDouble())
+  is Float  -> Apfloat(this)
+  is Double -> Apfloat(this)
+  else      -> NEVER
+}
 
 fun Int.toApint() = Apint(this.toLong())
 fun Long.toApint() = Apint(this)
@@ -500,6 +513,11 @@ operator fun <A: Apfloat> A.plus(other: Number): Apfloat = when (other) {
   is Apfloat -> this.add(other)
   else       -> err("how to do Apfloat.plus(${other::class.simpleName})?")
 }
+
+fun Apint.toApfloat() = Apfloat(this.toDouble())
+
+operator fun <A: Apint> A.plus(other: Apfloat): Apfloat = this.toApfloat().add(other)
+
 
 operator fun <A: Apfloat> A.minus(other: Number): Apfloat = when (other) {
   is Int     -> this.subtract(other.toApint())
@@ -598,12 +616,34 @@ public inline fun <T> Iterable<T>.sumOf(selector: (T)->Float): Float {
   return sum
 }
 
-fun randomAngleInDegrees() = nextDouble() * 360.0
+fun randomAngleInDegrees() = nextDouble()*360.0
 
 data class Sides(val adj: Double, val opp: Double)
+
 fun dirAndHypToAdjAndOpp(dirInDegrees: Double, hyp: Double): Sides {
-    val rads = Math.toRadians(dirInDegrees)
-    val opposite = kotlin.math.sin(rads) * hyp
-    val adj = kotlin.math.cos(rads) * hyp
-    return Sides(adj = adj, opp = opposite)
+  val rads = Math.toRadians(dirInDegrees)
+  val opposite = kotlin.math.sin(rads)*hyp
+  val adj = kotlin.math.cos(rads)*hyp
+  return Sides(adj = adj, opp = opposite)
+}
+
+
+enum class UnitType(val symbol: String?, val longNameSingular: String?, val longNamePlural: String?) {
+  PERCENT("%", "percent", "percent"),
+  DEGREES("°", "degree", "degrees"),
+  RATIO(null, null, null)
+}
+
+/*https://stackoverflow.com/questions/31539584/how-can-i-make-my-factorial-method-work-with-decimals-gamma*/
+fun Double.generalizedFactorial(): Double {
+  /*Gamma(n) = (n-1)! for integer n*/
+  return Gamma.gamma(this + 1)
+}
+
+fun Double.generalizedFactorialOrSimpleIfInfOrNaN(): BigDecimal {
+  /*Gamma(n) = (n-1)! for integer n*/
+  println("getting gamma of ${this + 1}")
+  return Gamma.gamma(this + 1).takeIf { !it.isInfinite() && !it.isNaN() }?.toBigDecimal() ?: roundToInt()
+	.simpleFactorial()
+	.toBigDecimal()
 }

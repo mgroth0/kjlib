@@ -4,6 +4,7 @@ import com.aparapi.Kernel
 import com.aparapi.Range
 import com.aparapi.internal.kernel.KernelManager
 import com.aparapi.internal.opencl.OpenCLPlatform
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import matt.kjlib.async.ThreadInterface.Canceller
@@ -16,7 +17,9 @@ import java.lang.Thread.sleep
 import java.util.concurrent.Callable
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
+import java.util.concurrent.Future
 import java.util.concurrent.Semaphore
+import kotlin.collections.MutableMap.MutableEntry
 import kotlin.concurrent.thread
 import kotlin.contracts.contract
 import kotlin.random.Random
@@ -318,20 +321,34 @@ class AccurateTimer(name: String? = null, debug: Boolean = false): MattTimer(nam
 			null
 		  }
 		}?.apply {
-		  if (debug) {tab("applying")}
+		  if (debug) {
+			tab("applying")
+		  }
 		  if (!checkCancel(this, nextKey!!)) {
-			if (debug) {tab("running")}
+			if (debug) {
+			  tab("running")
+			}
 			run()
 			if (!checkCancel(this, nextKey!!)) {
-			  if (debug) {tab("rescheduling")}
+			  if (debug) {
+				tab("rescheduling")
+			  }
 			  schedulingSem.with {
-				if (debug) {tab("nextKey=${nextKey}")}
+				if (debug) {
+				  tab("nextKey=${nextKey}")
+				}
 				val removed = nexts.remove(nextKey!!)
-				if (debug) {tab("removed=${removed}")}
+				if (debug) {
+				  tab("removed=${removed}")
+				}
 				var next = delays[this]!! + System.currentTimeMillis()
-				if (debug) {tab("next=${next}")}
+				if (debug) {
+				  tab("next=${next}")
+				}
 				while (nexts.containsKey(next)) next += 1
-				if (debug) {tab("next=${next}")}
+				if (debug) {
+				  tab("next=${next}")
+				}
 				nexts[next] = this
 			  }
 			}
@@ -490,7 +507,23 @@ fun <T, R> Sequence<T>.parMapIndexed(op: (Int, T)->R): List<R> {
   }.toList().map { it.get() }
 }
 
-fun <K, V> Sequence<K>.parAssociateWith(numThreads: Int? = null, op: (K)->V): Map<K, V> {
+class FutureMap<K, V>(val map: Map<K, V>, val futures: List<Future<Unit>>) {
+  val total = futures.size
+  inline fun fill(op: (Int)->Unit): Map<K, V> {
+	contract {
+	  callsInPlace(op)
+	}
+	var i = 0
+	futures.map {
+	  it.get()
+	  op(i)
+	  i++
+	}
+	return map
+  }
+}
+
+fun <K, V> Sequence<K>.parAssociateWith(numThreads: Int? = null, op: (K)->V): FutureMap<K, V> {
   val listForCapacity = this.toList()
   val pool = numThreads?.let { Executors.newFixedThreadPool(it) } ?: GLOBAL_POOL
   /*  val r = ConcurrentHashMap<K, V>(
@@ -499,7 +532,7 @@ fun <K, V> Sequence<K>.parAssociateWith(numThreads: Int? = null, op: (K)->V): Ma
 	)*/
   val r = mutableMapOf<K, V>()
   val sem = Semaphore(1)
-  listForCapacity.map { k ->
+  val futures = listForCapacity.map { k ->
 
 	/*
 	this is so buggy. and worst of all, it usually just blocks and doesn't raise an exception. but when it does raise an exception its very ugly and not found anywhere on the internet:
@@ -520,21 +553,8 @@ fun <K, V> Sequence<K>.parAssociateWith(numThreads: Int? = null, op: (K)->V): Ma
 		}
 	  }
 	})
-  }.toList()/*.apply {
-	*//*sleep(5000)
-	while (any{ !it.isDone}) {
-	  sleep(500)
-	}*//*
-  }*/
-	.map {
-	  /*while (true) {
-		sleep(1000)
-	  }*/
-	  /*println("waiting on ${it}")*/
-	  it.get()
-	  /*println("got ${it}")*/
-	}
-  return r
+  }.toList()
+  return FutureMap(r, futures)
 }
 
 fun <K, V> Sequence<K>.parChunkAssociateWith(numThreads: Int? = null, op: (K)->V): Map<K, V> {
@@ -638,3 +658,71 @@ fun aparAPITest() {
   taball(result)
 
 }
+
+
+suspend fun <T> FlowCollector<T>.emitAll(list: Iterable<T>) {
+  list.forEach { emit(it) }
+}
+
+
+
+class MutSemMap<K, V>(
+  private val map: MutableMap<K, V> = HashMap(),
+  private val maxsize: Int = Int.MAX_VALUE
+): MutableMap<K, V> {
+  private val sem = Semaphore(1)
+  override val size: Int
+	get() = sem.with { map.size }
+
+  override fun containsKey(key: K): Boolean {
+	return sem.with { map.containsKey(key) }
+  }
+
+  override fun containsValue(value: V): Boolean {
+	return sem.with { map.containsValue(value) }
+  }
+
+  override fun get(key: K): V? {
+	return sem.with { map.get(key) }
+  }
+
+  override fun isEmpty(): Boolean {
+	return sem.with { map.isEmpty() }
+  }
+
+  override val entries: MutableSet<MutableEntry<K, V>>
+	get() = sem.with { map.entries }
+  override val keys: MutableSet<K>
+	get() = sem.with { map.keys }
+  override val values: MutableCollection<V>
+	get() = sem.with { map.values }
+
+  override fun clear() {
+	sem.with { map.clear() }
+  }
+
+  override fun put(key: K, value: V): V? {
+	return sem.with { map.put(key, value) }
+  }
+
+  override fun putAll(from: Map<out K, V>) {
+	return sem.with { map.putAll(from) }
+  }
+
+  override fun remove(key: K): V? {
+	return sem.with { map.remove(key) }
+  }
+
+  fun setIfNotFull(k: K, v: V): Boolean {
+	return sem.with {
+	  if (map.size < maxsize) {
+		map[k] = v
+		true
+	  } else false
+	}
+  }
+
+}
+
+fun <K, V> mutSemMapOf(vararg pairs: Pair<K, V>, maxsize: Int = Int.MAX_VALUE) =
+  MutSemMap(mutableMapOf(*pairs), maxsize = maxsize)

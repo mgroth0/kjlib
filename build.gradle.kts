@@ -9,6 +9,8 @@ dependencies {
 
     api(libs.oshi)
 
+    implementation(libs.commons.math)
+
 
     /*api("org.tensorflow:tensorflow-core-api:0.4.0")*/
     /*implementation("org.tensorflow:tensorflow-core-api:0.4.0")*/
