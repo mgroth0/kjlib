@@ -1,7 +1,7 @@
 package matt.kjlib
 
+import matt.kbuild.runtime
 import matt.kjlib.byte.ByteSize
-import matt.kjlib.commons.runtime
 import matt.kjlib.log.err
 import matt.kjlib.str.taball
 import kotlin.contracts.InvocationKind.AT_LEAST_ONCE
@@ -53,7 +53,6 @@ inline fun whileTrue(op: ()->Boolean) {
 
 
 private class Thing
-
 fun resourceTxt(name: String) = Thing()::class.java.classLoader.getResourceAsStream(name)?.bufferedReader()?.readText()
 
 

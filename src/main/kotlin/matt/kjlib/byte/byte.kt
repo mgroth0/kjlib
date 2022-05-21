@@ -80,24 +80,9 @@ fun pipedPrintStream(): Pair<PrintStream, PipedInputStream> {
 }
 
 
-class EndOfStreamException: Exception()
 
-@Throws(IOException::class)
-fun Reader.readWithTimeout(timeoutMillis: Int): String {
-  val entTimeMS = System.currentTimeMillis() + timeoutMillis
-  var r = ""
-  var c: Int
-  while (System.currentTimeMillis() < entTimeMS) {
-	if (ready()) {
-	  c = read()
-	  if (c == -1) {
-		if (r.isNotEmpty()) return r else throw EndOfStreamException()
-	  }
-	  r += c.toChar().toString()
-	}
-  }
-  return r
-}
+
+
 
 
 class ReaderEndReason(val type: TYPE, val exception: Exception? = null) {

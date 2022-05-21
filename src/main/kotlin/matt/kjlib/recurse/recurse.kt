@@ -1,5 +1,6 @@
 package matt.kjlib.recurse
 
+import matt.kbuild.recurse
 import matt.kjlib.log.err
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -12,33 +13,6 @@ fun <T> T.recursionDepth(rchildren: (T)->Iterable<T>): Int {
 }
 
 
-fun <T> T.recurse(includeSelf: Boolean = true, rchildren: (T)->Iterable<T>): Sequence<T> {
-  val mychildren = rchildren(this).iterator()
-  var gaveSelf = false
-  var currentChild: Iterator<T>? = null
-  return object: Iterator<T> {
-	override fun hasNext(): Boolean {
-	  if (currentChild != null && currentChild!!.hasNext()) {
-		return true
-	  }
-	  return mychildren.hasNext() || (!gaveSelf && includeSelf)
-	}
-
-	override fun next(): T {
-	  return if (currentChild != null && currentChild!!.hasNext()) {
-		currentChild!!.next()
-	  } else if (mychildren.hasNext()) {
-		currentChild = mychildren.next().recurse(rchildren = rchildren).iterator()
-		next()
-	  } else if (!gaveSelf && includeSelf) {
-		gaveSelf = true
-		this@recurse
-	  } else {
-		throw RuntimeException("guess I messed up the recursion logic")
-	  }
-	}
-  }.asSequence()
-}
 
 fun <T> T.recurseWithDepth(
   includeSelf: Boolean = true,

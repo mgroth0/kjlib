@@ -1,6 +1,6 @@
 package matt.kjlib.log
 
-import matt.kjlib.commons.FLOW_FOLDER
+import matt.kbuild.FLOW_FOLDER
 import matt.kjlib.file.get
 import matt.klib.log.warn
 import java.io.ByteArrayOutputStream

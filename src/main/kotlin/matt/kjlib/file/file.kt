@@ -1,9 +1,9 @@
 package matt.kjlib.file
 
+import matt.kbuild.recurse
 import matt.kjlib.async.every
 import matt.kjlib.byte.ByteSize
 import matt.kjlib.date.Duration
-import matt.kjlib.recurse.recurse
 import matt.kjlib.stream.isIn
 import java.io.File
 import java.nio.file.FileSystems

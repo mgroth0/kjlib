@@ -1,6 +1,7 @@
 dependencies {
   api(projects.kj.klibexport)
   api(projects.kj.reflect)
+  api(projects.kj.kbuild)
   api(libs.bundles.multik.full)
   implementation(libs.apfloat)
   implementation(libs.aparapi)

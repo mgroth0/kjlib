@@ -1,7 +1,8 @@
 package matt.kjlib.shell
 
 
-import matt.kjlib.commons.runtime
+import matt.kbuild.allStdOutAndStdErr
+import matt.kbuild.proc
 import oshi.software.os.OSProcess
 import java.io.File
 import java.io.InputStream
@@ -11,23 +12,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 
-fun proc(
-  wd: File?,
-  vararg args: String,
-  env: Map<String, String> = mapOf()
-): Process {
-  val envp = env.map {
-	it.key + "=" + it.value
-  }.toTypedArray()
-  return if (wd == null) runtime.exec(
-	args,
-	envp
-  ) else runtime.exec(
-	args,
-	envp,
-	wd
-  )
-}
+
 
 fun exec(wd: File?, vararg args: String) = proc(wd, *args).waitFor() == 0
 fun execReturn(vararg args: String) = execReturn(null, *args)
@@ -40,19 +25,6 @@ fun execReturn(wd: File?, vararg args: String, verbose: Boolean = false): String
   return proc(wd, *args).allStdOutAndStdErr()
 }
 
-fun Process.allStdOutAndStdErr() = streams.joinToString("") {
-  /*FutureTask {*/ /*no idea why i did this... it caused blocking i think*/
-  it
-	.bufferedReader()
-	.lines()
-	.toList()
-	.joinToString("\n")
-}
-
-val Process.streams: List<InputStream>
-  get() {
-	return listOf(inputStream, errorStream)
-  }
 
 
 fun obliterate(pid: Long) {
