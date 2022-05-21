@@ -33,7 +33,7 @@ fun File.onModify(checkFreq: Duration, op: ()->Unit) {
 var File.text
   get() = readText()
   set(v) {
-	parentFile.mkdirs()
+	mkparents()
 	writeText(v)
   }
 
@@ -104,7 +104,7 @@ fun File.next(): File {
 
 fun File.doubleBackupWrite(s: String, thread: Boolean = false) {
 
-  parentFile.mkdirs()
+  mkparents()
   createNewFile()
 
   /*this is important. Extra security is always good.*/
@@ -200,15 +200,20 @@ operator fun File.get(item: String): File {
 fun File.isImage() = extension.isIn("png", "jpg", "jpeg")
 
 fun File.append(s: String, mkdirs: Boolean = true) {
-  if (mkdirs) {
-	parentFile.mkdirs()
-  }
+  if (mkdirs) mkparents()
   appendText(s)
 }
 
-fun File.write(s: String, mkdirs: Boolean = true) {
-  if (mkdirs) {
-	parentFile.mkdirs()
-  }
+fun File.write(s: String, mkparents: Boolean = true) {
+  if (mkparents) mkparents()
   writeText(s)
+}
+
+fun File.mkparents() = parentFile.mkdirs()
+
+
+fun File.isBlank() = bufferedReader().run {
+  val r = read() == -1
+  close()
+  r
 }

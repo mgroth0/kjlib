@@ -9,8 +9,10 @@ import java.io.File
 
 val USER_HOME = File(System.getProperty("user.home"))
 val REGISTERED_FOLDER = File(USER_HOME.resolve(".registeredDir.txt").readText().trim())
-val FLOW_FOLDER = if (thisMachine == Machine.WINDOWS) File("C:\\Users\\mgrot\\IdeaProjects\\MyDesktop") else USER_HOME.resolve(resourceTxt("rootFolder.txt")?.let { File(it) }
-  ?: (if (isNewMac) REGISTERED_FOLDER["flow"] else REGISTERED_FOLDER["todo/flow"]))
+val FLOW_FOLDER =
+  if (thisMachine == Machine.WINDOWS) File("C:\\Users\\mgrot\\IdeaProjects\\MyDesktop") else USER_HOME.resolve(
+	resourceTxt("rootFolder.txt")?.let { File(it) }
+	  ?: (if (isNewMac) REGISTERED_FOLDER["flow"] else REGISTERED_FOLDER["todo/flow"]))
 val LOG_FOLDER = FLOW_FOLDER.resolve("log").apply { mkdir() }
 val USER_DIR = File(System.getProperty("user.dir"))
 val TEMP_DIR = USER_DIR["tmp"].apply { mkdir() }
@@ -24,6 +26,9 @@ val VAR_JSON = DATA_FOLDER["VAR.json"]
 val VAL_JSON = DATA_FOLDER["VAL.json"]
 
 val SCREENSHOT_FOLDER = REGISTERED_FOLDER["screenshots"]
+
+
+val CACHE_FOLDER = REGISTERED_FOLDER["cache"]
 
 
 val runtime = Runtime.getRuntime()!!

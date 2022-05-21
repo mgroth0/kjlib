@@ -1,25 +1,31 @@
 dependencies {
-    api(projects.kj.klibexport)
-    api(projects.kj.reflect)
-    api(libs.bundles.multik.full)
-    implementation(libs.apfloat)
-    implementation(libs.aparapi)
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+  api(projects.kj.klibexport)
+  api(projects.kj.reflect)
+  api(libs.bundles.multik.full)
+  implementation(libs.apfloat)
+  implementation(libs.aparapi)
+  api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
 
 
-    api(libs.oshi)
+  api(libs.oshi)
 
-    implementation(libs.commons.math)
+  implementation(libs.commons.math)
+
+  api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
 
 
-    /*api("org.tensorflow:tensorflow-core-api:0.4.0")*/
-    /*implementation("org.tensorflow:tensorflow-core-api:0.4.0")*/
-    /*implementation("org.tensorflow:tensorflow-core-platform:0.4.0")*/
+  /*api("org.tensorflow:tensorflow-core-api:0.4.0")*/
+  /*implementation("org.tensorflow:tensorflow-core-api:0.4.0")*/
+  /*implementation("org.tensorflow:tensorflow-core-platform:0.4.0")*/
 }
-/*
-kotlin {
-  experimental.coroutines = org.jetbrains.kotlin.gradle.dsl.Coroutines.ENABLE
-}*/
+
+
+
+plugins {
+  kotlin("plugin.serialization") version tomlVersion("kotlin")
+
+  /*experimental.coroutines = org.jetbrains.kotlin.gradle.dsl.Coroutines.ENABLE*/
+}
 
 /*
 configurations.all {

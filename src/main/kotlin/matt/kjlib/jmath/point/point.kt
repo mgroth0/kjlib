@@ -1,5 +1,9 @@
+@file:UseSerializers(ApfloatSerializer::class)
+
 package matt.kjlib.jmath.point
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import matt.kjlib.jmath.minus
 import matt.kjlib.jmath.plus
 import matt.kjlib.jmath.point.PointDim.X
@@ -7,6 +11,7 @@ import matt.kjlib.jmath.point.PointDim.Y
 import matt.kjlib.jmath.sq
 import matt.kjlib.jmath.sqrt
 import matt.kjlib.jmath.toApfloat
+import matt.kjlib.ser.ApfloatSerializer
 import matt.klib.math.sq
 import matt.klibexport.klibexport.setAll
 import org.apfloat.Apfloat
@@ -62,6 +67,7 @@ interface Point {
 }
 
 
+@Serializable
 data class BasicPoint(
   override val x: Double, override val y: Double
 ): Point {
@@ -80,6 +86,8 @@ data class BasicPoint(
   }
 }
 
+
+@Serializable
 data class APoint(
   override val x: Apfloat, override val y: Apfloat
 ): Point {

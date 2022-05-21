@@ -7,8 +7,12 @@ import com.aparapi.internal.opencl.OpenCLPlatform
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.PolymorphicSerializer
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.plus
 import matt.kjlib.async.ThreadInterface.Canceller
 import matt.kjlib.commons.runtime
+import matt.kjlib.compcache.ComputeCache
 import matt.kjlib.date.Duration
 import matt.kjlib.log.massert
 import matt.kjlib.str.tab
@@ -665,12 +669,14 @@ suspend fun <T> FlowCollector<T>.emitAll(list: Iterable<T>) {
 }
 
 
-
+@kotlinx.serialization.Serializable
 class MutSemMap<K, V>(
   private val map: MutableMap<K, V> = HashMap(),
   private val maxsize: Int = Int.MAX_VALUE
 ): MutableMap<K, V> {
-  private val sem = Semaphore(1)
+
+  private val sem by lazy { Semaphore(1) }
+
   override val size: Int
 	get() = sem.with { map.size }
 
@@ -723,6 +729,12 @@ class MutSemMap<K, V>(
   }
 
 }
+
+//val dummy = run {
+//  ComputeCache.jsonFormat = ComputeCache.buildJsonFormat(ComputeCache.jsonFormat.serializersModule + SerializersModule {
+//	polymorphic(MutSemMap::class) {} MutSemMap.serializer(PolymorphicSerializer(Any::class), PolymorphicSerializer(Any::class))
+//  })
+//}
 
 fun <K, V> mutSemMapOf(vararg pairs: Pair<K, V>, maxsize: Int = Int.MAX_VALUE) =
   MutSemMap(mutableMapOf(*pairs), maxsize = maxsize)

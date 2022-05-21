@@ -158,6 +158,10 @@ fun taball(s: String, itr: Iterable<*>) {
   }
 }
 
+fun taball(s: String, itr: Map<*,*>) {
+  taball(s,itr.entries)
+}
+
 fun Int.prependZeros(untilNumDigits: Int): String {
   var s = this.toString()
   while (s.length < untilNumDigits) {
