@@ -4,6 +4,7 @@ import matt.kbuild.runtime
 import matt.kjlib.byte.ByteSize
 import matt.kjlib.log.err
 import matt.kjlib.str.taball
+import matt.temp.temp
 import kotlin.contracts.InvocationKind.AT_LEAST_ONCE
 import kotlin.contracts.contract
 
@@ -60,3 +61,5 @@ inline fun <T> Iterable<T>.firstOrErr(msg:  String,predicate: (T) -> Boolean): T
   for (element in this) if (predicate(element)) return element
   err(msg)
 }
+
+fun doTemp() = temp()
