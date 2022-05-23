@@ -22,17 +22,6 @@ fun String.lineIndexOfIndex(i: Int): Int {
 fun String.lineNumOfIndex(i: Int) = lineIndexOfIndex(i) + 1
 
 
-/*kinda how JetBrains wants us to do it*/
-fun String.cap() =
-  replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-/*if I go back to 1.4: this.capitalize()*/
-
-
-/*kinda how JetBrains wants us to do it*/
-fun String.decap() =
-  replaceFirstChar { it.lowercase() }
-/*if I go back to 1.4: this.decapitalize()*/
-
 
 val isKotlin1_4OrEarlier = KotlinVersion.CURRENT.major <= 1 && KotlinVersion.CURRENT.minor <= 4
 
