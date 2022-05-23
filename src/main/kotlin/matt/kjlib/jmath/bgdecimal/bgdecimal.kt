@@ -1,5 +1,5 @@
 @file:Suppress("UNUSED_PARAMETER", "UNREACHABLE_CODE", "unused", "UNUSED_VALUE", "LocalVariableName",
-  "VARIABLE_WITH_REDUNDANT_INITIALIZER"
+  "VARIABLE_WITH_REDUNDANT_INITIALIZER", "DEPRECATED_IDENTITY_EQUALS"
 )
 
 package matt.kjlib.jmath.bgdecimal
@@ -2291,7 +2291,7 @@ object BigDecimalMath {
    */
   fun multiplyRound(x: BigComplex, y: BigDecimal?): BigComplex {
 	val R: BigDecimal = multiplyRound(x.re, y!!)
-	val I: BigDecimal = multiplyRound(x.im, y!!)
+	val I: BigDecimal = multiplyRound(x.im, y)
 	return BigComplex(R, I)
   } /* multiplyRound */
 

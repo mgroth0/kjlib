@@ -1,4 +1,4 @@
-@file:Suppress("unused", "FunctionName", "KDocUnresolvedReference")
+@file:Suppress("unused", "FunctionName", "KDocUnresolvedReference", "RedundantIf")
 
 package matt.kjlib.jmath.rational
 
