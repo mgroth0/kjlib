@@ -1,3 +1,4 @@
+
 package matt.kjlib.async
 
 import com.aparapi.Kernel
@@ -7,19 +8,17 @@ import com.aparapi.internal.opencl.OpenCLPlatform
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.PolymorphicSerializer
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.plus
 import matt.kbuild.runtime
 import matt.kjlib.async.ThreadInterface.Canceller
-import matt.kjlib.compcache.ComputeCache
 import matt.kjlib.date.Duration
 import matt.kjlib.log.massert
 import matt.kjlib.str.tab
 import matt.kjlib.str.taball
+import matt.klibexport.klibexport.go
 import java.lang.Thread.sleep
 import java.util.concurrent.Callable
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.concurrent.Semaphore
@@ -30,6 +29,7 @@ import kotlin.random.Random
 
 // Check out FutureTasks too!
 
+@Suppress("unused")
 class MySemaphore(val name: String): Semaphore(1) {
   override fun toString() = "Semaphore:$name"
 }
@@ -37,7 +37,7 @@ class MySemaphore(val name: String): Semaphore(1) {
 
 class QueueThread(
   sleepPeriod: Duration,
-  val sleepType: SleepType
+  private val sleepType: SleepType
 ): Thread() {
   enum class SleepType {
 	EVERY_JOB,
@@ -52,20 +52,22 @@ class QueueThread(
   private var stopped = false
   private val organizationalSem = Semaphore(1)
 
-  fun safestop() {
+  @Suppress("unused")
+  fun safeStop() {
 	stopped = true
   }
 
+  @Suppress("SpellCheckingInspection")
   override fun run() {
 	super.run()
 	while (!stopped) {
 	  var ran = false
 	  if (queue.size > 0) {
 		ran = true
-		var id: Int? = null
-		var task: (()->Any?)? = null
+		var id: Int?
+		var task: (() -> Any?)?
 		organizationalSem.with {
-		  val (idd, taskk) = queue.removeAt(0)
+		   val (idd, taskk) = queue.removeAt(0)
 		  id = idd
 		  task = taskk
 		}
@@ -80,16 +82,16 @@ class QueueThread(
 	}
   }
 
-  object RESULT_PLACEHOLDER
+  object ResultPlaceholder
 
   private var nextID = 1
 
   fun <T> with(op: ()->T?): Job<T?> {
-	var id: Int? = null
+	var id: Int?
 	organizationalSem.with {
 	  id = nextID
 	  nextID += 1
-	  results[id!!] = RESULT_PLACEHOLDER
+	  results[id!!] = ResultPlaceholder
 	  queue.add(id!! to op)
 	}
 	return Job(id!!)
@@ -98,20 +100,20 @@ class QueueThread(
   inner class Job<T>(
 	val id: Int
   ) {
-	val isDone: Boolean
+	private val isDone: Boolean
 	  get() {
 		return organizationalSem.with {
-		  results[id] != RESULT_PLACEHOLDER
+		  results[id] != ResultPlaceholder
 		}
 	  }
 
-	@Suppress("UNCHECKED_CAST")
+	@Suppress("UNCHECKED_CAST", "unused")
 	fun waitAndGet(): T {
 	  waitFor()
 	  return results[id] as T
 	}
 
-	fun waitFor() {
+	private fun waitFor() {
 	  while (!isDone) {
 		sleep(sleepPeriod.toLong())
 	  }
@@ -137,7 +139,7 @@ fun <T> Semaphore.with(op: ()->T): T {
   return r
 }
 
-// runs op in thread with sem. Caller thread makes sure that sem is acquired before continueing.
+// runs op in thread with sem. Caller thread makes sure that sem is acquired before continuing.
 // literally a combination of sem and thread
 fun Semaphore.thread(op: ()->Unit) {
   acquire()
@@ -155,12 +157,12 @@ fun Semaphore.wrap(op: ()->Unit): ()->Unit {
 class SemaphoreString(private var string: String) {
   private val sem = Semaphore(1)
   fun takeAndClear(): String {
-	var yourstring: String = ""
+	var yourString: String
 	sem.with {
-	  yourstring = string
+	  yourString = string
 	  string = ""
 	}
-	return yourstring
+	return yourString
   }
 
   operator fun plusAssign(other: String) {
@@ -191,7 +193,7 @@ class MyTimerTask(private val op: MyTimerTask.()->Unit, val name: String? = null
 	private set
 
   fun run() {
-	invokationI += 1
+	invocationI += 1
 	op()
   }
 
@@ -199,9 +201,10 @@ class MyTimerTask(private val op: MyTimerTask.()->Unit, val name: String? = null
 	cancelled = true
   }
 
-  var invokationI = 0L
+  private var invocationI = 0L
+  @Suppress("unused")
   fun onEvery(period: Int, op: MyTimerTask.()->Unit) {
-	if (invokationI%period == 0L) op()
+	if (invocationI%period == 0L) op()
   }
 
 }
@@ -258,7 +261,7 @@ class FullDelayBeforeEveryExecutionTimer(name: String? = null, debug: Boolean = 
   override fun start() {
 	daemon {
 	  while (delays.isNotEmpty()) {
-		var nextKey: Long? = null
+		var nextKey: Long?
 		schedulingSem.with {
 		  nextKey = nexts.firstKey()
 		  val n = nexts[nextKey]!!
@@ -297,11 +300,11 @@ class FullDelayBeforeEveryExecutionTimer(name: String? = null, debug: Boolean = 
 }
 
 class AccurateTimer(name: String? = null, debug: Boolean = false): MattTimer(name, debug) {
-  val waitTime = 100L
+  private val waitTime = 100L
   override fun start() {
 	daemon {
 	  while (delays.isNotEmpty()) {
-		var nextKey: Long? = null
+		var nextKey: Long?
 		schedulingSem.with {
 		  nextKey = nexts.firstKey()
 		  val n = nexts[nextKey]!!
@@ -368,7 +371,7 @@ class AccurateTimer(name: String? = null, debug: Boolean = false): MattTimer(nam
 //private val timer = Timer(true)
 private val mainTimer = FullDelayBeforeEveryExecutionTimer("MAIN_TIMER")
 
-private var usedTimer = false
+//private var usedTimer = false
 
 
 fun every(
@@ -382,17 +385,19 @@ fun every(
   massert(!(ownTimer && timer != null))
 
   val task = MyTimerTask(op, name)
-  val timer = (if (ownTimer) {
+  (if (ownTimer) {
 	FullDelayBeforeEveryExecutionTimer()
-  } else timer ?: mainTimer)
-
-
-
-  if (zeroDelayFirst) {
-	timer.scheduleWithZeroDelayFirst(task, d.inMilliseconds.toLong())
-  } else {
-	timer.schedule(task, d.inMilliseconds.toLong())
+  } else timer ?: mainTimer).go { theTimer ->
+	if (zeroDelayFirst) {
+	  theTimer.scheduleWithZeroDelayFirst(task, d.inMilliseconds.toLong())
+	} else {
+	  theTimer.schedule(task, d.inMilliseconds.toLong())
+	}
   }
+
+
+
+
 
   return task
 
@@ -402,6 +407,7 @@ fun every(
 fun sync(op: ()->Unit) = Semaphore(1).wrap(op)
 
 
+@Suppress("unused")
 fun printStackTracesForASec() {
   val t = Thread.currentThread()
   thread {
@@ -443,6 +449,7 @@ class ThreadInterface {
 	  cancelled = true
 	}
 
+	@Suppress("unused")
 	fun cancelAndWait() {
 	  cancel()
 	  if (!complete) sem.acquire()
@@ -451,6 +458,7 @@ class ThreadInterface {
 }
 
 
+@Suppress("unused")
 fun IntRange.oscillate(thread: Boolean = false, periodMs: Long? = null, op: (Int)->Unit): Canceller {
   var i = start - step
   var increasing = true
@@ -470,15 +478,16 @@ fun IntRange.oscillate(thread: Boolean = false, periodMs: Long? = null, op: (Int
 }
 
 
-fun sleep_until(system_ms: Long) {
-  val diff = system_ms - System.currentTimeMillis()
+fun sleepUntil(systemMs: Long) {
+  val diff = systemMs - System.currentTimeMillis()
   if (diff > 0) {
-	Thread.sleep(diff)
+	sleep(diff)
   }
 }
 
 val GLOBAL_POOL_SIZE = runtime.availableProcessors()
-val GLOBAL_POOL by lazy { Executors.newFixedThreadPool(GLOBAL_POOL_SIZE) }
+val GLOBAL_POOL: ExecutorService by lazy { Executors.newFixedThreadPool(GLOBAL_POOL_SIZE) }
+@Suppress("unused")
 fun <T, R> Iterable<T>.parMap(op: (T)->R): List<R> {
   return map {
 	GLOBAL_POOL.submit(Callable {
@@ -487,6 +496,7 @@ fun <T, R> Iterable<T>.parMap(op: (T)->R): List<R> {
   }.toList().map { it.get() }
 }
 
+@Suppress("unused")
 fun <T, R> Iterable<T>.parMapIndexed(op: (Int, T)->R): List<R> {
   return mapIndexed { i, it ->
 	GLOBAL_POOL.submit(Callable {
@@ -495,6 +505,7 @@ fun <T, R> Iterable<T>.parMapIndexed(op: (Int, T)->R): List<R> {
   }.toList().map { it.get() }
 }
 
+@Suppress("unused")
 fun <T, R> Sequence<T>.parMap(op: (T)->R): List<R> {
   return map {
 	GLOBAL_POOL.submit(Callable {
@@ -503,6 +514,7 @@ fun <T, R> Sequence<T>.parMap(op: (T)->R): List<R> {
   }.toList().map { it.get() }
 }
 
+@Suppress("unused")
 fun <T, R> Sequence<T>.parMapIndexed(op: (Int, T)->R): List<R> {
   return mapIndexed { i, it ->
 	GLOBAL_POOL.submit(Callable {
@@ -512,7 +524,6 @@ fun <T, R> Sequence<T>.parMapIndexed(op: (Int, T)->R): List<R> {
 }
 
 class FutureMap<K, V>(val map: Map<K, V>, val futures: List<Future<Unit>>) {
-  val total = futures.size
   inline fun fill(op: (Int)->Unit): Map<K, V> {
 	contract {
 	  callsInPlace(op)
@@ -527,6 +538,7 @@ class FutureMap<K, V>(val map: Map<K, V>, val futures: List<Future<Unit>>) {
   }
 }
 
+@Suppress("unused")
 fun <K, V> Sequence<K>.parAssociateWith(numThreads: Int? = null, op: (K)->V): FutureMap<K, V> {
   val listForCapacity = this.toList()
   val pool = numThreads?.let { Executors.newFixedThreadPool(it) } ?: GLOBAL_POOL
@@ -561,6 +573,7 @@ fun <K, V> Sequence<K>.parAssociateWith(numThreads: Int? = null, op: (K)->V): Fu
   return FutureMap(r, futures)
 }
 
+@Suppress("unused")
 fun <K, V> Sequence<K>.parChunkAssociateWith(numThreads: Int? = null, op: (K)->V): Map<K, V> {
   /*ArrayList(this.toList()).spliterator().*/
   val r = ConcurrentHashMap<K, V>()
@@ -577,6 +590,7 @@ fun <K, V> Sequence<K>.parChunkAssociateWith(numThreads: Int? = null, op: (K)->V
   return r
 }
 
+@Suppress("unused")
 fun <K, V> Sequence<K>.coAssociateWith(
   op: (K)->V
 ): Map<K, V> {
@@ -606,22 +620,21 @@ fun <K, V> Sequence<K>.coAssociateWith(
 }*/
 
 
+@Suppress("unused")
 fun aparAPITest() {
 
 
   println("com.aparapi.examples.info.Main")
   val platforms = OpenCLPlatform().openCLPlatforms
   println("Machine contains " + platforms.size + " OpenCL platforms")
-  var platformc = 0
-  for (platform in platforms) {
+  for ((platformc, platform) in platforms.withIndex()) {
 	println("Platform $platformc{")
 	println("   Name    : \"" + platform.name + "\"")
 	println("   Vendor  : \"" + platform.vendor + "\"")
 	println("   Version : \"" + platform.version + "\"")
 	val devices = platform.openCLDevices
 	println("   Platform contains " + devices.size + " OpenCL devices")
-	var devicec = 0
-	for (device in devices) {
+	for ((devicec, device) in devices.withIndex()) {
 	  println("   Device $devicec{")
 	  println("       Type                  : " + device.type)
 	  println("       GlobalMemSize         : " + device.globalMemSize)
@@ -630,10 +643,8 @@ fun aparAPITest() {
 	  println("       MaxWorkGroupSizes     : " + device.maxWorkGroupSize)
 	  println("       MaxWorkItemDimensions : " + device.maxWorkItemDimensions)
 	  println("   }")
-	  devicec++
 	}
 	println("}")
-	platformc++
   }
   val preferences = KernelManager.instance().defaultPreferences
   println("\nDevices in preferred order:\n")
@@ -664,6 +675,7 @@ fun aparAPITest() {
 }
 
 
+@Suppress("unused")
 suspend fun <T> FlowCollector<T>.emitAll(list: Iterable<T>) {
   list.forEach { emit(it) }
 }
@@ -689,7 +701,7 @@ class MutSemMap<K, V>(
   }
 
   override fun get(key: K): V? {
-	return sem.with { map.get(key) }
+	return sem.with { map[key] }
   }
 
   override fun isEmpty(): Boolean {

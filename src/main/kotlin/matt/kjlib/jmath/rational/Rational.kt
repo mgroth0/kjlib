@@ -1,3 +1,5 @@
+@file:Suppress("unused", "FunctionName", "KDocUnresolvedReference")
+
 package matt.kjlib.jmath.rational
 
 import matt.kjlib.jmath.bgdecimal.BigDecimalMath.scalePrec

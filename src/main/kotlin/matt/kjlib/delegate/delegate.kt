@@ -5,13 +5,12 @@ import matt.kjlib.olist.BasicObservableList
 import matt.kjlib.olist.toBasicObservableList
 import matt.kjlib.oset.BasicObservableSet
 import matt.kjlib.oset.toBasicObservableSet
-import matt.kjlib.str.taball
 import matt.klibexport.klibexport.setAll
 import kotlin.reflect.KProperty
 
 sealed class SuperDelegateBase<T : Any, V>(
-    thisRef: T?,
-    name: String?,
+    @Suppress("UNUSED_PARAMETER") thisRef: T?,
+    @Suppress("UNUSED_PARAMETER") name: String?,
     val setfun: ((V) -> V)? = null,
     val getfun: ((V) -> V)? = null
 ) {
@@ -78,7 +77,7 @@ object STUPID
 class SuperDelegate<T : Any, V>(
     name: String? = null,
     thisRef: T? = null,
-    val default: Any? = NO_DEFAULT,
+    val default: Any? = NoDefault,
     setfun: ((V) -> V)? = null,
     getfun: ((V) -> V)? = null
 ) : SuperDelegateBase<T, V>(thisRef, name, setfun = setfun, getfun = getfun) {
@@ -90,13 +89,13 @@ class SuperDelegate<T : Any, V>(
         return SuperDelegate(thisRef = thisRef, name = prop.name, default = default, setfun = setfun, getfun = getfun)
     }
 
-    var was_set = false
+    var wasSet = false
 
     private var _field: Any? = STUPID
     override var field: V
         set(value) {
             _field = value
-            was_set = true
+            wasSet = true
         }
         get() {
             return if (_field == STUPID) {
@@ -112,7 +111,7 @@ class SuperDelegate<T : Any, V>(
     override fun set(vvv: Any?) {
         @Suppress("UNCHECKED_CAST")
         val v = if (setfun == null) vvv else setfun.invoke(vvv as V)
-        if (was_set) {
+        if (wasSet) {
             val old = field
             if (old != v) {
                 @Suppress("UNCHECKED_CAST")
@@ -128,20 +127,20 @@ class SuperDelegate<T : Any, V>(
     }
 
     init {
-        if (default != NO_DEFAULT) {
+        if (default != NoDefault) {
             set(default)
         }
     }
 
 }
 
-object NO_DEFAULT
+object NoDefault
 
 
 class SuperListDelegate<T : Any, V>(
     name: String? = null,
     thisRef: T? = null,
-    val default: Any? = NO_DEFAULT,
+    val default: Any? = NoDefault,
 ) : SuperDelegateBase<T, V>(thisRef, name) {
 
     operator fun provideDelegate(
@@ -151,17 +150,17 @@ class SuperListDelegate<T : Any, V>(
         return SuperListDelegate(thisRef = thisRef, name = prop.name, default = default)
     }
 
-    var was_set = false
+    var wasSet = false
 
 
     override var field: BasicObservableList<*>? = null
 
 
     override fun set(vvv: Any?) {
-        require(!was_set)
+        require(!wasSet)
         require(vvv is List<*>)
         field = vvv.toBasicObservableList()
-        was_set = true
+        wasSet = true
         (field as BasicObservableList).onChange {
             @Suppress("UNCHECKED_CAST")
             change(field as V)
@@ -169,7 +168,7 @@ class SuperListDelegate<T : Any, V>(
     }
 
     fun setAll(c: Collection<*>) {
-        if (!was_set) {
+        if (!wasSet) {
             set(listOf<V>())
         }
         @Suppress("UNCHECKED_CAST")
@@ -177,7 +176,7 @@ class SuperListDelegate<T : Any, V>(
     }
 
     init {
-        if (default != NO_DEFAULT) {
+        if (default != NoDefault) {
             setAll(default as Collection<*>)
         }
     }
@@ -189,7 +188,7 @@ class SuperListDelegate<T : Any, V>(
 class SuperSetDelegate<T : Any, V>(
     name: String? = null,
     thisRef: T? = null,
-    val default: Any? = NO_DEFAULT,
+    val default: Any? = NoDefault,
 ) : SuperDelegateBase<T, V>(thisRef, name) {
 
     operator fun provideDelegate(
@@ -199,17 +198,17 @@ class SuperSetDelegate<T : Any, V>(
         return SuperSetDelegate(thisRef = thisRef, name = prop.name, default = default)
     }
 
-    var was_set = false
+    var wasSet = false
 
 
     override var field: BasicObservableSet<*>? = null
 
 
     override fun set(vvv: Any?) {
-        require(!was_set)
+        require(!wasSet)
         require(vvv is Set<*>)
         field = vvv.toBasicObservableSet()
-        was_set = true
+        wasSet = true
         (field as BasicObservableSet).onChange {
             @Suppress("UNCHECKED_CAST")
             change(field as V)
@@ -218,7 +217,7 @@ class SuperSetDelegate<T : Any, V>(
 
     fun setAll(c: Collection<*>) {
 //        taball("SuperSetDelegate.setAll1", c)
-        if (!was_set) {
+        if (!wasSet) {
             set(setOf<V>())
         }
 //        println("SuperSetDelegate.setAll2")
@@ -228,7 +227,7 @@ class SuperSetDelegate<T : Any, V>(
     }
 
     fun add(e: Any?) {
-        if (!was_set) {
+        if (!wasSet) {
             set(setOf<V>())
         }
         @Suppress("UNCHECKED_CAST")
@@ -236,7 +235,7 @@ class SuperSetDelegate<T : Any, V>(
     }
 
     fun remove(e: Any?) {
-        if (!was_set) {
+        if (!wasSet) {
             set(setOf<V>())
         } else {
             @Suppress("UNCHECKED_CAST")
@@ -246,7 +245,7 @@ class SuperSetDelegate<T : Any, V>(
     }
 
     init {
-        if (default != NO_DEFAULT) {
+        if (default != NoDefault) {
 //            println("maybe before setAll 2")
             setAll(default as Collection<*>)
         }

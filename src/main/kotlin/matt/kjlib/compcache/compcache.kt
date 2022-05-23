@@ -1,4 +1,4 @@
-@file:Suppress("ProtectedInFinal")
+@file:Suppress("ProtectedInFinal", "unused")
 
 package matt.kjlib.compcache
 
@@ -45,6 +45,7 @@ class ComputeCache<I, O> private constructor(val enableCache: Boolean = true) {
 
   companion object {
 
+	@Suppress("MemberVisibilityCanBePrivate")
 	fun buildJsonFormat(theMod: SerializersModule? = null) = Json {
 	  allowStructuredMapKeys = true
 	  theMod?.go { serializersModule = it }
@@ -57,8 +58,8 @@ class ComputeCache<I, O> private constructor(val enableCache: Boolean = true) {
 		return field
 	  }
 	set(value) {
-	  println("old jsonFormat = ${field}")
-	  println("new jsonFormat = ${value}")
+	  println("old jsonFormat = $field")
+	  println("new jsonFormat = $value")
 	  field = value
 	}
 
@@ -82,6 +83,7 @@ class ComputeCache<I, O> private constructor(val enableCache: Boolean = true) {
 	}
 
 
+	@Suppress("unused")
 	inline fun <reified T: ComputeInput<*>, reified R> saveCache() {
 	  val t = tic(prefix = "saving cache for ${T::class.simpleName}")
 	  t.toc("starting")
@@ -151,8 +153,10 @@ abstract class ComputeInput<O> {
 	}
   }
 
+  @Suppress("UNCHECKED_CAST")
   val cacheFile by lazy { (this::class as KClass<ComputeInput<*>>).cacheFile }
 
+  @Suppress("MemberVisibilityCanBePrivate")
   fun loadCache(
 	//	oClass: KClass<O>,
 	//	tClass: KClass<T>
@@ -171,7 +175,7 @@ abstract class ComputeInput<O> {
 
   fun maybeLoad() {
 	if (!ComputeCache.cacheHasBeenSetUp[this::class]!! && cacheFile.exists() && !cacheFile.isBlank()) {
-	  computeCaches[this::class] = loadCache() as ComputeCache<ComputeInput<O>, O>
+	  computeCaches[this::class] = loadCache()
 	  ComputeCache.cacheHasBeenSetUp[this::class] = true
 	}
   }

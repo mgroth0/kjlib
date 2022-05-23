@@ -8,7 +8,7 @@ class BasicBooleanProperty(initialValue: Boolean) {
   var value: Boolean = initialValue
 	set(value) {
 	  field = value
-	  listeners.forEach { (obj, op) ->
+	  listeners.forEach { (_, op) ->
 		op(value)
 	  }
 	}

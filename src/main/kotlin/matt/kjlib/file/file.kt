@@ -20,13 +20,13 @@ infix fun File.withExtension(ext: String): File {
 }
 
 fun File.onModify(checkFreq: Duration, op: ()->Unit) {
-  var last_modified = recursiveLastModified()
+  var lastModified = recursiveLastModified()
   every(checkFreq) {
 	val mod = recursiveLastModified()
-	if (mod != last_modified) {
+	if (mod != lastModified) {
 	  op()
 	}
-	last_modified = mod
+	lastModified = mod
   }
 }
 
@@ -37,10 +37,11 @@ var File.text
 	writeText(v)
   }
 
-fun String.toPath() = FileSystems.getDefault().getPath(this.trim())
+fun String.toPath(): Path = FileSystems.getDefault().getPath(this.trim())
 val File.doesNotExist get() = !exists()
 
 
+@Suppress("unused")
 fun Path.startsWithAny(atLeastOne: Path, vararg more: Path): Boolean {
   if (startsWith(atLeastOne)) return true
   more.forEach { if (startsWith(it)) return true }
@@ -65,8 +66,10 @@ fun File.clearIfTooBigThenAppendText(s: String) {
 
 fun File.recursiveChildren() = recurse { it.listFiles()?.toList() ?: listOf() }
 
-fun Iterable<File>.filterHasExtenion(ext: String) = filter { it.extension == ext }
-fun Sequence<File>.filterHasExtenion(ext: String) = filter { it.extension == ext }
+@Suppress("unused")
+fun Iterable<File>.filterHasExtension(ext: String) = filter { it.extension == ext }
+@Suppress("unused")
+fun Sequence<File>.filterHasExtension(ext: String) = filter { it.extension == ext }
 
 fun File.deleteIfExists() {
   if (exists()) {
@@ -84,7 +87,7 @@ fun File.resRepExt(newExt: String) =
 
 fun File.recursiveLastModified(): Long {
   var greatest = 0L
-  recurse { it: File -> it.listFiles()?.toList() ?: listOf<File>() }.forEach {
+  recurse { it.listFiles()?.toList() ?: listOf() }.forEach {
 	greatest = listOf(greatest, it.lastModified()).maxOrNull()!!
   }
   return greatest
@@ -133,7 +136,7 @@ fun File.doubleBackupWrite(s: String, thread: Boolean = false) {
 }
 
 
-fun File.backupWork(thread: Boolean = false, text: String? = null): ()->Unit {
+fun File.backupWork(@Suppress("UNUSED_PARAMETER") thread: Boolean = false, text: String? = null): ()->Unit {
 
   if (!this.exists()) {
 	throw Exception("cannot back up ${this}, which does not exist")
@@ -187,6 +190,7 @@ fun File.getNextAndClearWhenMoreThan(n: Int, extraExt: String = "itr"): File {
 }
 
 
+@Suppress("unused")
 val File.fname: String
   get() = name
 val File.abspath: String

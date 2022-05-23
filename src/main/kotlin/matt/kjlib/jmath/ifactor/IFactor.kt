@@ -1,3 +1,7 @@
+@file:Suppress("NAME_SHADOWING", "unused", "UNUSED_VARIABLE", "UNCHECKED_CAST", "CovariantEquals",
+  "KDocUnresolvedReference", "SpellCheckingInspection", "PARAMETER_NAME_CHANGED_ON_OVERRIDE"
+)
+
 package matt.kjlib.jmath.ifactor
 
 import matt.kjlib.jmath.prime.Prime

@@ -1,3 +1,7 @@
+@file:Suppress("UNUSED_PARAMETER", "UNREACHABLE_CODE", "unused", "UNUSED_VALUE", "LocalVariableName",
+  "VARIABLE_WITH_REDUNDANT_INITIALIZER"
+)
+
 package matt.kjlib.jmath.bgdecimal
 
 import matt.kjlib.jmath.bernoulli.Bernoulli
@@ -1134,7 +1138,7 @@ object BigDecimalMath {
 		resul = if (i%2 == 0) resul.add(c) else resul.subtract(c)
 		if (Math.abs(c.toDouble()) < 0.1*eps) break
 		fourn = fourn.shiftLeft(2)
-		xpowi = multiplyRound(xpowi!!, xhighprSq)
+		xpowi = multiplyRound(xpowi, xhighprSq)
 		i++
 	  }
 	  mc = MathContext(err2prec(resul.toDouble(), eps))
