@@ -2500,7 +2500,7 @@ object BigDecimalMath {
 	/* n/(x+iy) = nx/(x^2+y^2) -nyi/(x^2+y^2)
          */
 	val repart: BigDecimal = multiplyRound(z.re, n!!)
-	val impart: BigDecimal = multiplyRound(z.im, n!!)
+	val impart: BigDecimal = multiplyRound(z.im, n)
 	return BigComplex(repart, impart)
   } /* divideRound */
 

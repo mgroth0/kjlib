@@ -1,4 +1,4 @@
-@file:Suppress("unused", "FunctionName", "KDocUnresolvedReference", "RedundantIf")
+@file:Suppress("unused", "FunctionName", "KDocUnresolvedReference", "RedundantIf", "PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 
 package matt.kjlib.jmath.rational
 
