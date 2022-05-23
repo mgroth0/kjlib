@@ -3,7 +3,7 @@ dependencies {
   api(projects.kj.reflect)
   api(projects.kj.kbuild)
   api(libs.bundles.multik.full)
-  api(projects.kj.temp)
+//  api(projects.kj.temp)
   implementation(libs.apfloat)
   implementation(libs.aparapi)
   api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
