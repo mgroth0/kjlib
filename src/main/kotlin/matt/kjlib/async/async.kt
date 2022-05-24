@@ -750,3 +750,9 @@ class MutSemMap<K, V>(
 
 fun <K, V> mutSemMapOf(vararg pairs: Pair<K, V>, maxsize: Int = Int.MAX_VALUE) =
   MutSemMap(mutableMapOf(*pairs), maxsize = maxsize)
+
+fun waitFor(sleepPeriod: Long, l: ()->Boolean) {
+  while (!l()) {
+	Thread.sleep(sleepPeriod)
+  }
+}
