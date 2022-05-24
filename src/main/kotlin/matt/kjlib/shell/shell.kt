@@ -18,11 +18,11 @@ fun exec(wd: File?, vararg args: String) = proc(wd, *args).waitFor() == 0
 fun execReturn(vararg args: String) = execReturn(null, *args)
 fun execPython(s: String) = execReturn("/usr/bin/python", "-c", s)
 
-fun execReturn(wd: File?, vararg args: String, verbose: Boolean = false): String {
+fun execReturn(wd: File?, vararg args: String, verbose: Boolean = false, printResult: Boolean = false): String {
   if (verbose) {
 	println("running ${args.joinToString(" ")}")
   }
-  return proc(wd, *args).allStdOutAndStdErr()
+  return proc(wd, *args).allStdOutAndStdErr().also { if (printResult) println(it) }
 }
 
 
