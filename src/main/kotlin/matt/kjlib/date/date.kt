@@ -211,10 +211,14 @@ class Stopwatch(
   }
 
   private val prefixS = if (prefix != null) "$prefix\t" else ""
+
+  val record = mutableMapOf<Double,String>()
+
   infix fun toc(s: String): Duration? {
 	if (enabled) {
 	  val stop = System.nanoTime()
 	  val dur = Duration(startRelativeNanos, stop)
+	  record[dur.inMilliseconds] = s
 	  if (!silent) {
 		if (simplePrinting) {
 		  println("${dur.format().addSpacesUntilLengthIs(10)}\t$s")
