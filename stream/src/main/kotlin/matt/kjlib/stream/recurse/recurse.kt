@@ -1,4 +1,4 @@
-package matt.kjlib.recurse
+package matt.kjlib.stream.recurse
 
 import matt.kbuild.recurse
 import matt.kjlib.lang.err
@@ -12,7 +12,6 @@ fun <T> T.recursionDepth(rchildren: (T)->Iterable<T>): Int {
 	it.recursionDepth(rchildren)
   }.maxOrNull() ?: 0) + 1
 }
-
 
 
 fun <T> T.recurseWithDepth(

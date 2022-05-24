@@ -1,4 +1,4 @@
-package matt.kjlib.itr
+package matt.kjlib.stream.itr
 
 import matt.kjlib.lang.err
 
