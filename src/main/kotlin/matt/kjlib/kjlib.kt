@@ -2,7 +2,7 @@ package matt.kjlib
 
 import matt.kbuild.runtime
 import matt.kjlib.byte.ByteSize
-import matt.kjlib.log.err
+import matt.kjlib.lang.err
 import matt.kjlib.str.taball
 //import matt.temp.temp
 import kotlin.contracts.InvocationKind.AT_LEAST_ONCE

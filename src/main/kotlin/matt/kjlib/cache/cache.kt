@@ -1,6 +1,6 @@
 package matt.kjlib.cache
 
-import matt.kjlib.log.err
+import matt.kjlib.lang.err
 import kotlin.contracts.ExperimentalContracts
 import kotlin.reflect.KClass
 

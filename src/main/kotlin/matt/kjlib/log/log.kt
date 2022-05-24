@@ -2,7 +2,6 @@ package matt.kjlib.log
 
 import matt.kbuild.FLOW_FOLDER
 import matt.kjlib.file.get
-import matt.klib.log.warn
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.io.PrintWriter
@@ -11,14 +10,6 @@ import java.nio.charset.StandardCharsets
 val exceptionFolder = FLOW_FOLDER["log"]["errorReports"]
 
 
-
-fun err(s: String = ""): Nothing {
-  throw RuntimeException(s)
-}
-
-val NEVER: Nothing
-  get() = err("NEVER")
-
 fun mAssert(b: Boolean) {
   if (!b) {
 	throw RuntimeException("Bad!")
@@ -26,7 +17,6 @@ fun mAssert(b: Boolean) {
 }
 
 fun massert(b: Boolean) = mAssert(b)
-
 
 
 @Suppress("unused")
@@ -50,8 +40,6 @@ class Printer(private val pw: PrintWriter): Prints {
   override fun println(a: Any) = pw.println(a)
   override fun print(a: Any) = pw.print(a)
 }
-
-
 
 
 fun Exception.printStackTraceToString(): String {

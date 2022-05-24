@@ -1,5 +1,6 @@
 package matt.kjlib.stream
 
+
 import kotlin.contracts.InvocationKind.UNKNOWN
 import kotlin.contracts.contract
 

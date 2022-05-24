@@ -2,6 +2,8 @@ dependencies {
   api(projects.kj.klibexport)
   api(projects.kj.reflect)
   api(projects.kj.kbuild)
+  api(projects.kj.kjlib.lang)
+  api(projects.kj.kjlib.stream)
   api(libs.bundles.multik.full)
 //  api(projects.kj.temp)
   implementation(libs.apfloat)

@@ -1,7 +1,7 @@
 package matt.kjlib.map
 
 import matt.kjlib.itr.FakeMutableIterator
-import matt.kjlib.log.err
+import matt.kjlib.lang.err
 import matt.kjlib.str.lower
 import matt.klib.dmap.withStoringDefault
 import kotlin.collections.MutableMap.MutableEntry

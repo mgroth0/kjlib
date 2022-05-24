@@ -1,6 +1,6 @@
 package matt.kjlib.itr
 
-import matt.kjlib.log.err
+import matt.kjlib.lang.err
 
 
 fun <E> List<E>.loopIterator() = LoopIterator(this)

@@ -1,6 +1,6 @@
 package matt.kjlib.str
 
-import matt.kjlib.log.err
+import matt.kjlib.lang.err
 import java.io.File
 import java.math.BigDecimal
 
@@ -20,7 +20,6 @@ fun String.lineIndexOfIndex(i: Int): Int {
 }
 
 fun String.lineNumOfIndex(i: Int) = lineIndexOfIndex(i) + 1
-
 
 
 val isKotlin1_4OrEarlier = KotlinVersion.CURRENT.major <= 1 && KotlinVersion.CURRENT.minor <= 4
@@ -147,8 +146,8 @@ fun taball(s: String, itr: Iterable<*>) {
   }
 }
 
-fun taball(s: String, itr: Map<*,*>) {
-  taball(s,itr.entries)
+fun taball(s: String, itr: Map<*, *>) {
+  taball(s, itr.entries)
 }
 
 fun Int.prependZeros(untilNumDigits: Int): String {
@@ -269,5 +268,5 @@ val VOWELS = arrayOf('A', 'E', 'I', 'O', 'U', 'Y')
 val CONSENENTS = ALPHABET.filter { it !in VOWELS }.toTypedArray()
 
 
-operator fun String.get(intRange: IntRange) = subSequence(intRange.first,intRange.last + 1)
+operator fun String.get(intRange: IntRange) = subSequence(intRange.first, intRange.last + 1)
 fun String.throttled() = "THROTTLED STRING OF LENGTH $length (\"${this[0..100]}\"...)"

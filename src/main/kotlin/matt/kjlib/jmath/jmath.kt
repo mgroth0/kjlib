@@ -1,8 +1,6 @@
 package matt.kjlib.jmath
 
 import matt.kjlib.jmath.bgdecimal.BigDecimalMath
-import matt.kjlib.log.NEVER
-import matt.kjlib.log.err
 import matt.kjlib.stream.forEachNested
 import matt.klib.math.sq
 import org.apache.commons.math3.special.Gamma
@@ -487,7 +485,7 @@ fun Number.toApfloat() = when (this) {
   is Short  -> Apfloat(this.toDouble())
   is Float  -> Apfloat(this)
   is Double -> Apfloat(this)
-  else      -> NEVER
+  else      -> throw RuntimeException("no implementation of ${this::class}.toApfloat()")
 }
 
 fun Int.toApint() = Apint(this.toLong())
@@ -497,21 +495,21 @@ operator fun <A: Apfloat> A.times(other: Number): Apfloat = when (other) {
   is Double  -> this.multiply(other.toApfloat())
   is Float   -> this.multiply(other.toApfloat())
   is Apfloat -> this.multiply(other)
-  else       -> err("how to do Apfloat.times(${other::class.simpleName})?")
+  else       -> throw RuntimeException("how to do Apfloat.times(${other::class.simpleName})?")
 }
 
 operator fun <A: Apfloat> A.rem(other: Number): Apfloat = when (other) {
   is Int     -> ApfloatMath.fmod(this, other.toApint())
   is Double  -> ApfloatMath.fmod(this, other.toApfloat())
   is Apfloat -> ApfloatMath.fmod(this, other)
-  else       -> err("how to do Apfloat.rem(${other::class.simpleName})?")
+  else       -> throw RuntimeException("how to do Apfloat.rem(${other::class.simpleName})?")
 }
 
 operator fun <A: Apfloat> A.plus(other: Number): Apfloat = when (other) {
   is Int     -> this.add(other.toApint())
   is Double  -> this.add(other.toApfloat())
   is Apfloat -> this.add(other)
-  else       -> err("how to do Apfloat.plus(${other::class.simpleName})?")
+  else       -> throw RuntimeException("how to do Apfloat.plus(${other::class.simpleName})?")
 }
 
 fun Apint.toApfloat() = Apfloat(this.toDouble())
@@ -523,14 +521,14 @@ operator fun <A: Apfloat> A.minus(other: Number): Apfloat = when (other) {
   is Int     -> this.subtract(other.toApint())
   is Double  -> this.subtract(other.toApfloat())
   is Apfloat -> this.subtract(other)
-  else       -> err("how to do Apfloat.minus(${other::class.simpleName})?")
+  else       -> throw RuntimeException("how to do Apfloat.minus(${other::class.simpleName})?")
 }
 
 operator fun <A: Apfloat> A.div(other: Number): Apfloat = when (other) {
   is Int     -> this.divide(other.toApint())
   is Double  -> this.divide(other.toApfloat())
   is Apfloat -> this.divide(other)
-  else       -> err("how to do Apfloat.div(${other::class.simpleName})?")
+  else       -> throw RuntimeException("how to do Apfloat.div(${other::class.simpleName})?")
 }
 
 fun Apfloat.sq() = ApfloatMath.pow(this, 2)
@@ -583,14 +581,14 @@ infix fun Apfloat.pow(other: Number): Apfloat = when (other) {
   is Int     -> ApfloatMath.pow(this, other.toApint())
   is Double  -> ApfloatMath.pow(this, other.toApfloat())
   is Apfloat -> ApfloatMath.pow(this, other)
-  else       -> err("how to do Apfloat.pow(${other::class.simpleName})?")
+  else       -> throw RuntimeException("how to do Apfloat.pow(${other::class.simpleName})?")
 }
 
 operator fun Apfloat.compareTo(other: Number): Int = when (other) {
   is Int     -> this.compareTo(other.toApint())
   is Double  -> this.compareTo(other.toApfloat())
   is Apfloat -> this.compareTo(other)
-  else       -> err("how to do Apfloat.compareTo(${other::class.simpleName})?")
+  else       -> throw RuntimeException("how to do Apfloat.compareTo(${other::class.simpleName})?")
 }
 
 fun cos(n: Apfloat) = ApfloatMath.cos(n)

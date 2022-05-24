@@ -1,6 +1,6 @@
 package matt.kjlib.weak
 
-import matt.kjlib.log.err
+import matt.kjlib.lang.err
 import java.lang.ref.WeakReference
 
 val immortals = mutableSetOf<Any>()
