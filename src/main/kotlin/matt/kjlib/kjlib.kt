@@ -2,22 +2,9 @@ package matt.kjlib
 
 import matt.kbuild.runtime
 import matt.kjlib.byte.ByteSize
-import matt.kjlib.lang.err
-import matt.kjlib.str.taball
-//import matt.temp.temp
 import kotlin.contracts.InvocationKind.AT_LEAST_ONCE
 import kotlin.contracts.contract
 
-
-fun <T> Iterable<T>.debugFirst(pred: (T)->Boolean): T {
-  println("debugFirst1")
-  taball("iterable", this)
-  for (thing in this) {
-	if (pred(thing)) return thing
-  }
-  println("debugFirst2")
-  err("could not find first")
-}
 
 data class Geometry(
   val x: Double,
@@ -54,6 +41,7 @@ inline fun whileTrue(op: ()->Boolean) {
 
 
 private class Thing
+
 fun resourceTxt(name: String) = Thing()::class.java.classLoader.getResourceAsStream(name)?.bufferedReader()?.readText()
 
 
