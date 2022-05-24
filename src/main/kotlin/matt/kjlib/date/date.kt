@@ -212,13 +212,21 @@ class Stopwatch(
 
   private val prefixS = if (prefix != null) "$prefix\t" else ""
 
-  val record = mutableMapOf<Double,String>()
+  val record = mutableListOf<Pair<Long,String>>()
+  fun increments() = record.mapIndexed {index,(l,s) ->
+	if (index == 0) 0L to s
+	else (l - record[index - 1].first) to s
+  }
+
+//	record.entries.runningFold(0L to "START") { acc, it ->
+//	((it.key - acc.first) - startRelativeNanos) to it.value
+//  }
 
   infix fun toc(s: String): Duration? {
 	if (enabled) {
 	  val stop = System.nanoTime()
 	  val dur = Duration(startRelativeNanos, stop)
-	  record[dur.inMilliseconds] = s
+	  record += stop to  s
 	  if (!silent) {
 		if (simplePrinting) {
 		  println("${dur.format().addSpacesUntilLengthIs(10)}\t$s")
