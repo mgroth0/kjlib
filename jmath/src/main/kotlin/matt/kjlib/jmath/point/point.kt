@@ -8,10 +8,10 @@ import matt.kjlib.jmath.minus
 import matt.kjlib.jmath.plus
 import matt.kjlib.jmath.point.PointDim.X
 import matt.kjlib.jmath.point.PointDim.Y
+import matt.kjlib.jmath.ser.ApfloatSerializer
 import matt.kjlib.jmath.sq
 import matt.kjlib.jmath.sqrt
 import matt.kjlib.jmath.toApfloat
-import matt.kjlib.ser.ApfloatSerializer
 import matt.klib.math.sq
 import matt.klibexport.klibexport.setAll
 import org.apfloat.Apfloat

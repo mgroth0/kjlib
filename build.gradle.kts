@@ -4,18 +4,19 @@ dependencies {
   api(projects.kj.kbuild)
   api(projects.kj.kjlib.lang)
   api(projects.kj.kjlib.stream)
-  api(libs.bundles.multik.full)
-//  api(projects.kj.temp)
-  implementation(libs.apfloat)
+  api(projects.kj.kjlib.jmath)
   implementation(libs.aparapi)
+
+//  api(projects.kj.temp)
+
   api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
 
 
   api(libs.oshi)
 
-  implementation(libs.commons.math)
 
-  api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
+
+  api(libs.kotlinx.serialization.json)
 
 
   /*api("org.tensorflow:tensorflow-core-api:0.4.0")*/
