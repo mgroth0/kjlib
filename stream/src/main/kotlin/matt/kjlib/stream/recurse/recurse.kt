@@ -1,6 +1,5 @@
 package matt.kjlib.stream.recurse
 
-import matt.kbuild.recurse
 import matt.kjlib.lang.err
 
 import kotlin.contracts.ExperimentalContracts
@@ -89,6 +88,34 @@ inline fun <T: Any> T.chain(crossinline op: (T)->T?): Sequence<T> {
 		needsCheck = true
 		return nextO!!
 	  } else err("bad logic")
+	}
+  }.asSequence()
+}
+
+fun <T> T.recurse(includeSelf: Boolean = true, rchildren: (T)->Iterable<T>): Sequence<T> {
+  val mychildren = rchildren(this).iterator()
+  var gaveSelf = false
+  var currentChild: Iterator<T>? = null
+  return object: Iterator<T> {
+	override fun hasNext(): Boolean {
+	  if (currentChild != null && currentChild!!.hasNext()) {
+		return true
+	  }
+	  return mychildren.hasNext() || (!gaveSelf && includeSelf)
+	}
+
+	override fun next(): T {
+	  return if (currentChild != null && currentChild!!.hasNext()) {
+		currentChild!!.next()
+	  } else if (mychildren.hasNext()) {
+		currentChild = mychildren.next().recurse(rchildren = rchildren).iterator()
+		next()
+	  } else if (!gaveSelf && includeSelf) {
+		gaveSelf = true
+		this@recurse
+	  } else {
+		throw RuntimeException("guess I messed up the recursion logic")
+	  }
 	}
   }.asSequence()
 }
