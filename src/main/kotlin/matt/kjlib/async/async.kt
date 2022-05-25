@@ -8,9 +8,9 @@ import com.aparapi.internal.opencl.OpenCLPlatform
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import matt.kbuild.runtime
 import matt.kjlib.async.ThreadInterface.Canceller
 import matt.kjlib.date.Duration
+import matt.kjlib.lang.jlang.runtime
 import matt.kjlib.log.massert
 import matt.kjlib.str.tab
 import matt.kjlib.str.taball

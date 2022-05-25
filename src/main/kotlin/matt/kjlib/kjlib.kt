@@ -1,7 +1,7 @@
 package matt.kjlib
 
-import matt.kbuild.runtime
 import matt.kjlib.byte.ByteSize
+import matt.kjlib.lang.jlang.runtime
 import kotlin.contracts.InvocationKind.AT_LEAST_ONCE
 import kotlin.contracts.contract
 
