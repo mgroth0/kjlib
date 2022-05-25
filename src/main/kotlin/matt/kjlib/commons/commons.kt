@@ -2,9 +2,9 @@ package matt.kjlib.commons
 
 import matt.kbuild.DATA_FOLDER
 import matt.kbuild.FLOW_FOLDER
-import matt.kbuild.REGISTERED_FOLDER
 import matt.kbuild.isNewMac
 import matt.kjlib.file.get
+import matt.klib.REGISTERED_FOLDER
 import java.io.File
 
 
