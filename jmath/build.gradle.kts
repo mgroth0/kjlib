@@ -8,3 +8,6 @@ dependencies {
   implementation(libs.commons.math)
   api(libs.bundles.multik.full)
 }
+plugins {
+  kotlin("plugin.serialization")
+}
