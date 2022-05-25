@@ -626,7 +626,7 @@ fun aparAPITest() {
 
   println("com.aparapi.examples.info.Main")
   val platforms = OpenCLPlatform().openCLPlatforms
-  println("Machine contains " + platforms.size + " OpenCL platforms")
+  println("matt.klib.sys.Machine contains " + platforms.size + " OpenCL platforms")
   for ((platformc, platform) in platforms.withIndex()) {
 	println("Platform $platformc{")
 	println("   Name    : \"" + platform.name + "\"")
