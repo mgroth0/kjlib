@@ -1,6 +1,7 @@
 package matt.kjlib.lang
 
 fun err(s: String = ""): Nothing {
+  println("demmy")
   throw RuntimeException(s)
 }
 
