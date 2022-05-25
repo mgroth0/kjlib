@@ -1,5 +1,6 @@
 package matt.kjlib.byte
 
+import matt.kjlib.lang.jlang.runtime
 import matt.kjlib.str.sigfig
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -130,4 +131,17 @@ fun ByteArray.toHex(): String {
 	hexChars[j*2 + 1] = hexArray[v and 0x0F]
   }
   return String(hexChars)
+}
+
+class MemReport {
+  val total = ByteSize(runtime.totalMemory())
+  val max = ByteSize(runtime.maxMemory())
+  val free = ByteSize(runtime.freeMemory())
+  override fun toString(): String {
+	var s = ""
+	s += "heapsize:${total}\n"
+	s += "heapmaxsize:${max}\n"
+	s += "heapFreesize:${free}"
+	return s
+  }
 }
