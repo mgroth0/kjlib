@@ -5,7 +5,6 @@ import matt.kbuild.FLOW_FOLDER
 import matt.kbuild.REGISTERED_FOLDER
 import matt.kbuild.isNewMac
 import matt.kjlib.file.get
-import matt.kjlib.resourceTxt
 import java.io.File
 
 

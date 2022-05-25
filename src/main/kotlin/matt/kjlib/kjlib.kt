@@ -40,8 +40,6 @@ inline fun whileTrue(op: ()->Boolean) {
 }
 
 
-private class Thing
 
-fun resourceTxt(name: String) = Thing()::class.java.classLoader.getResourceAsStream(name)?.bufferedReader()?.readText()
 
 
