@@ -1,16 +1,37 @@
 package matt.kjlib.shell
 
-
-import matt.kbuild.allStdOutAndStdErr
-import matt.kbuild.proc
 import oshi.software.os.OSProcess
 import java.io.File
-import java.lang.reflect.Field
+import java.io.InputStream
 import java.time.Duration
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
+
+
+fun proc(
+  wd: File?, vararg args: String, env: Map<String, String> = mapOf()
+): Process {
+  val envp = env.map {
+	it.key + "=" + it.value
+  }.toTypedArray()
+  return if (wd == null) Runtime.getRuntime().exec(
+	args, envp
+  ) else Runtime.getRuntime().exec(
+	args, envp, wd
+  )
+}
+
+fun Process.allStdOutAndStdErr() =
+  streams.joinToString("") {/*FutureTask {*/ /*no idea why i did this... it caused blocking i think*/
+	it.bufferedReader().lines().toList().joinToString("\n")
+  }
+
+val Process.streams: List<InputStream>
+  get() {
+	return listOf(inputStream, errorStream)
+  }
 
 
 fun exec(wd: File?, vararg args: String) = proc(wd, *args).waitFor() == 0
@@ -25,7 +46,6 @@ fun execReturn(wd: File?, vararg args: String, verbose: Boolean = false, printRe
 }
 
 
-
 fun obliterate(pid: Long) {
   println("obliterating $pid")
   Runtime.getRuntime().apply {
@@ -35,9 +55,8 @@ fun obliterate(pid: Long) {
   }
 }
 
-val START_FORMAT: DateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
-  .withLocale(Locale.ENGLISH)
-  .withZone(ZoneId.systemDefault())
+val START_FORMAT: DateTimeFormatter =
+  DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(Locale.ENGLISH).withZone(ZoneId.systemDefault())
 
 fun Process.startInstant(): String? = info().startInstant().orElseGet { null }?.let {
   START_FORMAT.format(it)
@@ -121,3 +140,17 @@ val OSProcess.arguments: List<String>?
 	}
   }
 
+
+fun shell(vararg args: String, debug: Boolean = false, workingDir: File? = null): String {
+  if (debug) {
+	println("running command: ${args.joinToString(" ")}")
+  }
+  val p = proc(
+	wd = workingDir, args = args
+  )
+  val output = p.allStdOutAndStdErr()
+  if (debug) {
+	println("output: ${output}")
+  }
+  return output
+}

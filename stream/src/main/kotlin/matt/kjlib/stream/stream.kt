@@ -1,6 +1,7 @@
 package matt.kjlib.stream
 
 
+import matt.kjlib.lang.err
 import kotlin.contracts.InvocationKind.UNKNOWN
 import kotlin.contracts.contract
 
@@ -126,3 +127,10 @@ fun Array<FloatArray>.flatten() = FloatArray(this.map { it.size }.sum()).also { 
   }
 }
 
+
+
+
+inline fun <T> Iterable<T>.firstOrErr(msg: String, predicate: (T)->Boolean): T {
+  for (element in this) if (predicate(element)) return element
+  err(msg)
+}
