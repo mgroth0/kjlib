@@ -10,7 +10,7 @@ import java.io.PrintStream
 import java.io.Reader
 import kotlin.experimental.and
 
-class ByteSize(val bytes: Long) {
+data class ByteSize(val bytes: Long): Comparable<ByteSize> {
   companion object {
 	const val KILO: Long = 1024
 	const val MEGA = KILO*KILO
@@ -25,16 +25,40 @@ class ByteSize(val bytes: Long) {
 
   val formatted by lazy {
 	when {
-	  giga > 1 -> "${giga.sigfig(3)} GB"
-	  mega > 1 -> "${mega.sigfig(3)} MB"
-	  kilo > 1 -> "${kilo.sigfig(3)} KB"
-	  else     -> "${bytes.sigfig(3)} B"
+	  giga > 1 || giga < -1 -> "${giga.sigfig(3)} GB"
+	  mega > 1 || mega < -1 -> "${mega.sigfig(3)} MB"
+	  kilo > 1 || kilo < -1 -> "${kilo.sigfig(3)} KB"
+	  else                  -> "${bytes.sigfig(3)} B"
 	}
+  }
+
+  override fun compareTo(other: ByteSize): Int {
+	return this.bytes.compareTo(other.bytes)
   }
 
   override fun toString(): String {
 	return formatted
   }
+
+  operator fun plus(other: ByteSize): ByteSize {
+	return ByteSize(bytes + other.bytes)
+  }
+
+  operator fun minus(other: ByteSize): ByteSize {
+	return ByteSize(bytes - other.bytes)
+  }
+
+}
+
+@OptIn(kotlin.experimental.ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+@JvmName("sumOfByteSize")
+inline fun <T> Iterable<T>.sumOf(selector: (T)->ByteSize): ByteSize {
+  var sum: ByteSize = ByteSize(0)
+  for (element in this) {
+	sum += selector(element)
+  }
+  return sum
 }
 
 fun redirectOut(duplicate: Boolean = true, op: (String)->Unit) {
@@ -79,11 +103,6 @@ fun pipedPrintStream(): Pair<PrintStream, PipedInputStream> {
 
   return ps to inPipe
 }
-
-
-
-
-
 
 
 class ReaderEndReason(val type: TYPE, val exception: Exception? = null) {
