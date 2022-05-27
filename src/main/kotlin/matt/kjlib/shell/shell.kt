@@ -5,13 +5,12 @@ import matt.kbuild.allStdOutAndStdErr
 import matt.kbuild.proc
 import oshi.software.os.OSProcess
 import java.io.File
-import java.io.InputStream
+import java.lang.reflect.Field
 import java.time.Duration
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
-
 
 
 fun exec(wd: File?, vararg args: String) = proc(wd, *args).waitFor() == 0
@@ -121,3 +120,4 @@ val OSProcess.arguments: List<String>?
 	  }
 	}
   }
+

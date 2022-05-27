@@ -1,4 +1,3 @@
-
 package matt.kjlib.async
 
 import com.aparapi.Kernel
@@ -15,6 +14,9 @@ import matt.kjlib.log.massert
 import matt.kjlib.str.tab
 import matt.kjlib.str.taball
 import matt.klibexport.klibexport.go
+import java.io.OutputStream
+import java.io.PipedInputStream
+import java.io.PipedOutputStream
 import java.lang.Thread.sleep
 import java.util.concurrent.Callable
 import java.util.concurrent.ConcurrentHashMap
@@ -36,12 +38,10 @@ class MySemaphore(val name: String): Semaphore(1) {
 
 
 class QueueThread(
-  sleepPeriod: Duration,
-  private val sleepType: SleepType
+  sleepPeriod: Duration, private val sleepType: SleepType
 ): Thread() {
   enum class SleepType {
-	EVERY_JOB,
-	WHEN_NO_JOBS
+	EVERY_JOB, WHEN_NO_JOBS
   }
 
   private val sleepPeriod = sleepPeriod.inMilliseconds
@@ -65,9 +65,9 @@ class QueueThread(
 	  if (queue.size > 0) {
 		ran = true
 		var id: Int?
-		var task: (() -> Any?)?
+		var task: (()->Any?)?
 		organizationalSem.with {
-		   val (idd, taskk) = queue.removeAt(0)
+		  val (idd, taskk) = queue.removeAt(0)
 		  id = idd
 		  task = taskk
 		}
@@ -202,6 +202,7 @@ class MyTimerTask(private val op: MyTimerTask.()->Unit, val name: String? = null
   }
 
   private var invocationI = 0L
+
   @Suppress("unused")
   fun onEvery(period: Int, op: MyTimerTask.()->Unit) {
 	if (invocationI%period == 0L) op()
@@ -415,11 +416,9 @@ fun printStackTracesForASec() {
 
 	  val traces = Thread.getAllStackTraces()[t]!!
 
-	  if (traces.isEmpty()) {
-		//		globaltoc("$t has no stacktrace")
+	  if (traces.isEmpty()) {        //		globaltoc("$t has no stacktrace")
 	  } else {
-		println()
-		//		globaltoc("stacktrace of $t")
+		println()        //		globaltoc("stacktrace of $t")
 		println()
 		Thread.getAllStackTraces()[t]!!.forEach {
 		  println(it)
@@ -487,6 +486,7 @@ fun sleepUntil(systemMs: Long) {
 
 val GLOBAL_POOL_SIZE = runtime.availableProcessors()
 val GLOBAL_POOL: ExecutorService by lazy { Executors.newFixedThreadPool(GLOBAL_POOL_SIZE) }
+
 @Suppress("unused")
 fun <T, R> Iterable<T>.parMap(op: (T)->R): List<R> {
   return map {
@@ -541,8 +541,7 @@ class FutureMap<K, V>(val map: Map<K, V>, val futures: List<Future<Unit>>) {
 @Suppress("unused")
 fun <K, V> Sequence<K>.parAssociateWith(numThreads: Int? = null, op: (K)->V): FutureMap<K, V> {
   val listForCapacity = this.toList()
-  val pool = numThreads?.let { Executors.newFixedThreadPool(it) } ?: GLOBAL_POOL
-  /*  val r = ConcurrentHashMap<K, V>(
+  val pool = numThreads?.let { Executors.newFixedThreadPool(it) } ?: GLOBAL_POOL/*  val r = ConcurrentHashMap<K, V>(
 	  listForCapacity.size,
 	  loadFactor =
 	)*/
@@ -574,8 +573,10 @@ fun <K, V> Sequence<K>.parAssociateWith(numThreads: Int? = null, op: (K)->V): Fu
 }
 
 @Suppress("unused")
-fun <K, V> Sequence<K>.parChunkAssociateWith(numThreads: Int? = null, op: (K)->V): Map<K, V> {
-  /*ArrayList(this.toList()).spliterator().*/
+fun <K, V> Sequence<K>.parChunkAssociateWith(
+  numThreads: Int? = null,
+  op: (K)->V
+): Map<K, V> {/*ArrayList(this.toList()).spliterator().*/
   val r = ConcurrentHashMap<K, V>()
   val list = this.toList()
   list.chunked(kotlin.math.ceil(list.size.toDouble()/(numThreads ?: GLOBAL_POOL_SIZE)).toInt()).map {
@@ -683,8 +684,7 @@ suspend fun <T> FlowCollector<T>.emitAll(list: Iterable<T>) {
 
 @kotlinx.serialization.Serializable
 class MutSemMap<K, V>(
-  private val map: MutableMap<K, V> = HashMap(),
-  private val maxsize: Int = Int.MAX_VALUE
+  private val map: MutableMap<K, V> = HashMap(), private val maxsize: Int = Int.MAX_VALUE
 ): MutableMap<K, V> {
 
   private val sem by lazy { Semaphore(1) }
@@ -755,4 +755,14 @@ fun waitFor(sleepPeriod: Long, l: ()->Boolean) {
   while (!l()) {
 	Thread.sleep(sleepPeriod)
   }
+}
+
+fun <R> stringPipe(giveOp: (OutputStream)->Unit, takeOp: (String)->R): R {
+  val o = PipedOutputStream()
+  val i = PipedInputStream(o)
+  thread { giveOp(o) }
+  val reader = i.bufferedReader()
+  val text = reader.readText()
+  val r = takeOp(text)
+  return r
 }

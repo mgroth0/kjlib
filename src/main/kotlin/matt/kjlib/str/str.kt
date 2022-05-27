@@ -270,3 +270,11 @@ val CONSENENTS = ALPHABET.filter { it !in VOWELS }.toTypedArray()
 
 operator fun String.get(intRange: IntRange) = subSequence(intRange.first, intRange.last + 1)
 fun String.throttled() = "THROTTLED STRING OF LENGTH $length (\"${this[0..100]}\"...)"
+
+fun String.toHyphenCase(): String {
+  if (isBlank()) return this
+  return this[0].lowercase() + toCharArray()
+	.map { it.toString() }
+	.drop(1)
+	.joinToString(separator = "") { if (it[0].isUpperCase()) "-${it[0].lowercase()}" else it }
+}

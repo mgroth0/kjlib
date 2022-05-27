@@ -164,6 +164,8 @@ class MutableCaseInsensitiveMap<V>: CaseInsensitiveMap<V>(), MutableMap<String, 
 fun <K, V> lazyMap(getter: (K)->V): Map<K, V> {
   return mutableMapOf<K, V>().withStoringDefault(getter)
 }
+
 fun <K, V> lazyMutableMap(getter: (K)->V): MutableMap<K, V> {
   return mutableMapOf<K, V>().withStoringDefault(getter)
 }
+

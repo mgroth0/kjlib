@@ -29,6 +29,11 @@ fun <T> Iterable<T>.filterNotIn(vararg matches: T): List<T> {
   return filterTo(ArrayList()) { it !in matches }
 }
 
+fun <T> Iterable<T>.filterNot(vararg matches: T) = filterNotIn(*matches)
+fun <T> Iterable<T>.except(vararg matches: T) = filterNotIn(*matches)
+fun <T> Iterable<T>.besides(vararg matches: T) = filterNotIn(*matches)
+
+
 fun <T> Iterable<T>.filterIn(vararg matches: T): List<T> {
   return filterTo(ArrayList()) { it in matches }
 }
@@ -120,3 +125,4 @@ fun Array<FloatArray>.flatten() = FloatArray(this.map { it.size }.sum()).also { 
 	}
   }
 }
+
