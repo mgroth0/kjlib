@@ -1,13 +1,13 @@
 package matt.kjlib.log
 
-import matt.kbuild.FLOW_FOLDER
+import matt.kjlib.commons.FLOW_FOLDER
 import matt.kjlib.file.get
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.io.PrintWriter
 import java.nio.charset.StandardCharsets
 
-val exceptionFolder = FLOW_FOLDER["log"]["errorReports"]
+val exceptionFolder = FLOW_FOLDER!!["log"]["errorReports"]
 
 
 fun mAssert(b: Boolean) {
