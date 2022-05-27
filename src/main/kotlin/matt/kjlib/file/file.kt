@@ -196,9 +196,7 @@ val File.fname: String
 val File.abspath: String
   get() = absolutePath
 
-operator fun File.get(item: String): File {
-  return resolve(item)
-}
+
 
 
 fun File.isImage() = extension.isIn("png", "jpg", "jpeg")

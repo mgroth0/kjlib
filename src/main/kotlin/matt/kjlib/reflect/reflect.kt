@@ -1,8 +1,8 @@
 package matt.kjlib.reflect
 
 import matt.kjlib.date.ms
-import matt.kjlib.file.get
 import matt.kjlib.file.recursiveChildren
+import matt.klib.commons.get
 import matt.klib.lang.inlined
 import java.io.File
 
