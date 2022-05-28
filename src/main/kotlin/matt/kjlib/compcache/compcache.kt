@@ -24,7 +24,7 @@ import matt.kjlib.str.addSpacesUntilLengthIs
 import matt.kjlib.str.tab
 import matt.kjlib.str.truncate
 import matt.klib.commons.get
-import matt.klibexport.klibexport.go
+import matt.klib.lang.go
 import matt.reflect.subclasses
 import kotlin.reflect.KClass
 import kotlin.reflect.full.companionObjectInstance
@@ -57,11 +57,11 @@ class ComputeCache<I, O> private constructor(val enableCache: Boolean = true) {
 		println("field=${field}")
 		return field
 	  }
-	set(value) {
-	  println("old jsonFormat = $field")
-	  println("new jsonFormat = $value")
-	  field = value
-	}
+	  set(value) {
+		println("old jsonFormat = $field")
+		println("new jsonFormat = $value")
+		field = value
+	  }
 
 	val cacheHasBeenSetUp = lazyMutableMap<Any, Boolean> {
 	  false
@@ -92,10 +92,9 @@ class ComputeCache<I, O> private constructor(val enableCache: Boolean = true) {
 	  tab("jsonFormat.serializersModule=${jsonFormat.serializersModule}")
 
 
-
 	  @Suppress("UNCHECKED_CAST") val encoded = jsonFormat.encodeToString(
-//		PolymorphicSerializer<Compute>
-//		PolymorphicSerializer(ComputeCache::class),
+		//		PolymorphicSerializer<Compute>
+		//		PolymorphicSerializer(ComputeCache::class),
 		computeCaches[T::class] as ComputeCache<Any, R>
 	  )
 	  t.toc("finished encoding length = ${encoded.length}")

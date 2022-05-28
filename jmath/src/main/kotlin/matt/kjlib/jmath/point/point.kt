@@ -12,8 +12,8 @@ import matt.kjlib.jmath.ser.ApfloatSerializer
 import matt.kjlib.jmath.sq
 import matt.kjlib.jmath.sqrt
 import matt.kjlib.jmath.toApfloat
+import matt.klib.lang.setAll
 import matt.klib.math.sq
-import matt.klibexport.klibexport.setAll
 import org.apfloat.Apfloat
 import kotlin.math.sqrt
 
