@@ -7,6 +7,7 @@ import matt.klib.oset.toBasicObservableSet
 import matt.klib.lang.NEVER
 import matt.klib.lang.setAll
 import kotlin.reflect.KProperty
+import kotlin.reflect.KProperty0
 
 sealed class SuperDelegateBase<T : Any, V>(
     @Suppress("UNUSED_PARAMETER") thisRef: T?,
@@ -253,3 +254,4 @@ class SuperSetDelegate<T : Any, V>(
 
 
 }
+

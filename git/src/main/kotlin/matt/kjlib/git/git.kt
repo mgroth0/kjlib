@@ -3,6 +3,8 @@ package matt.kjlib.git
 import matt.kjlib.git.GitModulesLineType.Path
 import matt.kjlib.git.GitModulesLineType.Submodule
 import matt.kjlib.git.GitModulesLineType.URL
+import matt.kjlib.git.ignore.GitIgnore
+import matt.kjlib.lang.jlang.toStringBuilder
 import matt.kjlib.shell.shell
 import matt.klib.commons.get
 import matt.klib.commons.thisMachine
@@ -13,9 +15,25 @@ import java.io.File
 
 abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
 
+  override fun toString() = toStringBuilder(::gitProjectDir)
+
   init {
 	require(File(dotGitDir).name == ".git") {
 	  "dotGitDir should be named \".git\", but instead it is named ${File(dotGitDir).name}"
+	}
+  }
+
+  val gitProjectDir = File(dotGitDir).parentFile
+  val gitIgnoreFile = gitProjectDir[".gitignore"]
+  val gitProjectName by lazy { gitProjectDir.name }
+
+
+  fun ignore() = GitIgnore(gitIgnoreFile.readText())
+
+  fun removeIgnoredFilesFromCache() {
+	println("removing ignored files from cache of $this")
+	ignore().patterns.forEach {
+	  println("\t$it:\t" + gitRm(it, cached = true, recursive = true).toString())
 	}
   }
 
@@ -35,9 +53,6 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
 	}
   }
 
-  val gitProjectDir = File(dotGitDir).parentFile
-
-  val gitProjectName by lazy { gitProjectDir.name }
 
   fun branchCommands() = wrapGitCommand(
 	"branch",
@@ -65,8 +80,15 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
 
   fun submoduleAdd(url: String, path: String? = null) = op(submoduleAddCommand(url = url, path = path))
 
-  private fun gitRmCommand(path: String) = wrapGitCommand("rm", path)
-  fun gitRm(path: String) = op(gitRmCommand(path = path))
+  private fun gitRmCommand(path: String, cached: Boolean, recursive: Boolean) = wrapGitCommand(
+	"rm",
+	*(if (cached) arrayOf("--cached") else arrayOf()),
+	*(if (recursive) arrayOf("--r") else arrayOf()),
+	path
+  )
+
+  fun gitRm(path: String, cached: Boolean = false, recursive: Boolean = false) =
+	op(gitRmCommand(path = path, cached = cached, recursive = recursive))
 
   private fun revParseHeadCommand() = wrapGitCommand("rev-parse", "HEAD", quietApplicable = false)
   fun currentCommitHash() = op(revParseHeadCommand())
