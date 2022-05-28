@@ -1,7 +1,7 @@
 package matt.kjlib.stream
 
 
-import matt.kjlib.lang.err
+import matt.klib.lang.err
 import kotlin.contracts.InvocationKind.UNKNOWN
 import kotlin.contracts.contract
 

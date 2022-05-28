@@ -1,10 +1,10 @@
 package matt.kjlib.delegate
 
-import matt.kjlib.lang.NEVER
 import matt.kjlib.olist.BasicObservableList
 import matt.kjlib.olist.toBasicObservableList
 import matt.kjlib.oset.BasicObservableSet
 import matt.kjlib.oset.toBasicObservableSet
+import matt.klib.lang.NEVER
 import matt.klib.lang.setAll
 import kotlin.reflect.KProperty
 

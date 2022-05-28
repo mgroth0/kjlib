@@ -8,7 +8,7 @@ import matt.kjlib.jmath.bernoulli.Bernoulli
 import matt.kjlib.jmath.bigcomplex.BigComplex
 import matt.kjlib.jmath.factorial.Factorial
 import matt.kjlib.jmath.rational.Rational
-import matt.kjlib.lang.err
+import matt.klib.lang.err
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext

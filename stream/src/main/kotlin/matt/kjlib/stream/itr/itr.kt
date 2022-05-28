@@ -1,7 +1,6 @@
 package matt.kjlib.stream.itr
 
-import matt.kjlib.lang.err
-
+import matt.klib.lang.err
 
 fun <E> List<E>.loopIterator() = LoopIterator(this)
 fun <E> MutableList<E>.loopIterator() = MutableLoopIterator(this)

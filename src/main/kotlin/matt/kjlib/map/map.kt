@@ -1,9 +1,9 @@
 package matt.kjlib.map
 
 import matt.kjlib.stream.itr.FakeMutableIterator
-import matt.kjlib.lang.err
 import matt.kjlib.str.lower
 import matt.klib.dmap.withStoringDefault
+import matt.klib.lang.err
 import kotlin.collections.MutableMap.MutableEntry
 
 
