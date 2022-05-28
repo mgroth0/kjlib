@@ -30,13 +30,6 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
 
   fun ignore() = GitIgnore(gitIgnoreFile.readText())
 
-  fun removeIgnoredFilesFromCache() {
-	println("removing ignored files from cache of $this")
-	ignore().patterns.forEach {
-	  println("\t$it:\t" + gitRm(it, cached = true, recursive = true).toString())
-	}
-	println("commiting clean up: ${commit("removeIgnoredFilesFromCache")}")
-  }
 
   private fun gitConfigGetCommand(prop: String) = wrapGitCommand("config", "--get", prop, quietApplicable = false)
   fun getConfigGet(prop: String) = op(gitConfigGetCommand(prop))
@@ -84,7 +77,7 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
   private fun gitRmCommand(path: String, cached: Boolean, recursive: Boolean) = wrapGitCommand(
 	"rm",
 	*(if (cached) arrayOf("--cached") else arrayOf()),
-	*(if (recursive) arrayOf("--r") else arrayOf()),
+	*(if (recursive) arrayOf("-r") else arrayOf()),
 	path
   )
 
