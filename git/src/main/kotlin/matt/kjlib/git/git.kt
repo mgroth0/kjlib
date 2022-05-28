@@ -12,7 +12,7 @@ abstract class GitProject<R>(val dir: String, val debug: Boolean) {
   private fun gitConfigGetCommand(prop: String) = wrapGitCommand("config", "--get", prop, quietApplicable = false)
   fun getConfigGet(prop: String) = op(gitConfigGetCommand(prop))
 
-  
+
   private fun gitConfigRemoveSectionCommand(section: String) =
 	wrapGitCommand("config", "--remove-section", section, quietApplicable = false)
 
@@ -58,7 +58,7 @@ abstract class GitProject<R>(val dir: String, val debug: Boolean) {
   private fun gitRmCommand(path: String) = wrapGitCommand("rm", path)
   fun gitRm(path: String) = op(gitRmCommand(path = path))
 
-  private fun revParseHeadCommand() = wrapGitCommand("git", "rev-parse", "HEAD", quietApplicable = false)
+  private fun revParseHeadCommand() = wrapGitCommand("rev-parse", "HEAD", quietApplicable = false)
   fun currentCommitHash() = op(revParseHeadCommand())
 
   val commandStart = arrayOf("git", "--git-dir=${dir}")
