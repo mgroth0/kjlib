@@ -1,8 +1,6 @@
 package matt.kjlib.str
 
 import matt.klib.lang.err
-import java.io.File
-import java.math.BigDecimal
 
 fun String.lineIndexOfIndex(i: Int): Int {
   if (length == 0) {
@@ -27,8 +25,7 @@ val isKotlin1_4OrEarlier = KotlinVersion.CURRENT.major <= 1 && KotlinVersion.CUR
 object CharCheck {
   init {
 	if (isKotlin1_4OrEarlier) {
-	  err("OPPOSITE OF THE FOLLOWING")
-	  /*if (KotlinVersion.CURRENT.isAtLeast(1, 5)) {*/
+	  err("OPPOSITE OF THE FOLLOWING")	/*if (KotlinVersion.CURRENT.isAtLeast(1, 5)) {*/
 	  err("delete Char.code below")
 	  err("update decap")
 	  err("update cap")
@@ -49,8 +46,7 @@ val Char.code
 fun String.lower() = lowercase()
 
 /*1.4: toLowerCase()*/
-fun String.upper() = uppercase()
-/*1.4: toUpperCase()*/
+fun String.upper() = uppercase()/*1.4: toUpperCase()*/
 
 infix fun String.loweq(s: String): Boolean {
   return this.lower() == s.lower()
@@ -90,16 +86,6 @@ abstract class DelimiterAppender(s: String = "") {
 class LineAppender(s: String = ""): DelimiterAppender(s) {
   override val delimiter = "\n"
 }
-
-fun Number.sigfig(significantFigures: Int): Double {
-  return BigDecimal(this.toDouble()).toSignificantFigures(significantFigures).toDouble()
-}
-
-fun BigDecimal.toSignificantFigures(significantFigures: Int): BigDecimal {
-  val s = String.format("%." + significantFigures + "G", this)
-  return BigDecimal(s)
-}
-
 
 fun tab(a: Any) {
   println("\t${a}")
@@ -205,12 +191,6 @@ fun String.toIntOrNullIfBlank() = if (isBlank()) null else this.toInt()
 fun String.toDoubleOrNullIfBlank() = if (isBlank()) null else this.toDouble()
 fun String.toBooleanOrNullIfBlank() = if (isBlank()) null else this.toBoolean()
 
-fun String.writeToFile(f: File, mkdirs: Boolean = true) {
-  if (mkdirs) {
-	f.parentFile.mkdirs()
-  }
-  f.writeText(this)
-}
 
 fun String.truncate(maxChars: Int): String {
   if (length <= maxChars) return this
@@ -236,32 +216,8 @@ fun String.truncateWithElipsesOrAddSpaces(exactNumChars: Int): String {
 }
 
 val ALPHABET = arrayOf(
-  'A',
-  'B',
-  'C',
-  'D',
-  'E',
-  'F',
-  'G',
-  'H',
-  'I',
-  'J',
-  'K',
-  'L',
-  'M',
-  'N',
-  'O',
-  'P',
-  'Q',
-  'R',
-  'S',
-  'T',
-  'U',
-  'V',
-  'W',
-  'X',
-  'Y',
-  'Z'
+  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
+  'X', 'Y', 'Z'
 )
 
 val VOWELS = arrayOf('A', 'E', 'I', 'O', 'U', 'Y')
@@ -273,8 +229,6 @@ fun String.throttled() = "THROTTLED STRING OF LENGTH $length (\"${this[0..100]}\
 
 fun String.toHyphenCase(): String {
   if (isBlank()) return this
-  return this[0].lowercase() + toCharArray()
-	.map { it.toString() }
-	.drop(1)
+  return this[0].lowercase() + toCharArray().map { it.toString() }.drop(1)
 	.joinToString(separator = "") { if (it[0].isUpperCase()) "-${it[0].lowercase()}" else it }
 }

@@ -208,3 +208,10 @@ fun File.isBlank() = bufferedReader().run {
   close()
   r
 }
+
+fun String.writeToFile(f: File, mkdirs: Boolean = true) {
+  if (mkdirs) {
+	f.parentFile.mkdirs()
+  }
+  f.writeText(this)
+}

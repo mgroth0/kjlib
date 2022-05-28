@@ -1,7 +1,7 @@
 package matt.kjlib.byte
 
+import matt.kjlib.jmath.sigfig
 import matt.kjlib.lang.jlang.runtime
-import matt.kjlib.str.sigfig
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.PipedInputStream

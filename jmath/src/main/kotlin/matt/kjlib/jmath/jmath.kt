@@ -645,3 +645,12 @@ fun Double.generalizedFactorialOrSimpleIfInfOrNaN(): BigDecimal {
 	.simpleFactorial()
 	.toBigDecimal()
 }
+
+fun Number.sigfig(significantFigures: Int): Double {
+  return BigDecimal(this.toDouble()).toSignificantFigures(significantFigures).toDouble()
+}
+
+fun BigDecimal.toSignificantFigures(significantFigures: Int): BigDecimal {
+  val s = String.format("%." + significantFigures + "G", this)
+  return BigDecimal(s)
+}
