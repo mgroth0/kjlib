@@ -27,7 +27,7 @@ dependencies {
 
 
 plugins {
-  kotlin("plugin.serialization") version tomlVersion("kotlin")
+  kotlin("plugin.serialization")
 
   /*experimental.coroutines = org.jetbrains.kotlin.gradle.dsl.Coroutines.ENABLE*/
 }
