@@ -1,8 +1,6 @@
 package matt.kjlib.file
 
-import matt.kjlib.async.every
 import matt.kjlib.byte.ByteSize
-import matt.kjlib.date.Duration
 import matt.kjlib.stream.isIn
 import matt.kjlib.stream.recurse.recurse
 import java.io.File
@@ -19,16 +17,7 @@ infix fun File.withExtension(ext: String): File {
   }
 }
 
-fun File.onModify(checkFreq: Duration, op: ()->Unit) {
-  var lastModified = recursiveLastModified()
-  every(checkFreq) {
-	val mod = recursiveLastModified()
-	if (mod != lastModified) {
-	  op()
-	}
-	lastModified = mod
-  }
-}
+
 
 var File.text
   get() = readText()

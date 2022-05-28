@@ -1,5 +1,5 @@
 dependencies {
-//  api(projects.kj.klibexport)
+  //  api(projects.kj.klibexport)
   api(jvm(projects.k.klib))
   api(projects.kj.reflect)
   //  api(projects.kj.kbuild)
@@ -13,8 +13,7 @@ dependencies {
   api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
 
 
-//  api(libs.oshi)
-
+  //  api(libs.oshi)
 
 
   api(libs.kotlinx.serialization.json)
