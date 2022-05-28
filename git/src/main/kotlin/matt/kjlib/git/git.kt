@@ -35,6 +35,7 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
 	ignore().patterns.forEach {
 	  println("\t$it:\t" + gitRm(it, cached = true, recursive = true).toString())
 	}
+	println("commiting clean up: ${commit("removeIgnoredFilesFromCache")}")
   }
 
   private fun gitConfigGetCommand(prop: String) = wrapGitCommand("config", "--get", prop, quietApplicable = false)
