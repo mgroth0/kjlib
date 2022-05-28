@@ -12,6 +12,7 @@ abstract class GitProject<R>(val dir: String, val debug: Boolean) {
   private fun gitConfigGetCommand(prop: String) = wrapGitCommand("config", "--get", prop, quietApplicable = false)
   fun getConfigGet(prop: String) = op(gitConfigGetCommand(prop))
 
+  
   private fun gitConfigRemoveSectionCommand(section: String) =
 	wrapGitCommand("config", "--remove-section", section, quietApplicable = false)
 
