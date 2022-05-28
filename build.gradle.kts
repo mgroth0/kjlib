@@ -4,7 +4,7 @@ dependencies {
   api(projects.kj.reflect)
   //  api(projects.kj.kbuild)
   api(projects.kj.kjlib.lang)
-  api(projects.kj.kjlib.stream)
+  api(jvm(projects.k.stream))
   api(projects.kj.kjlib.jmath)
   implementation(libs.aparapi)
 
