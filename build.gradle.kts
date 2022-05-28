@@ -12,7 +12,7 @@ dependencies {
   api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
 
 
-  api(libs.oshi)
+//  api(libs.oshi)
 
 
 
