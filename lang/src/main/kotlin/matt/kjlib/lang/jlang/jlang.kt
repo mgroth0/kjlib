@@ -11,7 +11,7 @@ fun resourceTxt(name: String) = ClassLoader.getSystemClassLoader().getResourceAs
 
 fun Any.toStringBuilder(vararg props: KProperty0<*>): String {
   val suffix = if (props.isEmpty()) "@" + this.hashCode() else "with " + props.joinToString(" ") {
-	it.name + "=" + it.call(this).toString()
+	it.name + "=" + it.call().toString()
   }
   return "[${0::class}$suffix]"
 }
