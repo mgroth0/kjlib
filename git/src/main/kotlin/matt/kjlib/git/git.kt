@@ -76,10 +76,7 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
   private fun wrapGitCommand(vararg command: String, quietApplicable: Boolean = true): Array<String> {
 	return if (thisMachine == WINDOWS) {
 	  arrayOf(
-		"C:\\Program Files\\Git\\bin\\sh.exe",
-		"-c",
-		*commandStart,
-		command.joinToString(" ").replace("\\", "/"),
+		"C:\\Program Files\\Git\\bin\\sh.exe", "-c", *commandStart, command.joinToString(" ").replace("\\", "/"),
 		*(if (quietApplicable && !debug) arrayOf("--quiet") else arrayOf())
 	  )
 	} else arrayOf(*commandStart, *command, *(if (quietApplicable && !debug) arrayOf("--quiet") else arrayOf()))
@@ -87,25 +84,21 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
 
   abstract fun op(command: Array<String>): R
 
-  fun branchDeleteCommand(branchName: String) =
-	arrayOf("branch", "-d", branchName)
+  fun branchDeleteCommand(branchName: String) = arrayOf("branch", "-d", branchName)
 
 
   fun branchDelete(branchName: String) = op(branchDeleteCommand(branchName))
 
-  fun branchCreateCommand(branchName: String) =
-	wrapGitCommand("branch", branchName)
+  fun branchCreateCommand(branchName: String) = wrapGitCommand("branch", branchName)
 
   fun branchCreate(branchName: String) = op(branchCreateCommand(branchName))
 
-  private fun checkoutCommand(branchName: String) =
-	wrapGitCommand("checkout", branchName)
+  private fun checkoutCommand(branchName: String) = wrapGitCommand("checkout", branchName)
 
 
   fun checkoutMaster() = op(checkoutCommand("master"))
 
-  fun mergeCommand(branchName: String) =
-	wrapGitCommand("merge", branchName)
+  fun mergeCommand(branchName: String) = wrapGitCommand("merge", branchName)
 
   fun merge(branchName: String) = op(mergeCommand(branchName))
 
@@ -127,16 +120,14 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
   * (so ugly)
   *
   * */
-  fun pullCommand() =
-	wrapGitCommand("pull", "origin", "master")
+  fun pullCommand() = wrapGitCommand("pull", "origin", "master")
 
   fun pull() = op(pullCommand())
 }
 
 class SimpleGit(gitDir: String, debug: Boolean = false): GitProject<String>(gitDir, debug) {
   constructor(projectDir: File, debug: Boolean = false): this(
-	projectDir.resolve(".git").absolutePath,
-	debug
+	projectDir.resolve(".git").absolutePath, debug
   )
 
   override fun op(command: Array<String>): String {
@@ -165,10 +156,7 @@ class SimpleGit(gitDir: String, debug: Boolean = false): GitProject<String>(gitD
 fun gitShell(vararg c: String, debug: Boolean = false, workingDir: File? = null): String {
   return if (thisMachine == WINDOWS) {
 	shell(
-	  "C:\\Program Files\\Git\\bin\\sh.exe",
-	  "-c",
-	  c.joinToString(" ").replace("\\", "/"),
-	  workingDir = workingDir,
+	  "C:\\Program Files\\Git\\bin\\sh.exe", "-c", c.joinToString(" ").replace("\\", "/"), workingDir = workingDir,
 	  debug = debug
 	)
   } else {
@@ -176,14 +164,13 @@ fun gitShell(vararg c: String, debug: Boolean = false, workingDir: File? = null)
   }
 }
 
-
 data class GitSubmodule(
-  val name: String = "",
-  val path: String = "",
-  val url: String = ""
+  val name: String, val path: String, val url: String
 ) {
   init {
-	require(name == path)
+	require(name == path) {
+	  "why are these not the same?\n\tname=${name}\n\tpath=$path?"
+	}
   }
 }
 
@@ -195,7 +182,10 @@ val GitProject<*>.gitSubmodules: List<GitSubmodule>
   get() {
 
 	var nextLineType = Submodule
-	var building = GitSubmodule()
+
+	var name = ""
+	var path = ""
+	var url = ""
 
 
 	val lineSeq = this.gitProjectDir[".gitmodules"].readText().lines().iterator()
@@ -207,17 +197,16 @@ val GitProject<*>.gitSubmodules: List<GitSubmodule>
 	  if (line.isNotBlank()) {
 		when (nextLineType) {
 		  Submodule -> {
-			building = building.copy(name = line.substringAfter("\"").substringBefore("\""))
+			name = line.substringAfter("\"").substringBefore("\"")
 			nextLineType = Path
 		  }
 		  Path      -> {
-			building = building.copy(path = line.substringAfter("=").trim())
+			path = line.substringAfter("=").trim()
 			nextLineType = URL
 		  }
 		  URL       -> {
-			building = building.copy(url = line.substringAfter("=").trim())
-			mods += building
-			building = GitSubmodule()
+			url = line.substringAfter("=").trim()
+			mods += GitSubmodule(name = name, path = path, url = url)
 			nextLineType = Submodule
 		  }
 		}
