@@ -1,13 +1,23 @@
 package matt.kjlib.git
 
+import matt.kjlib.git.GitModulesLineType.Path
+import matt.kjlib.git.GitModulesLineType.Submodule
+import matt.kjlib.git.GitModulesLineType.URL
 import matt.kjlib.shell.shell
+import matt.klib.commons.get
 import matt.klib.commons.thisMachine
 import matt.klib.lang.err
 import matt.klib.sys.Machine.WINDOWS
 import java.io.File
 
 
-abstract class GitProject<R>(val dir: String, val debug: Boolean) {
+abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
+
+  init {
+	require(File(dotGitDir).name == ".git") {
+	  "dotGitDir should be named \".git\", but instead it is named ${File(dotGitDir).name}"
+	}
+  }
 
   private fun gitConfigGetCommand(prop: String) = wrapGitCommand("config", "--get", prop, quietApplicable = false)
   fun getConfigGet(prop: String) = op(gitConfigGetCommand(prop))
@@ -25,7 +35,7 @@ abstract class GitProject<R>(val dir: String, val debug: Boolean) {
 	}
   }
 
-  val gitProjectDir = File(dir).parentFile
+  val gitProjectDir = File(dotGitDir).parentFile
 
   val gitProjectName by lazy { gitProjectDir.name }
 
@@ -61,7 +71,7 @@ abstract class GitProject<R>(val dir: String, val debug: Boolean) {
   private fun revParseHeadCommand() = wrapGitCommand("rev-parse", "HEAD", quietApplicable = false)
   fun currentCommitHash() = op(revParseHeadCommand())
 
-  val commandStart = arrayOf("git", "--git-dir=${dir}")
+  val commandStart = arrayOf("git", "--git-dir=${dotGitDir}")
 
   private fun wrapGitCommand(vararg command: String, quietApplicable: Boolean = true): Array<String> {
 	return if (thisMachine == WINDOWS) {
@@ -166,3 +176,54 @@ fun gitShell(vararg c: String, debug: Boolean = false, workingDir: File? = null)
   }
 }
 
+
+data class GitSubmodule(
+  val name: String = "",
+  val path: String = "",
+  val url: String = ""
+) {
+  init {
+	require(name == path)
+  }
+}
+
+enum class GitModulesLineType {
+  Submodule, Path, URL
+}
+
+val GitProject<*>.gitSubmodules: List<GitSubmodule>
+  get() {
+
+	var nextLineType = Submodule
+	var building = GitSubmodule()
+
+
+	val lineSeq = this.gitProjectDir[".gitmodules"].readText().lines().iterator()
+
+	val mods = mutableListOf<GitSubmodule>()
+
+	while (lineSeq.hasNext()) {
+	  val line = lineSeq.next()
+	  if (line.isNotBlank()) {
+		when (nextLineType) {
+		  Submodule -> {
+			building = building.copy(name = line.substringAfter("\"").substringBefore("\""))
+			nextLineType = Path
+		  }
+		  Path      -> {
+			building = building.copy(path = line.substringAfter("=").trim())
+			nextLineType = URL
+		  }
+		  URL       -> {
+			building = building.copy(url = line.substringAfter("=").trim())
+			mods += building
+			building = GitSubmodule()
+			nextLineType = Submodule
+		  }
+		}
+	  }
+	}
+
+	return mods
+
+  }
