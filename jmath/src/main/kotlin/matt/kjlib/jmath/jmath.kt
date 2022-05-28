@@ -1,7 +1,7 @@
 package matt.kjlib.jmath
 
 import matt.kjlib.jmath.bgdecimal.BigDecimalMath
-import matt.kjlib.stream.forEachNested
+import matt.stream.forEachNested
 import matt.klib.math.sq
 import org.apache.commons.math3.special.Gamma
 import org.apfloat.Apcomplex

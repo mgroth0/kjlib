@@ -1,8 +1,8 @@
 package matt.kjlib.file
 
 import matt.kjlib.byte.ByteSize
-import matt.kjlib.stream.isIn
-import matt.kjlib.stream.recurse.recurse
+import matt.stream.isIn
+import matt.stream.recurse.recurse
 import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.Files

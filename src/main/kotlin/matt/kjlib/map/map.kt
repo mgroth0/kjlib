@@ -1,6 +1,6 @@
 package matt.kjlib.map
 
-import matt.kjlib.stream.itr.FakeMutableIterator
+import matt.stream.itr.FakeMutableIterator
 import matt.klib.str.lower
 import matt.klib.dmap.withStoringDefault
 import matt.klib.lang.err
