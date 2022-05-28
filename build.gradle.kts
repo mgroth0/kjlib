@@ -1,5 +1,6 @@
 dependencies {
-  api(projects.kj.klibexport)
+//  api(projects.kj.klibexport)
+  api(jvm(projects.k.klib))
   api(projects.kj.reflect)
   //  api(projects.kj.kbuild)
   api(projects.kj.kjlib.lang)

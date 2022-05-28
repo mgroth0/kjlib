@@ -5,7 +5,7 @@ import matt.kjlib.olist.BasicObservableList
 import matt.kjlib.olist.toBasicObservableList
 import matt.kjlib.oset.BasicObservableSet
 import matt.kjlib.oset.toBasicObservableSet
-import matt.klibexport.klibexport.setAll
+import matt.klib.lang.setAll
 import kotlin.reflect.KProperty
 
 sealed class SuperDelegateBase<T : Any, V>(

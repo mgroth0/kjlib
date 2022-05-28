@@ -13,7 +13,7 @@ import matt.kjlib.lang.jlang.runtime
 import matt.kjlib.log.massert
 import matt.kjlib.str.tab
 import matt.kjlib.str.taball
-import matt.klibexport.klibexport.go
+import matt.klib.lang.go
 import java.io.OutputStream
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
@@ -31,8 +31,7 @@ import kotlin.random.Random
 
 // Check out FutureTasks too!
 
-@Suppress("unused")
-class MySemaphore(val name: String): Semaphore(1) {
+@Suppress("unused") class MySemaphore(val name: String): Semaphore(1) {
   override fun toString() = "Semaphore:$name"
 }
 
@@ -52,13 +51,11 @@ class QueueThread(
   private var stopped = false
   private val organizationalSem = Semaphore(1)
 
-  @Suppress("unused")
-  fun safeStop() {
+  @Suppress("unused") fun safeStop() {
 	stopped = true
   }
 
-  @Suppress("SpellCheckingInspection")
-  override fun run() {
+  @Suppress("SpellCheckingInspection") override fun run() {
 	super.run()
 	while (!stopped) {
 	  var ran = false
@@ -107,8 +104,7 @@ class QueueThread(
 		}
 	  }
 
-	@Suppress("UNCHECKED_CAST", "unused")
-	fun waitAndGet(): T {
+	@Suppress("UNCHECKED_CAST", "unused") fun waitAndGet(): T {
 	  waitFor()
 	  return results[id] as T
 	}
@@ -203,8 +199,7 @@ class MyTimerTask(private val op: MyTimerTask.()->Unit, val name: String? = null
 
   private var invocationI = 0L
 
-  @Suppress("unused")
-  fun onEvery(period: Int, op: MyTimerTask.()->Unit) {
+  @Suppress("unused") fun onEvery(period: Int, op: MyTimerTask.()->Unit) {
 	if (invocationI%period == 0L) op()
   }
 
@@ -408,8 +403,7 @@ fun every(
 fun sync(op: ()->Unit) = Semaphore(1).wrap(op)
 
 
-@Suppress("unused")
-fun printStackTracesForASec() {
+@Suppress("unused") fun printStackTracesForASec() {
   val t = Thread.currentThread()
   thread {
 	repeat(10) {
@@ -448,8 +442,7 @@ class ThreadInterface {
 	  cancelled = true
 	}
 
-	@Suppress("unused")
-	fun cancelAndWait() {
+	@Suppress("unused") fun cancelAndWait() {
 	  cancel()
 	  if (!complete) sem.acquire()
 	}
@@ -457,8 +450,11 @@ class ThreadInterface {
 }
 
 
-@Suppress("unused")
-fun IntRange.oscillate(thread: Boolean = false, periodMs: Long? = null, op: (Int)->Unit): Canceller {
+@Suppress("unused") fun IntRange.oscillate(
+  thread: Boolean = false,
+  periodMs: Long? = null,
+  op: (Int)->Unit
+): Canceller {
   var i = start - step
   var increasing = true
   val inter = ThreadInterface()
@@ -487,8 +483,7 @@ fun sleepUntil(systemMs: Long) {
 val GLOBAL_POOL_SIZE = runtime.availableProcessors()
 val GLOBAL_POOL: ExecutorService by lazy { Executors.newFixedThreadPool(GLOBAL_POOL_SIZE) }
 
-@Suppress("unused")
-fun <T, R> Iterable<T>.parMap(op: (T)->R): List<R> {
+@Suppress("unused") fun <T, R> Iterable<T>.parMap(op: (T)->R): List<R> {
   return map {
 	GLOBAL_POOL.submit(Callable {
 	  op(it)
@@ -496,8 +491,7 @@ fun <T, R> Iterable<T>.parMap(op: (T)->R): List<R> {
   }.toList().map { it.get() }
 }
 
-@Suppress("unused")
-fun <T, R> Iterable<T>.parMapIndexed(op: (Int, T)->R): List<R> {
+@Suppress("unused") fun <T, R> Iterable<T>.parMapIndexed(op: (Int, T)->R): List<R> {
   return mapIndexed { i, it ->
 	GLOBAL_POOL.submit(Callable {
 	  op(i, it)
@@ -505,8 +499,7 @@ fun <T, R> Iterable<T>.parMapIndexed(op: (Int, T)->R): List<R> {
   }.toList().map { it.get() }
 }
 
-@Suppress("unused")
-fun <T, R> Sequence<T>.parMap(op: (T)->R): List<R> {
+@Suppress("unused") fun <T, R> Sequence<T>.parMap(op: (T)->R): List<R> {
   return map {
 	GLOBAL_POOL.submit(Callable {
 	  op(it)
@@ -514,8 +507,7 @@ fun <T, R> Sequence<T>.parMap(op: (T)->R): List<R> {
   }.toList().map { it.get() }
 }
 
-@Suppress("unused")
-fun <T, R> Sequence<T>.parMapIndexed(op: (Int, T)->R): List<R> {
+@Suppress("unused") fun <T, R> Sequence<T>.parMapIndexed(op: (Int, T)->R): List<R> {
   return mapIndexed { i, it ->
 	GLOBAL_POOL.submit(Callable {
 	  op(i, it)
@@ -538,8 +530,7 @@ class FutureMap<K, V>(val map: Map<K, V>, val futures: List<Future<Unit>>) {
   }
 }
 
-@Suppress("unused")
-fun <K, V> Sequence<K>.parAssociateWith(numThreads: Int? = null, op: (K)->V): FutureMap<K, V> {
+@Suppress("unused") fun <K, V> Sequence<K>.parAssociateWith(numThreads: Int? = null, op: (K)->V): FutureMap<K, V> {
   val listForCapacity = this.toList()
   val pool = numThreads?.let { Executors.newFixedThreadPool(it) } ?: GLOBAL_POOL/*  val r = ConcurrentHashMap<K, V>(
 	  listForCapacity.size,
@@ -572,10 +563,8 @@ fun <K, V> Sequence<K>.parAssociateWith(numThreads: Int? = null, op: (K)->V): Fu
   return FutureMap(r, futures)
 }
 
-@Suppress("unused")
-fun <K, V> Sequence<K>.parChunkAssociateWith(
-  numThreads: Int? = null,
-  op: (K)->V
+@Suppress("unused") fun <K, V> Sequence<K>.parChunkAssociateWith(
+  numThreads: Int? = null, op: (K)->V
 ): Map<K, V> {/*ArrayList(this.toList()).spliterator().*/
   val r = ConcurrentHashMap<K, V>()
   val list = this.toList()
@@ -591,8 +580,7 @@ fun <K, V> Sequence<K>.parChunkAssociateWith(
   return r
 }
 
-@Suppress("unused")
-fun <K, V> Sequence<K>.coAssociateWith(
+@Suppress("unused") fun <K, V> Sequence<K>.coAssociateWith(
   op: (K)->V
 ): Map<K, V> {
   val r = ConcurrentHashMap<K, V>()
@@ -621,8 +609,7 @@ fun <K, V> Sequence<K>.coAssociateWith(
 }*/
 
 
-@Suppress("unused")
-fun aparAPITest() {
+@Suppress("unused") fun aparAPITest() {
 
 
   println("com.aparapi.examples.info.Main")
@@ -676,14 +663,12 @@ fun aparAPITest() {
 }
 
 
-@Suppress("unused")
-suspend fun <T> FlowCollector<T>.emitAll(list: Iterable<T>) {
+@Suppress("unused") suspend fun <T> FlowCollector<T>.emitAll(list: Iterable<T>) {
   list.forEach { emit(it) }
 }
 
 
-@kotlinx.serialization.Serializable
-class MutSemMap<K, V>(
+@kotlinx.serialization.Serializable class MutSemMap<K, V>(
   private val map: MutableMap<K, V> = HashMap(), private val maxsize: Int = Int.MAX_VALUE
 ): MutableMap<K, V> {
 
