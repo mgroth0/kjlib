@@ -3,6 +3,7 @@ package matt.kjlib.delegate
 import matt.kjlib.olist.BasicObservableList
 import matt.kjlib.olist.toBasicObservableList
 import matt.klib.lang.NEVER
+import matt.klib.lang.err
 import matt.klib.lang.setAll
 import matt.klib.oset.BasicObservableSet
 import matt.klib.oset.toBasicObservableSet
@@ -14,6 +15,11 @@ sealed class SuperDelegateBase<T : Any, V>(
     val setfun: ((V) -> V)? = null,
     val getfun: ((V) -> V)? = null
 ) {
+
+    init {
+        NEVER
+    }
+
     /* companion object {
        val instances = WeakHashMap<Any, MutableMap<String, SuperDelegateBase<*, *>>>()
      }
