@@ -4,11 +4,8 @@ dependencies {
   api(projects.kj.kjlib.lang)
   api(jvm(projects.k.stream))
   api(projects.kj.kjlib.jmath)
-  implementation(libs.aparapi)
   api(libs.kotlinx.serialization.json)
 }
-
-
 
 plugins {
   kotlin("plugin.serialization")
