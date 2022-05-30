@@ -2,12 +2,11 @@ package matt.kjlib.delegate
 
 import matt.kjlib.olist.BasicObservableList
 import matt.kjlib.olist.toBasicObservableList
-import matt.klib.oset.BasicObservableSet
-import matt.klib.oset.toBasicObservableSet
 import matt.klib.lang.NEVER
 import matt.klib.lang.setAll
+import matt.klib.oset.BasicObservableSet
+import matt.klib.oset.toBasicObservableSet
 import kotlin.reflect.KProperty
-import kotlin.reflect.KProperty0
 
 sealed class SuperDelegateBase<T : Any, V>(
     @Suppress("UNUSED_PARAMETER") thisRef: T?,
