@@ -154,3 +154,10 @@ fun shell(vararg args: String, debug: Boolean = false, workingDir: File? = null)
   }
   return output
 }
+
+
+fun getNameOfFrontmostProcessFromKOTLIN_FUCKING_NATIVE(): String {
+  return shell(
+	"/Users/matthewgroth/registered/flow/kn/build/bin/native/debugExecutable/kn.kexe"
+  ).trim()
+}

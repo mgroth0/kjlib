@@ -9,6 +9,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.io.PrintWriter
 import java.io.Reader
+import java.lang.System.currentTimeMillis
 import java.net.ConnectException
 import java.net.Socket
 import java.util.concurrent.Semaphore
@@ -26,19 +27,30 @@ class SingleSender(
   private val sem = MY_INTER_APP_SEM
 
   @Suppress("MemberVisibilityCanBePrivate")
-  override fun send(message: String, useSem: Boolean): String? { // return channel
+  override fun send(message: String, useSem: Boolean, andReceive: Boolean): String? { // return channel
 	val response: String?
 	try {
+	  val start = currentTimeMillis()
+	  println("1: ${currentTimeMillis() - start}")
 	  val kkSocket = Socket("localhost", port(key))
+	  println("2: ${currentTimeMillis() - start}")
 	  val out = PrintWriter(kkSocket.getOutputStream(), true)
+	  println("3: ${currentTimeMillis() - start}")
 	  val inReader = BufferedReader(
 		InputStreamReader(kkSocket.getInputStream())
 	  )
+	  println("4: ${currentTimeMillis() - start}")
 	  if (useSem) sem.acquire()
+	  println("5: ${currentTimeMillis() - start}")
 	  out.println(message)
+	  println("6: ${currentTimeMillis() - start}")
 	  /*out.print(message.trim())*/
-	  response = inReader.readWithTimeout(2000)
+
+	  response = if (andReceive) inReader.readWithTimeout(2000) else null
+
+	  println("7: ${currentTimeMillis() - start}")
 	  kkSocket.close()
+	  println("8: ${currentTimeMillis() - start}")
 	} catch (e: ConnectException) {
 	  println(e)
 	  if (useSem) sem.release()
@@ -70,13 +82,13 @@ class MultiSender(
 
   fun close() = kkSocket.close()
 
-  override fun send(message: String, useSem: Boolean): String? { // return channel
+  override fun send(message: String, useSem: Boolean, andReceive: Boolean): String? { // return channel
 	val response: String?
 	try {
 	  if (useSem) sem.acquire()
 	  out.println(message)
 	  /*out.print(message.trim())*/
-	  response = inReader.readWithTimeout(2000)
+	  response = if (andReceive) inReader.readWithTimeout(2000) else null
 	} catch (e: ConnectException) {
 	  println(e)
 	  if (useSem) sem.release()
@@ -94,18 +106,7 @@ class MultiSender(
 	}
   }
 
-  operator fun plusAssign(s: String) = sendNoResponse(s)
-
-  fun sendNoResponse(message: String) { // return channel
-	try {
-	  sem.acquire()
-	  out.println(message)
-	} catch (e: ConnectException) {
-	  println(e)
-	  sem.release()
-	}
-	sem.release()
-  }
+  operator fun plusAssign(s: String) = send(s, andReceive = false).let { }
 
 }
 
@@ -178,7 +179,7 @@ abstract class BaseSender {
   fun go(value: String) = send("GO" to value)
   fun open(value: String) = send("OPEN" to value)
 
-  abstract fun send(message: String, useSem: Boolean = true): String?
+  abstract fun send(message: String, useSem: Boolean = true, andReceive: Boolean = true): String?
 }
 
 
