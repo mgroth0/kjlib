@@ -1,6 +1,5 @@
 package matt.kjlib.byte
 
-import matt.kjlib.jmath.sigfig
 import matt.kjlib.lang.jlang.runtime
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -25,10 +24,10 @@ data class ByteSize(val bytes: Long): Comparable<ByteSize> {
 
   val formatted by lazy {
 	when {
-	  giga > 1 || giga < -1 -> "${giga.sigfig(3)} GB"
-	  mega > 1 || mega < -1 -> "${mega.sigfig(3)} MB"
-	  kilo > 1 || kilo < -1 -> "${kilo.sigfig(3)} KB"
-	  else                  -> "${bytes.sigfig(3)} B"
+	  giga > 1 || giga < -1 -> "%.3f GB".format(giga)
+	  mega > 1 || mega < -1 -> "%.3f MB".format(mega)
+	  kilo > 1 || kilo < -1 -> "%.3f KB".format(kilo)
+	  else                  -> "%.3f B".format(bytes)
 	}
   }
 

@@ -1,4 +1,4 @@
-package matt.kjlib.ranges
+package matt.kjlib.jmath.ranges
 
 import matt.kjlib.jmath.assertRound
 import matt.kjlib.jmath.compareTo
