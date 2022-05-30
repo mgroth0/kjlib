@@ -12,7 +12,6 @@ fun jumpToKotlinSourceString(
   packageFilter: String?
 ): Pair<File, Int>? {
   println("matt.kjlib.jumpToKotlinSourceString:${s}:${packageFilter}")
-  val t = System.currentTimeMillis()
   val packFolder = packageFilter?.replace(".", "/")
   var pair: Pair<File, Int>? = null
   inlined {

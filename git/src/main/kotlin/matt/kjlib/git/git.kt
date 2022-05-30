@@ -201,7 +201,7 @@ val GitProject<*>.gitSubmodules: List<GitSubmodule>
 
 	var name = ""
 	var path = ""
-	var url = ""
+	var url: String
 
 
 	val lineSeq = this.gitProjectDir[".gitmodules"].readText().lines().iterator()

@@ -1,8 +1,11 @@
 package matt.kjlib.jmath
 
 import matt.kjlib.jmath.bgdecimal.BigDecimalMath
-import matt.stream.forEachNested
+import matt.klib.math.DOUBLE_ONE
+import matt.klib.math.Sides
+import matt.klib.math.getPoisson
 import matt.klib.math.sq
+import matt.stream.forEachNested
 import org.apache.commons.math3.special.Gamma
 import org.apfloat.Apcomplex
 import org.apfloat.Apfloat
@@ -23,15 +26,8 @@ import java.math.BigInteger
 import java.math.MathContext
 import java.math.RoundingMode.HALF_UP
 import java.math.RoundingMode.UNNECESSARY
-import kotlin.math.abs
-import kotlin.math.exp
-import kotlin.math.floor
-import kotlin.math.ln
 import kotlin.math.pow
-import kotlin.math.round
 import kotlin.math.roundToInt
-import kotlin.random.Random.Default.nextDouble
-import kotlin.random.Random.Default.nextFloat
 
 val ApE = ApfloatMath.exp(Apfloat.ONE.precision(100)).apply {
   println("could just use ApfloatMath.exp, which is probably faster?")
@@ -47,7 +43,6 @@ val API = ApfloatMath.pi(20)
 val AZERO = Apfloat.ZERO
 val AZERO_FLOAT = Apfloat.ZERO.toApfloat()
 
-fun Double.floorInt() = floor(this).toInt()
 
 fun Float.sigFigs(n: Int): Float {
   var bd = BigDecimal(this.toDouble())
@@ -72,43 +67,9 @@ fun Apfloat.sigFigs(n: Int): Double {
 fun Apfloat.roundToInt() = Apint(ApfloatMath.round(this, 20, HALF_UP).toString())
 
 
-@Suppress("unused")
-fun Double.roundToDecimal(n: Int): Double {
-
-  val temp = this*(n*10)
-  val tempInt = temp.roundToInt().toDouble()
-  return tempInt/(n*10)
-}
+fun Apfloat.getPoisson(): Int = toDouble().getPoisson()
 
 
-fun Apfloat.getPoisson() = toDouble().getPoisson()
-
-fun Float.getPoisson(): Int {
-  /*val lambda = this*/
-  val L = exp(-this)
-  var p = 1.0f
-  var k = 0
-  do {
-	k++
-	p *= nextFloat()
-  } while (p > L)
-  return (k - 1)
-}
-
-/*https://stackoverflow.com/questions/1241555/algorithm-to-generate-poisson-and-binomial-random-numbers*/
-fun Double.getPoisson(): Int {
-  /*val lambda = this*/
-  val L = exp(-this)
-  var p = 1.0
-  var k = 0
-  do {
-	k++
-	p *= nextDouble()
-  } while (p > L)
-  return (k - 1)
-
-
-}
 
 fun Int.simpleFactorial(): BigInteger {
   require(this > -1)
@@ -125,43 +86,12 @@ fun Int.simpleFactorial(): BigInteger {
   //  return r
 }
 
-/*log (5*4*3*2*1) = log (5) + log(4) ...*/
-fun Int.logFactorial(): Double {
-  require(this > -1)
-  if (this == 0) return 0.0
-  var i = this
-  var r = 0.0
-  while (i > 0) {
-	r += ln(i.toDouble())
-	i -= 1
-  }
-  return r
-}
-
-fun Int.logFactorialFloat(): Float {
-  require(this > -1)
-  if (this == 0) return 0.0.toFloat()
-  var i = this
-  var r = 0.0.toFloat()
-  while (i > 0) {
-	r += ln(i.toFloat())
-	i -= 1
-  }
-  return r
-}
 
 
-fun orth(degrees: Float): Float {
-  require(degrees in 0.0f..180.0f)
-  return if (degrees < 90.0f) degrees + 90.0f
-  else degrees - 90.0f
-}
 
-fun orth(degrees: Double): Double {
-  require(degrees in 0.0..180.0)
-  return if (degrees < 90.0) degrees + 90.0
-  else degrees - 90.0
-}
+
+
+
 
 fun orth(degrees: Apfloat): Apfloat {
   require(degrees.toDouble() in 0.0..180.0)
@@ -169,41 +99,17 @@ fun orth(degrees: Apfloat): Apfloat {
   else degrees - 90.0
 }
 
-fun <T> Iterable<T>.meanOf(op: (T)->Double) = map { op(it) }.mean()
-fun List<Float>.mean() = sum()/size
-fun FloatArray.mean() = sum()/size
-fun List<Double>.mean() = sum()/size
-fun List<Double>.median() = if (this.size == 0) null else this.sorted()[round(this.size/2.0).toInt() - 1]
-fun DoubleArray.mean() = sum()/size
-fun IntArray.intMean() = (sum()/size.toDouble()).roundToInt()
-fun IntArray.doubleMean() = (sum()/size.toDouble())
-fun Sequence<Double>.mean() = toList().mean()
 
-@JvmName("meanInt")
-fun Sequence<Int>.mean() = map { it.toDouble() }.mean()
 fun List<BigDecimal>.mean() = fold(BigDecimal.ZERO) { acc, b -> acc + b }/BigDecimal.valueOf(size.toLong())
-
-const val DOUBLE_ONE = 1.0
-
-fun List<Float>.logSum() = fold(0f) { acc, d ->
-  acc + ln(d)
-}
-
-fun List<Double>.logSum() = fold(0.0) { acc, d ->
-  acc + ln(d)
-}
 
 
 fun List<Apfloat>.geometricMean() = fold(1.0.toApfloat()) { acc, d ->
   acc*d
 }.pow(DOUBLE_ONE/size)
 
-fun List<Double>.geometricMean(bump: Double = 1.0) = fold(1.0) { acc, d ->
-  acc*d*bump
-}.pow(DOUBLE_ONE/size)
 
 
-fun Sequence<Double>.geometricMean() = toList().geometricMean()
+
 
 fun List<BigDecimal>.geometricMean() = fold(BigDecimal.ONE) { acc, d -> acc*d }
   .let {
@@ -212,34 +118,7 @@ fun List<BigDecimal>.geometricMean() = fold(BigDecimal.ONE) { acc, d -> acc*d }
 
 fun Sequence<BigDecimal>.geometricMean() = toList().geometricMean()
 
-infix fun FloatArray.dot(other: FloatArray): Float {
-  require(this.size == other.size)
-  var ee = 0.0.toFloat()
-  (0 until this.size).forEach { x ->
-	val first = this[x]
-	val second = other[x]
-	if (!first.isNaN() && !second.isNaN()) {
-	  val r = this[x]*other[x]
-	  ee += r
-	}
-  }
-  return ee
-}
 
-infix fun DoubleArray.dot(other: DoubleArray): Double {
-  require(this.size == other.size)
-  var ee = 0.0
-  (0 until this.size).forEach { x ->
-	val first = this[x]
-	val second = other[x]
-	if (!first.isNaN() && !second.isNaN()) {
-	  val r = this[x]*other[x]
-	  ee += r
-	}
-  }
-  return ee
-
-}
 
 infix fun Array<out Apfloat?>.dotA(other: Array<out Apfloat?>): Apfloat {
   require(this.size == other.size)
@@ -256,20 +135,7 @@ infix fun Array<out Apfloat?>.dotA(other: Array<out Apfloat?>): Apfloat {
 
 }
 
-infix fun Array<out Float?>.dot(other: Array<out Float?>): Float {
-  require(this.size == other.size)
-  var ee = 0.0f
-  (0 until this.size).forEach { x ->
-	val first = this[x]
-	val second = other[x]
-	if (first != null && second != null) {
-	  val r = first*second
-	  ee += r
-	}
-  }
-  return ee
 
-}
 
 /*infix fun FloatArray.dot(other: FloatArray): Float {
   require(this.size == other.size)
@@ -443,20 +309,13 @@ infix fun MultiArray<Apcomplex, D2>.dot(other: MultiArray<Apcomplex, D2>): Apflo
 }
 
 
-fun nextUnitDouble() = nextDouble()*2 - 1
+
 fun sigmoid(x: Double): Double = 1/(1 + e.pow(-x))
 fun sigmoidDerivative(x: Double): Double = e.pow(-x).let { it/(1 + it).sq() }
 fun Asigmoid(x: Apfloat): Apfloat = 1.toApint()/(1.toApint() + Ae.pow(-x))
 fun AsigmoidDerivative(x: Apfloat): Apfloat = Ae.pow(-x).let { it/(1.toApint() + it).sq() }
 
-/**
- * Shortest distance (angular) between two angles.
- * It will be in range [0, 180].
- */
-fun angularDifference(alpha: Double, beta: Double): Double {
-  val phi = abs(beta - alpha)%360.0  /*This is either the distance or 360 - distance*/
-  return if (phi > 180.0) 360.0 - phi else phi
-}
+
 
 fun <N: Number> NDArray<N, D2>.convolve(kernel: NDArray<Double, D2>): NDArray<Double, D2> {
   val result = mk.empty<Double, D2>(shape[0], shape[1])
@@ -477,8 +336,6 @@ fun <N: Number> NDArray<N, D2>.convolve(kernel: NDArray<Double, D2>): NDArray<Do
   return result
 }
 
-//fun Float.toApfloat() = Apfloat(this)
-//fun Double.toApfloat() = Apfloat(this)
 fun Number.toApfloat() = when (this) {
   is Int    -> Apfloat(this.toDouble())
   is Long   -> Apfloat(this)
@@ -603,20 +460,9 @@ val AP_360 = Apint.ONE.multiply(Apint(360))
 fun Apfloat.assertRound() = ApfloatMath.round(this, 20, UNNECESSARY).truncate()
 
 
-@OptIn(kotlin.experimental.ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-@kotlin.jvm.JvmName("sumOfFloat")
-public inline fun <T> Iterable<T>.sumOf(selector: (T)->Float): Float {
-  var sum: Float = 0f
-  for (element in this) {
-	sum += selector(element)
-  }
-  return sum
-}
 
-fun randomAngleInDegrees() = nextDouble()*360.0
 
-data class Sides(val adj: Double, val opp: Double)
+
 
 fun dirAndHypToAdjAndOpp(dirInDegrees: Double, hyp: Double): Sides {
   val rads = Math.toRadians(dirInDegrees)
@@ -626,11 +472,7 @@ fun dirAndHypToAdjAndOpp(dirInDegrees: Double, hyp: Double): Sides {
 }
 
 
-enum class UnitType(val symbol: String?, val longNameSingular: String?, val longNamePlural: String?) {
-  PERCENT("%", "percent", "percent"),
-  DEGREES("°", "degree", "degrees"),
-  RATIO(null, null, null)
-}
+
 
 /*https://stackoverflow.com/questions/31539584/how-can-i-make-my-factorial-method-work-with-decimals-gamma*/
 fun Double.generalizedFactorial(): Double {
