@@ -1,25 +1,27 @@
 package matt.kjlib.file
 
 import matt.kjlib.byte.ByteSize
+import matt.klib.file.MFile
+import matt.klib.file.toMFile
 import matt.stream.isIn
 import matt.stream.recurse.recurse
-import java.io.File
+
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.concurrent.thread
 
-infix fun File.withExtension(ext: String): File {
+infix fun MFile.withExtension(ext: String): MFile {
   return when (this.extension) {
 	ext  -> this
-	""   -> File(this.path + "." + ext)
-	else -> File(this.path.replace("." + this.extension, ".$ext"))
+	""   -> MFile(this.path + "." + ext)
+	else -> MFile(this.path.replace("." + this.extension, ".$ext"))
   }
 }
 
 
 
-var File.text
+var MFile.text
   get() = readText()
   set(v) {
 	mkparents()
@@ -27,7 +29,7 @@ var File.text
   }
 
 fun String.toPath(): Path = FileSystems.getDefault().getPath(this.trim())
-val File.doesNotExist get() = !exists()
+val MFile.doesNotExist get() = !exists()
 
 
 @Suppress("unused")
@@ -37,15 +39,15 @@ fun Path.startsWithAny(atLeastOne: Path, vararg more: Path): Boolean {
   return false
 }
 
-fun Path.startsWithAny(atLeastOne: File, vararg more: File): Boolean {
+fun Path.startsWithAny(atLeastOne: MFile, vararg more: MFile): Boolean {
   if (startsWith(atLeastOne.toPath())) return true
   more.forEach { if (startsWith(it.toPath())) return true }
   return false
 }
 
-fun File.size() = ByteSize(Files.size(this.toPath()))
+fun MFile.size() = ByteSize(Files.size(this.toPath()))
 
-fun File.clearIfTooBigThenAppendText(s: String) {
+fun MFile.clearIfTooBigThenAppendText(s: String) {
   if (size().kilo > 10) {
 	write("cleared because over 10KB") /*got an out of memory error when limit was set as 100KB*/
   }
@@ -53,14 +55,14 @@ fun File.clearIfTooBigThenAppendText(s: String) {
 
 }
 
-fun File.recursiveChildren() = recurse { it.listFiles()?.toList() ?: listOf() }
+fun MFile.recursiveChildren() = recurse { it.listFiles()?.toList() ?: listOf() }
 
 @Suppress("unused")
-fun Iterable<File>.filterHasExtension(ext: String) = filter { it.extension == ext }
+fun Iterable<MFile>.filterHasExtension(ext: String) = filter { it.extension == ext }
 @Suppress("unused")
-fun Sequence<File>.filterHasExtension(ext: String) = filter { it.extension == ext }
+fun Sequence<MFile>.filterHasExtension(ext: String) = filter { it.extension == ext }
 
-fun File.deleteIfExists() {
+fun MFile.deleteIfExists() {
   if (exists()) {
 	if (isDirectory) {
 	  deleteRecursively()
@@ -70,11 +72,11 @@ fun File.deleteIfExists() {
   }
 }
 
-fun File.resRepExt(newExt: String) =
-  File(parentFile.absolutePath + File.separator + nameWithoutExtension + "." + newExt)
+fun MFile.resRepExt(newExt: String) =
+  MFile(parentFile.absolutePath + MFile.separator + nameWithoutExtension + "." + newExt)
 
 
-fun File.recursiveLastModified(): Long {
+fun MFile.recursiveLastModified(): Long {
   var greatest = 0L
   recurse { it.listFiles()?.toList() ?: listOf() }.forEach {
 	greatest = listOf(greatest, it.lastModified()).maxOrNull()!!
@@ -83,10 +85,10 @@ fun File.recursiveLastModified(): Long {
 }
 
 
-fun File.next(): File {
+fun MFile.next(): MFile {
   var ii = 0
   while (true) {
-	val f = File(absolutePath + ii.toString())
+	val f = MFile(absolutePath + ii.toString())
 	if (!f.exists()) {
 	  return f
 	}
@@ -94,7 +96,7 @@ fun File.next(): File {
   }
 }
 
-fun File.doubleBackupWrite(s: String, thread: Boolean = false) {
+fun MFile.doubleBackupWrite(s: String, thread: Boolean = false) {
 
   mkparents()
   createNewFile()
@@ -125,20 +127,20 @@ fun File.doubleBackupWrite(s: String, thread: Boolean = false) {
 }
 
 
-fun File.backupWork(@Suppress("UNUSED_PARAMETER") thread: Boolean = false, text: String? = null): ()->Unit {
+fun MFile.backupWork(@Suppress("UNUSED_PARAMETER") thread: Boolean = false, text: String? = null): ()->Unit {
 
   if (!this.exists()) {
 	throw Exception("cannot back up ${this}, which does not exist")
   }
 
-  val backupFolder = File(this.absolutePath).parentFile.resolve("backups")
+  val backupFolder = MFile(this.absolutePath).parentFile.resolve("backups")
   backupFolder.mkdir()
   if (!backupFolder.isDirectory) {
 	throw Exception("backupFolder not a dir")
   }
 
   val backupFile = backupFolder
-	.resolve(name)
+	.resolve(name).toMFile()
 	.getNextAndClearWhenMoreThan(100, extraExt = "backup")
 
   val realText = text ?: readText()
@@ -147,7 +149,7 @@ fun File.backupWork(@Suppress("UNUSED_PARAMETER") thread: Boolean = false, text:
 
 }
 
-fun File.backup(thread: Boolean = false, text: String? = null) {
+fun MFile.backup(thread: Boolean = false, text: String? = null) {
 
   val work = backupWork(thread = thread, text = text)
   if (thread) {
@@ -159,7 +161,7 @@ fun File.backup(thread: Boolean = false, text: String? = null) {
   }
 }
 
-fun File.getNextAndClearWhenMoreThan(n: Int, extraExt: String = "itr"): File {
+fun MFile.getNextAndClearWhenMoreThan(n: Int, extraExt: String = "itr"): MFile {
   val backupFolder = parentFile
   val allPreviousBackupsOfThis = backupFolder
 	.listFiles()!!.filter {
@@ -174,42 +176,42 @@ fun File.getNextAndClearWhenMoreThan(n: Int, extraExt: String = "itr"): File {
 	.filterKeys { it < (myBackupI - n) }
 	.forEach { it.value.delete() }
 
-  return backupFolder.resolve("${this.name}.${extraExt}${myBackupI}")
+  return backupFolder.resolve("${this.name}.${extraExt}${myBackupI}").toMFile()
 
 }
 
 
 @Suppress("unused")
-val File.fname: String
+val MFile.fname: String
   get() = name
-val File.abspath: String
+val MFile.abspath: String
   get() = absolutePath
 
 
 
 
-fun File.isImage() = extension.isIn("png", "jpg", "jpeg")
+fun MFile.isImage() = extension.isIn("png", "jpg", "jpeg")
 
-fun File.append(s: String, mkdirs: Boolean = true) {
+fun MFile.append(s: String, mkdirs: Boolean = true) {
   if (mkdirs) mkparents()
   appendText(s)
 }
 
-fun File.write(s: String, mkparents: Boolean = true) {
+fun MFile.write(s: String, mkparents: Boolean = true) {
   if (mkparents) mkparents()
   writeText(s)
 }
 
-fun File.mkparents() = parentFile.mkdirs()
+fun MFile.mkparents() = parentFile.mkdirs()
 
 
-fun File.isBlank() = bufferedReader().run {
+fun MFile.isBlank() = bufferedReader().run {
   val r = read() == -1
   close()
   r
 }
 
-fun String.writeToFile(f: File, mkdirs: Boolean = true) {
+fun String.writeToFile(f: MFile, mkdirs: Boolean = true) {
   if (mkdirs) {
 	f.parentFile.mkdirs()
   }

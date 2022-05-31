@@ -8,9 +8,9 @@ import matt.kjlib.lang.jlang.toStringBuilder
 import matt.kjlib.shell.shell
 import matt.klib.commons.get
 import matt.klib.commons.thisMachine
+import matt.klib.file.MFile
 import matt.klib.lang.err
-import matt.klib.sys.Machine.WINDOWS
-import java.io.File
+import matt.klib.sys.WINDOWS
 
 
 abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
@@ -18,12 +18,12 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
   override fun toString() = toStringBuilder(::gitProjectDir)
 
   init {
-	require(File(dotGitDir).name == ".git") {
-	  "dotGitDir should be named \".git\", but instead it is named ${File(dotGitDir).name}"
+	require(MFile(dotGitDir).name == ".git") {
+	  "dotGitDir should be named \".git\", but instead it is named ${MFile(dotGitDir).name}"
 	}
   }
 
-  val gitProjectDir = File(dotGitDir).parentFile
+  val gitProjectDir = MFile(dotGitDir).parentFile
   val gitIgnoreFile = gitProjectDir[".gitignore"]
   val gitProjectName by lazy { gitProjectDir.name }
 
@@ -142,7 +142,7 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
 }
 
 class SimpleGit(gitDir: String, debug: Boolean = false): GitProject<String>(gitDir, debug) {
-  constructor(projectDir: File, debug: Boolean = false): this(
+  constructor(projectDir: MFile, debug: Boolean = false): this(
 	projectDir.resolve(".git").absolutePath, debug
   )
 
@@ -169,7 +169,7 @@ class SimpleGit(gitDir: String, debug: Boolean = false): GitProject<String>(gitD
 }
 
 
-fun gitShell(vararg c: String, debug: Boolean = false, workingDir: File? = null): String {
+fun gitShell(vararg c: String, debug: Boolean = false, workingDir: MFile? = null): String {
   return if (thisMachine == WINDOWS) {
 	shell(
 	  "C:\\Program Files\\Git\\bin\\sh.exe", "-c", c.joinToString(" ").replace("\\", "/"), workingDir = workingDir,

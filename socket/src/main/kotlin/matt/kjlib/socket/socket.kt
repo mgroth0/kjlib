@@ -3,8 +3,9 @@ package matt.kjlib.socket
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import matt.klib.constants.ValJson
+import matt.klib.file.MFile
 import java.io.BufferedReader
-import java.io.File
+
 import java.io.IOException
 import java.io.InputStreamReader
 import java.io.PrintWriter
@@ -14,7 +15,7 @@ import java.net.ConnectException
 import java.net.Socket
 import java.util.concurrent.Semaphore
 
-val tempValJson = File("/Users/matthewgroth/registered/data/VAL.json").apply {
+val tempValJson = MFile("/Users/matthewgroth/registered/data/VAL.json").apply {
   println("this is temporary")
 }
 
@@ -149,9 +150,9 @@ object InterAppInterface {
 }
 
 
-fun SingleSender.open(file: File) = open(file.absolutePath)
+fun SingleSender.open(file: MFile) = open(file.absolutePath)
 
-fun File.openWithPDF() = InterAppInterface["PDF"].open(this)
+fun MFile.openWithPDF() = InterAppInterface["PDF"].open(this)
 
 val MY_INTER_APP_SEM = Semaphore(1)
 

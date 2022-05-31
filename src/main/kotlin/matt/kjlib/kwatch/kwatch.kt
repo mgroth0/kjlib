@@ -9,7 +9,9 @@ import matt.kjlib.kwatch.KWatchChannel.Mode.SingleFile
 import matt.kjlib.kwatch.KWatchEvent.Kind.Created
 import matt.kjlib.kwatch.KWatchEvent.Kind.Deleted
 import matt.kjlib.kwatch.KWatchEvent.Kind.Modified
-import java.io.File
+import matt.klib.file.MFile
+import matt.klib.file.toMFile
+
 import java.nio.file.FileSystems
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
@@ -30,7 +32,7 @@ import java.nio.file.attribute.BasicFileAttributes
  * @param [tag] - any kind of data that should be associated with this channel
  * @param [scope] - coroutine context for the channel, optional
  */
-fun File.asWatchChannel(
+fun MFile.asWatchChannel(
     mode: Mode? = null,
     tag: Any? = null,
     handler: (KWatchEvent) -> Unit
@@ -51,7 +53,7 @@ fun File.asWatchChannel(
  * @param [tag] - any kind of data that should be associated with this channel, optional
  */
 class KWatchChannel(
-  val file: File,
+  val file: MFile,
   val mode: Mode,
   val tag: Any? = null,
   val handler: (KWatchEvent) -> Unit
@@ -117,7 +119,7 @@ class KWatchChannel(
                     else -> Modified
                 }
                 val event = KWatchEvent(
-                        file = eventPath.toFile(),
+                        file = eventPath.toFile().toMFile(),
                         tag = tag,
                         kind = eventType
                 )
@@ -179,7 +181,7 @@ data class KWatchEvent(
   /**
          * Abolute path of modified folder/file
          */
-        val file: File,
+        val file: MFile,
 
   /**
          * Kind of file system event
@@ -192,7 +194,7 @@ data class KWatchEvent(
         val tag: Any?
 ) {
     /**
-     * File system event, wrapper around [WatchEvent.Kind]
+     * matt.klib.file.File system event, wrapper around [WatchEvent.Kind]
      */
     enum class Kind(val kind: String) {
         /**

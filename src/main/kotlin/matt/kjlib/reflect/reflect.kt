@@ -2,18 +2,19 @@ package matt.kjlib.reflect
 
 import matt.kjlib.file.recursiveChildren
 import matt.klib.commons.get
+import matt.klib.file.MFile
 import matt.klib.lang.inlined
-import java.io.File
+
 
 
 fun jumpToKotlinSourceString(
-  rootProject: File,
+  rootProject: MFile,
   s: String,
   packageFilter: String?
-): Pair<File, Int>? {
+): Pair<MFile, Int>? {
   println("matt.kjlib.jumpToKotlinSourceString:${s}:${packageFilter}")
   val packFolder = packageFilter?.replace(".", "/")
-  var pair: Pair<File, Int>? = null
+  var pair: Pair<MFile, Int>? = null
   inlined {
 	rootProject["settings.gradle.kts"]
 	  .readLines()

@@ -4,8 +4,9 @@ package matt.kjlib.shell
 
 import matt.klib.commons.REGISTERED_FOLDER
 import matt.klib.commons.get
+import matt.klib.file.MFile
 import oshi.software.os.OSProcess
-import java.io.File
+
 import java.io.InputStream
 import java.time.Duration
 import java.time.ZoneId
@@ -15,7 +16,7 @@ import java.util.Locale
 
 
 fun proc(
-  wd: File?, vararg args: String, env: Map<String, String> = mapOf()
+  wd: MFile?, vararg args: String, env: Map<String, String> = mapOf()
 ): Process {
   val envp = env.map {
 	it.key + "=" + it.value
@@ -38,11 +39,11 @@ val Process.streams: List<InputStream>
   }
 
 
-fun exec(wd: File?, vararg args: String) = proc(wd, *args).waitFor() == 0
+fun exec(wd: MFile?, vararg args: String) = proc(wd, *args).waitFor() == 0
 fun execReturn(vararg args: String) = execReturn(null, *args)
 fun execPython(s: String) = execReturn("/usr/bin/python", "-c", s)
 
-fun execReturn(wd: File?, vararg args: String, verbose: Boolean = false, printResult: Boolean = false): String {
+fun execReturn(wd: MFile?, vararg args: String, verbose: Boolean = false, printResult: Boolean = false): String {
   if (verbose) {
 	println("running ${args.joinToString(" ")}")
   }
@@ -145,7 +146,7 @@ val OSProcess.arguments: List<String>?
   }
 
 
-fun shell(vararg args: String, debug: Boolean = false, workingDir: File? = null): String {
+fun shell(vararg args: String, debug: Boolean = false, workingDir: MFile? = null): String {
   if (debug) {
 	println("running command: ${args.joinToString(" ")}")
   }

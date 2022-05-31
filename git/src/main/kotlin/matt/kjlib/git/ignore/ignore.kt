@@ -2,8 +2,9 @@ package matt.kjlib.git.ignore
 
 import matt.kjlib.git.GitProject
 import matt.klib.commons.DS_STORE
+import matt.klib.file.MFile
 import matt.klib.str.upper
-import java.io.File
+
 
 class GitIgnore(s: String) {
   val patterns = s
@@ -12,7 +13,7 @@ class GitIgnore(s: String) {
 	.map { it.trim() }
 }
 
-fun GitProject<*>.expectedIgnorePatterns(rootDir: File): List<String> = run {
+fun GitProject<*>.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
   val expectedPatterns = mutableListOf("/build/")
   expectedPatterns += ".gradle/"
   expectedPatterns += "/gradle/"
