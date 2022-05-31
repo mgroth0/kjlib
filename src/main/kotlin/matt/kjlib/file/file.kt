@@ -73,7 +73,7 @@ fun MFile.deleteIfExists() {
 }
 
 fun MFile.resRepExt(newExt: String) =
-  MFile(parentFile.absolutePath + MFile.separator + nameWithoutExtension + "." + newExt)
+  MFile(parentFile!!.absolutePath + MFile.separator + nameWithoutExtension + "." + newExt)
 
 
 fun MFile.recursiveLastModified(): Long {
@@ -133,7 +133,7 @@ fun MFile.backupWork(@Suppress("UNUSED_PARAMETER") thread: Boolean = false, text
 	throw Exception("cannot back up ${this}, which does not exist")
   }
 
-  val backupFolder = MFile(this.absolutePath).parentFile.resolve("backups")
+  val backupFolder = MFile(this.absolutePath).parentFile!!.resolve("backups")
   backupFolder.mkdir()
   if (!backupFolder.isDirectory) {
 	throw Exception("backupFolder not a dir")
@@ -163,8 +163,7 @@ fun MFile.backup(thread: Boolean = false, text: String? = null) {
 
 fun MFile.getNextAndClearWhenMoreThan(n: Int, extraExt: String = "itr"): MFile {
   val backupFolder = parentFile
-  val allPreviousBackupsOfThis = backupFolder
-	.listFiles()!!.filter {
+  val allPreviousBackupsOfThis = backupFolder!!.listFiles()!!.filter {
 	  it.name.startsWith(this@getNextAndClearWhenMoreThan.name + ".${extraExt}")
 	}.associateBy { it.name.substringAfterLast(".${extraExt}").toInt() }
 
@@ -202,7 +201,7 @@ fun MFile.write(s: String, mkparents: Boolean = true) {
   writeText(s)
 }
 
-fun MFile.mkparents() = parentFile.mkdirs()
+fun MFile.mkparents() = parentFile!!.mkdirs()
 
 
 fun MFile.isBlank() = bufferedReader().run {
@@ -213,7 +212,7 @@ fun MFile.isBlank() = bufferedReader().run {
 
 fun String.writeToFile(f: MFile, mkdirs: Boolean = true) {
   if (mkdirs) {
-	f.parentFile.mkdirs()
+	f.parentFile!!.mkdirs()
   }
   f.writeText(this)
 }

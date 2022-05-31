@@ -24,8 +24,8 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
   }
 
   val gitProjectDir = MFile(dotGitDir).parentFile
-  val gitIgnoreFile = gitProjectDir[".gitignore"]
-  val gitProjectName by lazy { gitProjectDir.name }
+  val gitIgnoreFile = gitProjectDir!![".gitignore"]
+  val gitProjectName by lazy { gitProjectDir!!.name }
 
 
   fun ignore() = GitIgnore(gitIgnoreFile.readText())
@@ -204,7 +204,7 @@ val GitProject<*>.gitSubmodules: List<GitSubmodule>
 	var url: String
 
 
-	val lineSeq = this.gitProjectDir[".gitmodules"].readText().lines().iterator()
+	val lineSeq = this.gitProjectDir!![".gitmodules"].readText().lines().iterator()
 
 	val mods = mutableListOf<GitSubmodule>()
 

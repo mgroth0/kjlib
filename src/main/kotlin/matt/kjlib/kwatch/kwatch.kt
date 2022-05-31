@@ -65,7 +65,7 @@ class KWatchChannel(
         file.parentFile
     } else {
         file
-    }.toPath()
+    }!!.toPath()
 
     /**
      * Registers this channel to watch any changes in path directory and its subdirectories

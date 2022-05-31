@@ -33,14 +33,14 @@ fun GitProject<*>.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
   expectedPatterns += "/log/"
   expectedPatterns += "/logs/"
   expectedPatterns += "/bin/jar/"
-  if (gitProjectDir.name.upper() in listOf("KJ", "K").map { it.upper() } || gitProjectDir == rootDir) {
+  if (gitProjectDir!!.name.upper() in listOf("KJ", "K").map { it.upper() } || gitProjectDir == rootDir) {
 	/*RootFiles*/
 	expectedPatterns += "/build.gradle.kts"
 	expectedPatterns += "/settings.gradle.kts"
 	expectedPatterns += "/gradle.properties"
 	expectedPatterns += "/shadow.gradle"
   }
-  if (gitProjectDir.name.upper() == "FLOW".upper()) {
+  if (gitProjectDir!!.name.upper() == "FLOW".upper()) {
 	expectedPatterns += "/explanations/"
 	expectedPatterns += "/unused_cool/"
 	expectedPatterns += "/icon/"
