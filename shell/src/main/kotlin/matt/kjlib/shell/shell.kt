@@ -1,5 +1,9 @@
+@file:Suppress("FunctionName", "FunctionName")
+
 package matt.kjlib.shell
 
+import matt.klib.commons.REGISTERED_FOLDER
+import matt.klib.commons.get
 import oshi.software.os.OSProcess
 import java.io.File
 import java.io.InputStream
@@ -156,8 +160,11 @@ fun shell(vararg args: String, debug: Boolean = false, workingDir: File? = null)
 }
 
 
-fun getNameOfFrontmostProcessFromKOTLIN_FUCKING_NATIVE(): String {
+//NOSONAR
+@SuppressWarnings("all") fun getNameOfFrontmostProcessFromKOTLIN_FUCKING_NATIVE(): String { //NOSONAR
   return shell(
-	"/Users/matthewgroth/registered/flow/kn/build/bin/native/debugExecutable/kn.kexe"
+	//	"/Users/matthewgroth/registered/flow/kn/build/bin/native/debugExecutable/kn.kexe"
+	//	"/Users/matthewgroth/registered/flow/bin/kn/kn.kexe"
+	REGISTERED_FOLDER["bin"]["kn"]["kn.kexe"].absolutePath
   ).trim()
 }
