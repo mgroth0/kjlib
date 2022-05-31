@@ -43,6 +43,7 @@ fun GitProject<*>.expectedIgnorePatterns(rootDir: File): List<String> = run {
 	expectedPatterns += "/explanations/"
 	expectedPatterns += "/unused_cool/"
 	expectedPatterns += "/icon/"
+	expectedPatterns += "/sound/"
 	expectedPatterns += "/status/"
   }
   if (gitProjectDir.name.upper() == "ROOTFILES".upper()) {
