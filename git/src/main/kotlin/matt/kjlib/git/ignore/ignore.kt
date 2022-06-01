@@ -15,6 +15,7 @@ class GitIgnore(s: String) {
 
 fun GitProject<*>.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
   val expectedPatterns = mutableListOf("/build/")
+  expectedPatterns += "/out/"
   expectedPatterns += ".gradle/"
   expectedPatterns += "/gradle/"
   expectedPatterns += "/gradlew"
