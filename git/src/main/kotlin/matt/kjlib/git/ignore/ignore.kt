@@ -13,11 +13,15 @@ class GitIgnore(s: String) {
 	.map { it.trim() }
 }
 
+fun todo(s: String) {
+
+}
+
 fun MFile.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
-  println("this should be called by my own special project type?")
+  todo("this should be called by my own special project type?")
   val projectDir = this
   require(this.isDirectory)
-  println("this shouldn't be git project because anything can have git ignores")
+  todo("this shouldn't be git project because anything can have git ignores")
   val expectedPatterns = mutableListOf("/build/")
   expectedPatterns += "/out/"
   expectedPatterns += ".gradle/"
