@@ -7,11 +7,13 @@ import matt.kjlib.git.ignore.GitIgnore
 import matt.kjlib.lang.jlang.toStringBuilder
 import matt.kjlib.shell.shell
 import matt.klib.commons.get
+import matt.klib.commons.plus
 import matt.klib.commons.thisMachine
 import matt.klib.file.MFile
 import matt.klib.lang.err
 import matt.klib.sys.WINDOWS
 
+val GIT_IGNORE_FILE_NAME = ".gitignore"
 
 abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
 
@@ -24,7 +26,7 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
   }
 
   val gitProjectDir = MFile(dotGitDir).parentFile
-  val gitIgnoreFile = gitProjectDir!![".gitignore"]
+  val gitIgnoreFile = gitProjectDir!! + GIT_IGNORE_FILE_NAME
   val gitProjectName by lazy { gitProjectDir!!.name }
 
 

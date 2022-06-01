@@ -13,7 +13,11 @@ class GitIgnore(s: String) {
 	.map { it.trim() }
 }
 
-fun GitProject<*>.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
+fun MFile.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
+  println("this should be called by my own special project type?")
+  val projectDir = this
+  require(this.isDirectory)
+  println("this shouldn't be git project because anything can have git ignores")
   val expectedPatterns = mutableListOf("/build/")
   expectedPatterns += "/out/"
   expectedPatterns += ".gradle/"
@@ -34,21 +38,21 @@ fun GitProject<*>.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
   expectedPatterns += "/log/"
   expectedPatterns += "/logs/"
   expectedPatterns += "/bin/jar/"
-  if (gitProjectDir!!.name.upper() in listOf("KJ", "K").map { it.upper() } || gitProjectDir == rootDir) {
+  if (projectDir.name.upper() in listOf("KJ", "K").map { it.upper() } || projectDir == rootDir) {
 	/*RootFiles*/
 	expectedPatterns += "/build.gradle.kts"
 	expectedPatterns += "/settings.gradle.kts"
 	expectedPatterns += "/gradle.properties"
 	expectedPatterns += "/shadow.gradle"
   }
-  if (gitProjectDir!!.name.upper() == "FLOW".upper()) {
+  if (projectDir.name.upper() == "FLOW".upper()) {
 	expectedPatterns += "/explanations/"
 	expectedPatterns += "/unused_cool/"
 	expectedPatterns += "/icon/"
 	expectedPatterns += "/sound/"
 	expectedPatterns += "/status/"
   }
-  if (gitProjectDir.name.upper() == "ROOTFILES".upper()) {
+  if (projectDir.name.upper() == "ROOTFILES".upper()) {
 	expectedPatterns -= "/gradle.properties" /*shouldn't be there, just double checking*/
   }
   return expectedPatterns
