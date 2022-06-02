@@ -25,6 +25,7 @@ fun MFile.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
   val expectedPatterns = mutableListOf("/build/")
   expectedPatterns += "/out/"
   expectedPatterns += "*.hprof"
+  expectedPatterns += "*.zip"
   expectedPatterns += ".private"
   expectedPatterns += ".gradle/"
   expectedPatterns += "/gradle/"
