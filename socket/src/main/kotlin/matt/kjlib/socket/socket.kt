@@ -160,8 +160,8 @@ abstract class BaseSender {
 
 
   @Suppress("MemberVisibilityCanBePrivate")
-  fun send(pair: Pair<String, String>): String? { // return channel
-	return send("${pair.first}:${pair.second}")
+  fun send(pair: Pair<String, String>, andReceive: Boolean = true): String? { // return channel
+	return send("${pair.first}:${pair.second}",andReceive=andReceive)
   }
 
   @Suppress("MemberVisibilityCanBePrivate")
