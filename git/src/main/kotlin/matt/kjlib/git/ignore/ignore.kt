@@ -24,6 +24,7 @@ fun MFile.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
   todo("this shouldn't be git project because anything can have git ignores")
   val expectedPatterns = mutableListOf("/build/")
   expectedPatterns += "/out/"
+  expectedPatterns += "*.hprof"
   expectedPatterns += ".private"
   expectedPatterns += ".gradle/"
   expectedPatterns += "/gradle/"
