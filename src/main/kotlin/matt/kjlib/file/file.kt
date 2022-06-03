@@ -110,13 +110,4 @@ fun MFile.backup(thread: Boolean = false, text: String? = null) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
+fun MFile.recursiveChildren() = recurse { it.listFiles()?.toList() ?: listOf() }
