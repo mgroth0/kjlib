@@ -20,6 +20,7 @@ fun MFile.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
   val projectDir = this
   require(this.isDirectory)
   todo("this shouldn't be git project because anything can have git ignores")
+  todo("merge with idea excludes")
   val expectedPatterns = mutableListOf("/build/")
   expectedPatterns += "/out/"
   expectedPatterns += "*.hprof"
