@@ -3,6 +3,7 @@ package matt.kjlib.git.ignore
 import matt.klib.commons.DS_STORE
 import matt.klib.file.MFile
 import matt.klib.str.upper
+import matt.klib.todo
 
 
 class GitIgnore(s: String) {
@@ -12,9 +13,7 @@ class GitIgnore(s: String) {
 	.map { it.trim() }
 }
 
-@Suppress("UseExpressionBody") fun todo(@Suppress("UNUSED_PARAMETER") s: String) {
-//NOSONAR
-}
+
 
 fun MFile.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
   todo("this should be called by my own special project type?")
