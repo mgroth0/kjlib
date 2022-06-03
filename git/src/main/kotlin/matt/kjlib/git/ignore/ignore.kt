@@ -1,6 +1,5 @@
 package matt.kjlib.git.ignore
 
-import matt.kjlib.git.GitProject
 import matt.klib.commons.DS_STORE
 import matt.klib.file.MFile
 import matt.klib.str.upper
@@ -13,8 +12,8 @@ class GitIgnore(s: String) {
 	.map { it.trim() }
 }
 
-fun todo(s: String) {
-
+@Suppress("UseExpressionBody") fun todo(@Suppress("UNUSED_PARAMETER") s: String) {
+//NOSONAR
 }
 
 fun MFile.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
