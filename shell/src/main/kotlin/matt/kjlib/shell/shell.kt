@@ -160,6 +160,7 @@ fun shell(vararg args: String, debug: Boolean = false, workingDir: MFile? = null
   if (debug) {
 	println("output: ${output}")
   }
+  p.waitFor()
   p.exitValue().takeIf { it != 0 }?.go {
 	err("error code is ${it}")
   }

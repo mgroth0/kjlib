@@ -62,6 +62,7 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
   private fun statusCommand() = wrapGitCommand("status", quietApplicable = false)
   fun status() = op(statusCommand())
 
+
   private fun addAllCommand() = wrapGitCommand("add", "-A", quietApplicable = false)
   fun addAll() = op(addAllCommand())
 
@@ -154,6 +155,7 @@ class SimpleGit(gitDir: String, debug: Boolean = false): GitProject<String>(gitD
 
   private fun isDetatched() = "detatched" in branch()
 
+
   private fun reattatch() {
 	println("${gitProjectName} is detached! dealing")
 	addAll()
@@ -167,6 +169,16 @@ class SimpleGit(gitDir: String, debug: Boolean = false): GitProject<String>(gitD
 
   fun reattatchIfNeeded() {
 	if (isDetatched()) reattatch()
+  }
+
+  fun workingTreeClean() = "nothing to commit, working tree clean" in status()
+  fun untrackedFilesPresent() = "untracked files present" in status()
+  fun commitIfNeededAndThrowIfUntrackedPresent(message: String? = null): String? {
+	if (workingTreeClean()) {
+	  return null
+	} else if (untrackedFilesPresent()) {
+	  err("untracked files present in $this")
+	} else return if (message == null) commit() else commit(message = message)
   }
 }
 
@@ -209,7 +221,6 @@ val GitProject<*>.gitSubmodules: List<GitSubmodule>
 	var url: String
 
 
-
 	val lineSeq = gitModulesFile.readText().lines().iterator()
 
 	val mods = mutableListOf<GitSubmodule>()
@@ -222,10 +233,12 @@ val GitProject<*>.gitSubmodules: List<GitSubmodule>
 			name = line.substringAfter("\"").substringBefore("\"")
 			nextLineType = Path
 		  }
+
 		  Path      -> {
 			path = line.substringAfter("=").trim()
 			nextLineType = URL
 		  }
+
 		  URL       -> {
 			url = line.substringAfter("=").trim()
 			mods += GitSubmodule(name = name, path = path, url = url)
