@@ -3,7 +3,6 @@ package matt.kjlib.git.ignore
 import matt.klib.commons.DS_STORE
 import matt.klib.file.MFile
 import matt.klib.str.upper
-import matt.klib.todo
 
 
 class GitIgnore(s: String) {
@@ -14,13 +13,11 @@ class GitIgnore(s: String) {
 }
 
 
-
+/*TODO: Merge with idea excludes*/
+/*TODO:this shouldn't be git "project" because anything can have git ignores*/
 fun MFile.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
-  todo("this should be called by my own special project type?")
   val projectDir = this
   require(this.isDirectory)
-  todo("this shouldn't be git project because anything can have git ignores")
-  todo("merge with idea excludes")
   val expectedPatterns = mutableListOf("/build/")
   expectedPatterns += "/out/"
   expectedPatterns += "*.hprof"

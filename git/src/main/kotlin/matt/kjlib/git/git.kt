@@ -199,6 +199,9 @@ enum class GitModulesLineType {
 val GitProject<*>.gitSubmodules: List<GitSubmodule>
   get() {
 
+	val gitModulesFile = this.gitProjectDir!![".gitmodules"]
+	if (!gitModulesFile.exists()) return listOf()
+
 	var nextLineType = Submodule
 
 	var name = ""
@@ -206,7 +209,8 @@ val GitProject<*>.gitSubmodules: List<GitSubmodule>
 	var url: String
 
 
-	val lineSeq = this.gitProjectDir!![".gitmodules"].readText().lines().iterator()
+
+	val lineSeq = gitModulesFile.readText().lines().iterator()
 
 	val mods = mutableListOf<GitSubmodule>()
 
