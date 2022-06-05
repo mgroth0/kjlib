@@ -2,6 +2,7 @@ modtype = LIB
 
 
 dependencies {
+  projects.k.klib
   if (findProject(":k:klib") != null) {
 	api(project(":k:klib")) {
 	  targetConfiguration = "jvmRuntimeElements"
