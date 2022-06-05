@@ -1,5 +1,7 @@
-import matt.klib.str.upper
 
+
+import matt.klib.str.upper
+modtype = LIB
 dependencies {
   if (rootDir.name.upper() == "FLOW") {
 	api(project(":k:klib")) {
