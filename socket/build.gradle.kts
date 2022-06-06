@@ -1,19 +1,11 @@
-
+//import matt.kbuild.gbuild.projectOrLocalMavenJVM
 
 import matt.klib.str.upper
 modtype = LIB
 dependencies {
   implementation(projects.kj.kjlib.lang)
-
-
-  if (rootDir.name.upper() == "FLOW") {
-    api(project(":k:klib")) {
-      targetConfiguration = "jvmRuntimeElements"
-    }
-  } else {
-    api("matt.k:klib:+")
-  }
-
+  projectOrLocalMavenJVM("api", ":k:klib")
+  projectOrLocalMavenJVM("api", ":k:stream")
   api(libs.kotlinx.serialization.json)
 }
 

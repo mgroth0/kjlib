@@ -4,12 +4,8 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import matt.klib.constants.ValJson
 import matt.klib.file.MFile
-import java.io.BufferedReader
-
-import java.io.IOException
-import java.io.InputStreamReader
+import matt.stream.kj.readTextBeforeTimeout
 import java.io.PrintWriter
-import java.io.Reader
 import java.lang.System.currentTimeMillis
 import java.net.ConnectException
 import java.net.Socket
@@ -37,9 +33,9 @@ class SingleSender(
 	  println("2: ${currentTimeMillis() - start}")
 	  val out = PrintWriter(kkSocket.getOutputStream(), true)
 	  println("3: ${currentTimeMillis() - start}")
-	  val inReader = BufferedReader(
-		InputStreamReader(kkSocket.getInputStream())
-	  )
+	  //	  val inReader = BufferedReader(
+	  //		InputStreamReader(kkSocket.getInputStream())
+	  //	  )
 	  println("4: ${currentTimeMillis() - start}")
 	  if (useSem) sem.acquire()
 	  println("5: ${currentTimeMillis() - start}")
@@ -47,7 +43,7 @@ class SingleSender(
 	  println("6: ${currentTimeMillis() - start}")
 	  /*out.print(message.trim())*/
 
-	  response = if (andReceive) inReader.readWithTimeout(2000) else null
+	  response = if (andReceive) kkSocket.readTextBeforeTimeout(2000) else null
 
 	  println("7: ${currentTimeMillis() - start}")
 	  kkSocket.close()
@@ -79,7 +75,7 @@ class MultiSender(
 
   private val kkSocket by lazy { Socket("localhost", port(key)) }
   private val out by lazy { PrintWriter(kkSocket.getOutputStream(), true) }
-  private val inReader by lazy { BufferedReader(InputStreamReader(kkSocket.getInputStream())) }
+  //  private val inReader by lazy { BufferedReader(InputStreamReader(kkSocket.getInputStream())) }
 
   fun close() = kkSocket.close()
 
@@ -89,7 +85,7 @@ class MultiSender(
 	  if (useSem) sem.acquire()
 	  out.println(message)
 	  /*out.print(message.trim())*/
-	  response = if (andReceive) inReader.readWithTimeout(2000) else null
+	  response = if (andReceive) kkSocket.readTextBeforeTimeout(2000) else null
 	} catch (e: ConnectException) {
 	  println(e)
 	  if (useSem) sem.release()
@@ -117,25 +113,6 @@ class NoServerResponseException(servername: String): Exception() {
 }
 
 
-@Throws(IOException::class)
-fun Reader.readWithTimeout(timeoutMillis: Int): String {
-  val entTimeMS = System.currentTimeMillis() + timeoutMillis
-  var r = ""
-  var c: Int
-  while (System.currentTimeMillis() < entTimeMS) {
-	if (ready()) {
-	  c = read()
-	  if (c == -1) {
-		if (r.isNotEmpty()) return r else throw EndOfStreamException()
-	  }
-	  r += c.toChar().toString()
-	}
-  }
-  return r
-}
-
-class EndOfStreamException: Exception()
-
 object InterAppInterface {
   private val senders = mutableMapOf<String, SingleSender>()
   operator fun get(value: String): SingleSender {
@@ -161,7 +138,7 @@ abstract class BaseSender {
 
   @Suppress("MemberVisibilityCanBePrivate")
   fun send(pair: Pair<String, String>, andReceive: Boolean = true): String? { // return channel
-	return send("${pair.first}:${pair.second}",andReceive=andReceive)
+	return send("${pair.first}:${pair.second}", andReceive = andReceive)
   }
 
   @Suppress("MemberVisibilityCanBePrivate")
