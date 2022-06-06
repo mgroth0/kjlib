@@ -27,11 +27,15 @@ class SocketReader(val socket: Socket) {
   )
 
   fun readTextBeforeTimeout(timeout: Long): String {
-	socketLogger += "matt.kjlib.socket.reader.readTextBeforeTimeout"
+	socketLogger += "readTextBeforeTimeout"
 	val stopAt = currentTimeMillis() + timeout
+	socketLogger += "readTextBeforeTimeout 1"
 	return runBlocking {
+	  socketLogger += "readTextBeforeTimeout 2"
 	  var r = ""
+	  socketLogger += "readTextBeforeTimeout 3"
 	  do {
+		socketLogger += "readTextBeforeTimeout 4"
 		val line = readLineOrSuspend(suspendMillis = 0)
 		if (line == null) {
 		  break
