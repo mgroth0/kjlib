@@ -27,7 +27,7 @@ class SocketReader(val socket: Socket) {
   )
 
   fun readTextBeforeTimeout(timeout: Long): String {
-	tempLogger += "matt.kjlib.socket.reader.readTextBeforeTimeout"
+	socketLogger += "matt.kjlib.socket.reader.readTextBeforeTimeout"
 	val stopAt = currentTimeMillis() + timeout
 	return runBlocking {
 	  var r = ""
@@ -46,7 +46,7 @@ class SocketReader(val socket: Socket) {
 
   /*null=matt.kjlib.socket.reader.EOF*/
   suspend fun readLineOrSuspend(suspendMillis: Long = 100): String? {
-	tempLogger += "readLineOrSuspend"
+	socketLogger += "readLineOrSuspend"
 	var line = ""
 	while (true) {
 	  when (val lineResult = readLine()) {
@@ -62,7 +62,7 @@ class SocketReader(val socket: Socket) {
   }
 
   private fun readLine(): ReadLineResult {
-	tempLogger += "readLine"
+	socketLogger += "readLine"
 	var line = ""
 	while (true) {
 	  val c = read()
@@ -83,7 +83,7 @@ class SocketReader(val socket: Socket) {
   }
 
   private fun read(timeout: Int = 1): ReadCharResult {
-	tempLogger += "read"
+	socketLogger += "read"
 	socket.soTimeout = timeout
 	return try {
 	  val c = reader.read()
