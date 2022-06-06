@@ -2,6 +2,7 @@ package matt.kjlib.socket
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import matt.kjlib.socket.reader.readTextBeforeTimeout
 import matt.klib.constants.ValJson
 import matt.klib.file.MFile
 import java.io.PrintWriter

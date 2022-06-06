@@ -7,6 +7,7 @@ dependencies {
   projectOrLocalMavenJVM("api", ":k:klib")
   projectOrLocalMavenJVM("api", ":k:stream")
   api(libs.kotlinx.serialization.json)
+  implementation(libs.kotlinx.coroutines)
 }
 
 
