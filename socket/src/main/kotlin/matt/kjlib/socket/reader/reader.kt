@@ -5,7 +5,6 @@ package matt.kjlib.socket.reader
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import matt.klib.commons.plus
 import matt.klib.log.DefaultLogger
 import matt.klib.log.Logger
 import java.io.BufferedReader
