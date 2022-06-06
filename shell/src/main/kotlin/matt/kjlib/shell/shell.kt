@@ -150,19 +150,13 @@ val OSProcess.arguments: List<String>?
 
 
 fun shell(vararg args: String, debug: Boolean = false, workingDir: MFile? = null): String {
-  if (debug) {
-	println("running command: ${args.joinToString(" ")}")
-  }
-  val p = proc(
-	wd = workingDir, args = args
-  )
+  if (debug) println("running command: ${args.joinToString(" ")}")
+  val p = proc(wd = workingDir, args = args)
   val output = p.allStdOutAndStdErr()
-  if (debug) {
-	println("output: ${output}")
-  }
+  if (debug) println("output: $output")
   p.waitFor()
   p.exitValue().takeIf { it != 0 }?.go {
-	err("error code is ${it}")
+	err("error code is $it, output is $output")
   }
   return output
 }
