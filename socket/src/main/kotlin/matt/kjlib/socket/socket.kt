@@ -3,6 +3,7 @@ package matt.kjlib.socket
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import matt.kjlib.socket.reader.readTextBeforeTimeout
+import matt.klib.commons.VAL_JSON
 import matt.klib.constants.ValJson
 import matt.klib.file.MFile
 import java.io.PrintWriter
@@ -11,11 +12,11 @@ import java.net.ConnectException
 import java.net.Socket
 import java.util.concurrent.Semaphore
 
-val tempValJson = MFile("/Users/matthewgroth/registered/data/VAL.json").apply {
-  println("this is temporary")
-}
+//val tempValJson = MFile("/Users/matthewgroth/registered/data/VAL.json").apply {
+//  println("this is temporary")
+//}
 
-fun port(name: String) = Json.decodeFromString<ValJson>(tempValJson.readText()).PORT[name]!!
+fun port(name: String) = Json.decodeFromString<ValJson>(VAL_JSON.readText()).PORT[name]!!
 
 
 class SingleSender(
@@ -145,7 +146,7 @@ abstract class BaseSender {
   fun receive(message: String) = send(message)
 
   @Suppress("unused")
-  fun activate() = send("ACTIVATE")
+  fun activate() = send("ACTIVATE", andReceive = false)
 
 
   fun areYouRunning(name: String): String? {
@@ -153,9 +154,9 @@ abstract class BaseSender {
   }
 
   @Suppress("unused")
-  fun exit() = send("EXIT")
-  fun go(value: String) = send("GO" to value)
-  fun open(value: String) = send("OPEN" to value)
+  fun exit() = send("EXIT", andReceive = false)
+  fun go(value: String) = send("GO" to value, andReceive = false)
+  fun open(value: String) = send("OPEN" to value, andReceive = false)
 
   abstract fun send(message: String, useSem: Boolean = true, andReceive: Boolean = true): String?
 }

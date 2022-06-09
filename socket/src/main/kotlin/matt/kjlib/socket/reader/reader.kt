@@ -5,8 +5,6 @@ package matt.kjlib.socket.reader
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import matt.klib.log.DefaultLogger
-import matt.klib.log.Logger
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.lang.System.currentTimeMillis
@@ -16,7 +14,7 @@ import java.net.SocketTimeoutException
 import kotlin.contracts.InvocationKind.UNKNOWN
 import kotlin.contracts.contract
 
-var socketLogger: Logger = DefaultLogger
+//var socketLogger: Logger = DefaultLogger
 
 fun Socket.readTextBeforeTimeout(timeout: Long, suspend: Boolean = true): String {
   return SocketReader(this).readTextBeforeTimeout(timeout = timeout, suspend = suspend)
@@ -67,11 +65,14 @@ class SocketReader(val socket: Socket) {
 	contract {
 	  callsInPlace(op, UNKNOWN)
 	}
-	socketLogger += "readLineOrSuspend"
+//	socketLogger += "readLineOr"
 	var line = ""
 	while (true) {
 	  when (val lineResult = readLine(readTimeout = readTimeout)) {
-		JustEOF     -> return null
+		JustEOF     -> return when (line) {
+		  ""   -> null
+		  else -> line
+		}
 		JustTIMEOUT -> op()
 		is RLine    -> line += when {
 		  lineResult.withEOF     -> return line + lineResult
@@ -79,11 +80,12 @@ class SocketReader(val socket: Socket) {
 		  else                   -> lineResult.l
 		}
 	  }
+//	  socketLogger += "line1=\"${line}\""
 	}
   }
 
   private fun readLine(readTimeout: Int): ReadLineResult {
-	socketLogger += "readLine"
+//	socketLogger += "readLine"
 	var line = ""
 	while (true) {
 	  when (val c = read(timeout = readTimeout)) {
@@ -99,11 +101,12 @@ class SocketReader(val socket: Socket) {
 		  else -> RLine(line, withTimeout = true)
 		}
 	  }
+//	  socketLogger += "line2=\"${line}\""
 	}
   }
 
   private fun read(timeout: Int): ReadCharResult {
-	socketLogger += "read"
+//	socketLogger += "read"
 	socket.soTimeout = timeout
 	return try {
 	  when (val c = reader.read()) {
