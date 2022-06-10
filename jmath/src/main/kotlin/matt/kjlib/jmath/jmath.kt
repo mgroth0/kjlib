@@ -1,5 +1,6 @@
 package matt.kjlib.jmath
 
+import com.aparapi.internal.exception.AparapiException
 import matt.kjlib.jmath.bgdecimal.BigDecimalMath
 import matt.klib.math.DOUBLE_ONE
 import matt.klib.math.Sides
@@ -28,6 +29,8 @@ import java.math.RoundingMode.HALF_UP
 import java.math.RoundingMode.UNNECESSARY
 import kotlin.math.pow
 import kotlin.math.roundToInt
+
+val aparAPIWillBeUsed = AparapiException::class
 
 val ApE = ApfloatMath.exp(Apfloat.ONE.precision(100)).apply {
   println("could just use ApfloatMath.exp, which is probably faster?")
