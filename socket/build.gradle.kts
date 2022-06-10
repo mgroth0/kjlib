@@ -3,9 +3,9 @@
 import matt.klib.str.upper
 modtype = LIB
 dependencies {
-  implementation(projects.kj.kjlib.lang)
+//  implementation(projects.kj.kjlib.lang)
   projectOrLocalMavenJVM("api", ":k:klib")
-  projectOrLocalMavenJVM("api", ":k:stream")
+//  projectOrLocalMavenJVM("api", ":k:stream")
   api(libs.kotlinx.serialization.json)
   implementation(libs.kotlinx.coroutines)
 }
