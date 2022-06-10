@@ -17,6 +17,10 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 
+//fun doSomething() {
+//  println(FRONTMOST_APP_NAME)
+//}
+
 
 fun proc(
   wd: MFile?, vararg args: String, env: Map<String, String> = mapOf()
