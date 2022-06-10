@@ -1,9 +1,8 @@
 package matt.kjlib.delegate
 
-import matt.kjlib.olist.BasicObservableList
-import matt.kjlib.olist.toBasicObservableList
+import matt.klib.olist.BasicObservableList
+import matt.klib.olist.toBasicObservableList
 import matt.klib.lang.NEVER
-import matt.klib.lang.err
 import matt.klib.lang.setAll
 import matt.klib.oset.BasicObservableSet
 import matt.klib.oset.toBasicObservableSet
