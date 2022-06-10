@@ -28,6 +28,8 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
   val gitProjectDir = MFile(dotGitDir).parentFile
   val gitIgnoreFile = gitProjectDir!! + GIT_IGNORE_FILE_NAME
   val gitProjectName by lazy { gitProjectDir!!.name }
+  val githubRepoName get () = url().split("/").last()
+
 
 
   fun ignore() = GitIgnore(gitIgnoreFile.readText())
