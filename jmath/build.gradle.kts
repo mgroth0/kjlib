@@ -3,7 +3,7 @@
 import matt.klib.str.upper
 modtype = LIB
 dependencies {
-  implementation(projects.kj.kjlib.lang)
+//  implementation(projects.kj.kjlib.lang)
   api(jvm(projects.k.stream))
   if (rootDir.name.upper() == "FLOW") {
 	api(project(":k:klib")) {
@@ -16,7 +16,8 @@ dependencies {
   api(libs.apfloat)
   implementation(libs.aparapi)
   implementation(libs.commons.math)
-  api(libs.bundles.multik.full)
+//  api(libs.bundles.multik.full)
+  api(libs.kotlinx.multik.api)
 }
 plugins {
   kotlin("plugin.serialization")
