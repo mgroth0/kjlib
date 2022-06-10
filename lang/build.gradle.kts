@@ -4,6 +4,6 @@ modtype = LIB
 
 
 dependencies {
-  projectOrLocalMavenJVM("api", ":k:klib")
+//  projectOrLocalMavenJVM("api", ":k:klib")
   kotlin("reflect")
 }
