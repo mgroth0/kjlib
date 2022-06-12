@@ -1,8 +1,11 @@
 modtype = LIB
 
+apis(
+  project(":k:klib")
+)
+
 dependencies {
 //  implementation(projects.kj.kjlib.lang)
-  projectOrLocalMavenJVM("api", ":k:klib")
   api(libs.oshi)
   implementation(projects.k.key)
 }

@@ -1,11 +1,14 @@
 //import matt.kbuild.gbuild.projectOrLocalMavenJVM
 
 import matt.klib.str.upper
+
 modtype = LIB
+apis(
+  project(":k:klib")
+)
 dependencies {
-//  implementation(projects.kj.kjlib.lang)
-  projectOrLocalMavenJVM("api", ":k:klib")
-//  projectOrLocalMavenJVM("api", ":k:stream")
+  //  implementation(projects.kj.kjlib.lang)
+  //  projectOrLocalMavenJVM("api", ":k:stream")
   api(libs.kotlinx.serialization.json)
   implementation(libs.kotlinx.coroutines)
 }
