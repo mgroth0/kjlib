@@ -1,5 +1,7 @@
 package matt.kjlib.git
 
+import matt.kjlib.git.GitConfigDomain.Global
+import matt.kjlib.git.GitConfigDomain.System
 import matt.kjlib.git.GitModulesLineType.Path
 import matt.kjlib.git.GitModulesLineType.Submodule
 import matt.kjlib.git.GitModulesLineType.URL
@@ -253,9 +255,18 @@ val GitProject<*>.gitSubmodules: List<GitSubmodule>
 
   }
 
+enum class GitConfigDomain(val arg: String?) {
+  System("--system"), Global("--global"), Local(null)
+}
+
+private fun gitConfig(domain: GitConfigDomain) = gitShell(
+  *listOfNotNull("git", "config", "--list", domain.arg).toTypedArray()
+).lines()
+  .associate { it.substringBefore("=") to it.substringAfter("=") }
+
 class GitConfig private constructor(map: Map<String, String>): Map<String, String> by map {
   companion object {
-	fun global() = GitConfig(gitShell("git", "config", "--list", "--global").lines()
-	  .associate { it.substringBefore("=") to it.substringAfter("=") })
+	fun global() = GitConfig(gitConfig(Global))
+	fun system() = GitConfig(gitConfig(System))
   }
 }
