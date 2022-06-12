@@ -28,8 +28,7 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
   val gitProjectDir = MFile(dotGitDir).parentFile
   val gitIgnoreFile = gitProjectDir!! + GIT_IGNORE_FILE_NAME
   val gitProjectName by lazy { gitProjectDir!!.name }
-  val githubRepoName get () = url().split("/").last()
-
+  val githubRepoName get() = url().split("/").last()
 
 
   fun ignore() = GitIgnore(gitIgnoreFile.readText())
@@ -253,3 +252,10 @@ val GitProject<*>.gitSubmodules: List<GitSubmodule>
 	return mods
 
   }
+
+class GitConfig private constructor(map: Map<String, String>): Map<String, String> by map {
+  companion object {
+	fun global() = GitConfig(gitShell("git", "config", "--list", "--global").lines()
+	  .associate { it.substringBefore("=") to it.substringAfter("=") })
+  }
+}
