@@ -14,6 +14,7 @@ import matt.klib.commons.thisMachine
 import matt.klib.file.MFile
 import matt.klib.lang.err
 import matt.klib.sys.WINDOWS
+import java.io.Serializable
 
 val GIT_IGNORE_FILE_NAME = ".gitignore"
 
@@ -147,7 +148,7 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
   fun pull() = op(pullCommand())
 }
 
-class SimpleGit(gitDir: String, debug: Boolean = false): GitProject<String>(gitDir, debug) {
+class SimpleGit(gitDir: String, debug: Boolean = false): GitProject<String>(gitDir, debug), Serializable {
   constructor(projectDir: MFile, debug: Boolean = false): this(
 	projectDir.resolve(".git").absolutePath, debug
   )
