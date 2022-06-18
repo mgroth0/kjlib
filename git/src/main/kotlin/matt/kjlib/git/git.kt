@@ -148,7 +148,7 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
   fun pull() = op(pullCommand())
 }
 
-class SimpleGit(gitDir: String, debug: Boolean = false): GitProject<String>(gitDir, debug), Serializable {
+class SimpleGit(gitDir: String, debug: Boolean = false): GitProject<String>(gitDir, debug) {
   constructor(projectDir: MFile, debug: Boolean = false): this(
 	projectDir.resolve(".git").absolutePath, debug
   )
