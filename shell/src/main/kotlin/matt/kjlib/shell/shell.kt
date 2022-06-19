@@ -175,3 +175,7 @@ fun shell(vararg args: String, debug: Boolean = false, workingDir: MFile? = null
 	FRONTMOST_APP_NAME
   ).trim()
 }
+
+fun someFunction() {
+  MFile("abc").relativeTo(MFile("123"))
+}
