@@ -2,11 +2,6 @@ package matt.kjlib.file
 
 import matt.kjlib.byte.ByteSize
 import matt.klib.file.MFile
-import matt.klib.file.ext.append
-import matt.klib.file.ext.getNextAndClearWhenMoreThan
-import matt.klib.file.ext.mkparents
-import matt.klib.file.ext.text
-import matt.klib.file.ext.write
 import matt.klib.file.toMFile
 import matt.stream.recurse.recurse
 import java.nio.file.Files
