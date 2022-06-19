@@ -271,3 +271,27 @@ class GitConfig private constructor(map: Map<String, String>): Map<String, Strin
 	fun system() = GitConfig(gitConfig(System))
   }
 }
+
+
+private val FILT = """
+  
+  
+  
+  II SHOULD REALLY ALWAYS MAKE A FRESH CLONE WHEN DOING THIS STUFF. ITS EXTREMELY DANGEROUS
+
+  git filter-repo --analyze --force
+
+  git add .
+  git commit -m "MUST COMMIT BEFORE ANY CHANGES. DIRTY CHANGES WILL BE LOST"
+
+  THE --INVERT-PATHS PART IS ESSENTIAL. DO NOT MISS THAT. OR ALL FILES WILL BE DELETED.
+
+  git filter-repo --force --path KJ/sci/stim/flicker/build --invert-paths
+  git filter-repo --force --path-glob '*.wav' --invert-paths
+
+  git remote add origin https://github.com/mgroth0/flow
+  git push origin master --force
+  
+  
+  
+""".trimIndent()
