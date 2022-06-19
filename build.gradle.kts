@@ -1,6 +1,3 @@
-
-
-import matt.klib.str.upper
 modtype = LIB
 apis(
   ":k:klib".jvm()
