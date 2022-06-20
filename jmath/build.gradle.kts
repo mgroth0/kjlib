@@ -6,7 +6,7 @@ apis(
   ":k:klib".jvm()
 )
 dependencies {
-//  implementation(projects.kj.kjlib.lang)
+//  implementation(projects.k.kjlib.lang)
   api(jvm(projects.k.stream))
 //  if (rootDir.name.upper() == "FLOW") {
 //	api(project(":k:klib")) {

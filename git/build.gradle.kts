@@ -6,6 +6,6 @@ implementations(
   ":k:klib".jvm()
 )
 dependencies {
-  implementation(projects.kj.kjlib.kjlibLang)
-  implementation(projects.kj.kjlib.kjlibShell)
+  implementation(projects.k.kjlib.kjlibLang)
+  implementation(projects.k.kjlib.kjlibShell)
 }

@@ -8,7 +8,7 @@ apis(
 //)
 
 dependencies {
-//  implementation(projects.kj.kjlib.lang)
+//  implementation(projects.k.kjlib.lang)
   api(libs.oshi)
   implementation(projects.k.key)
 }
