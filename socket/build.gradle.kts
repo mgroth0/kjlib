@@ -1,21 +1,12 @@
-//import matt.kbuild.gbuild.projectOrLocalMavenJVM
-
-import matt.klib.str.upper
-
 modtype = LIB
 apis(
-  ":k:klib".jvm()
+  ":k:klib".jvm(),
+  libs.kotlinx.serialization.json
 )
-dependencies {
-  //  implementation(projects.kj.kjlib.lang)
-  //  projectOrLocalMavenJVM("api", ":k:stream")
-  api(libs.kotlinx.serialization.json)
-  implementation(libs.kotlinx.coroutines)
-}
-
-
+implementations(
+  ":k:key".jvm(),
+  libs.kotlinx.coroutines
+)
 plugins {
   kotlin("plugin.serialization")
-
-  /*experimental.coroutines = org.jetbrains.kotlin.gradle.dsl.Coroutines.ENABLE*/
 }
