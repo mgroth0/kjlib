@@ -7,9 +7,6 @@ import java.io.PrintStream
 import java.io.PrintWriter
 import java.nio.charset.StandardCharsets
 
-val exceptionFolder = LOG_FOLDER["errorReports"]
-
-
 fun mAssert(b: Boolean) {
   if (!b) {
 	throw RuntimeException("Bad!")
