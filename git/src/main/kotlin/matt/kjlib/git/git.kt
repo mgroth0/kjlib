@@ -8,8 +8,6 @@ import matt.kjlib.git.GitModulesLineType.URL
 import matt.kjlib.git.ignore.GitIgnore
 import matt.kjlib.lang.jlang.toStringBuilder
 import matt.kjlib.shell.shell
-import matt.klib.commons.get
-import matt.klib.commons.plus
 import matt.klib.commons.thisMachine
 import matt.file.MFile
 import matt.file.mFile

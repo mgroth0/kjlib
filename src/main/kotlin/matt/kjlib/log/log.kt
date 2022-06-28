@@ -1,7 +1,6 @@
 package matt.kjlib.log
 
 import matt.file.commons.LOG_FOLDER
-import matt.file.commons.get
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.io.PrintWriter
