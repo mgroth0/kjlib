@@ -8,7 +8,7 @@ import matt.key.EXIT
 import matt.key.GO
 import matt.key.OPEN
 import matt.kjlib.socket.reader.readTextBeforeTimeout
-import matt.klib.commons.VAL_JSON_FILE
+import matt.file.commons.VAL_JSON_FILE
 import matt.klib.constants.ValJson
 import matt.file.MFile
 import java.io.PrintWriter

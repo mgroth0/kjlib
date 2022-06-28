@@ -1,7 +1,7 @@
 package matt.kjlib.log
 
-import matt.klib.commons.LOG_FOLDER
-import matt.klib.commons.get
+import matt.file.commons.LOG_FOLDER
+import matt.file.commons.get
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.io.PrintWriter
