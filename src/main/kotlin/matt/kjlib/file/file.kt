@@ -2,6 +2,7 @@ package matt.kjlib.file
 
 import matt.kjlib.byte.ByteSize
 import matt.klib.file.MFile
+import matt.klib.file.mFile
 import matt.klib.file.toMFile
 import matt.stream.recurse.recurse
 import java.nio.file.Files
@@ -31,7 +32,7 @@ fun MFile.recursiveLastModified(): Long {
 fun MFile.next(): MFile {
   var ii = 0
   while (true) {
-	val f = MFile(absolutePath + ii.toString())
+	val f = mFile(absolutePath + ii.toString())
 	if (!f.exists()) {
 	  return f
 	}
@@ -76,7 +77,7 @@ fun MFile.backupWork(@Suppress("UNUSED_PARAMETER") thread: Boolean = false, text
 	throw Exception("cannot back up ${this}, which does not exist")
   }
 
-  val backupFolder = MFile(this.absolutePath).parentFile!!.resolve("backups")
+  val backupFolder = mFile(this.absolutePath).parentFile!!.resolve("backups")
   backupFolder.mkdir()
   if (!backupFolder.isDirectory) {
 	throw Exception("backupFolder not a dir")

@@ -12,6 +12,7 @@ import matt.klib.commons.get
 import matt.klib.commons.plus
 import matt.klib.commons.thisMachine
 import matt.klib.file.MFile
+import matt.klib.file.mFile
 import matt.klib.lang.err
 import matt.klib.sys.WINDOWS
 import java.io.Serializable
@@ -23,12 +24,12 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
   override fun toString() = toStringBuilder(::gitProjectDir)
 
   init {
-	require(MFile(dotGitDir).name == ".git") {
-	  "dotGitDir should be named \".git\", but instead it is named ${MFile(dotGitDir).name}"
+	require(mFile(dotGitDir).name == ".git") {
+	  "dotGitDir should be named \".git\", but instead it is named ${mFile(dotGitDir).name}"
 	}
   }
 
-  val gitProjectDir = MFile(dotGitDir).parentFile
+  val gitProjectDir = mFile(dotGitDir).parentFile
   val gitIgnoreFile = gitProjectDir!! + GIT_IGNORE_FILE_NAME
   val gitProjectName by lazy { gitProjectDir!!.name }
   val githubRepoName get() = url().split("/").last()
