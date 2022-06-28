@@ -2,7 +2,7 @@ package matt.kjlib.reflect
 
 import matt.kjlib.file.recursiveChildren
 import matt.klib.commons.get
-import matt.klib.file.MFile
+import matt.file.MFile
 import matt.klib.lang.inlined
 
 

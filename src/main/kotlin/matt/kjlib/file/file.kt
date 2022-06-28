@@ -1,9 +1,9 @@
 package matt.kjlib.file
 
 import matt.kjlib.byte.ByteSize
-import matt.klib.file.MFile
-import matt.klib.file.mFile
-import matt.klib.file.toMFile
+import matt.file.MFile
+import matt.file.mFile
+import matt.file.toMFile
 import matt.stream.recurse.recurse
 import java.nio.file.Files
 import kotlin.concurrent.thread

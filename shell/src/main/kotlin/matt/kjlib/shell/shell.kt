@@ -5,8 +5,8 @@ package matt.kjlib.shell
 import matt.key.FRONTMOST_APP_NAME
 import matt.klib.commons.REGISTERED_FOLDER
 import matt.klib.commons.get
-import matt.klib.file.MFile
-import matt.klib.file.mFile
+import matt.file.MFile
+import matt.file.mFile
 import matt.klib.lang.err
 import matt.klib.lang.go
 import oshi.software.os.OSProcess

@@ -2,7 +2,7 @@ package matt.kjlib.git.ignore
 
 import matt.klib.commons.DS_STORE
 import matt.klib.commons.RootProjects
-import matt.klib.file.MFile
+import matt.file.MFile
 import matt.klib.str.upper
 
 

@@ -11,8 +11,8 @@ import matt.kjlib.shell.shell
 import matt.klib.commons.get
 import matt.klib.commons.plus
 import matt.klib.commons.thisMachine
-import matt.klib.file.MFile
-import matt.klib.file.mFile
+import matt.file.MFile
+import matt.file.mFile
 import matt.klib.lang.err
 import matt.klib.sys.WINDOWS
 import java.io.Serializable
