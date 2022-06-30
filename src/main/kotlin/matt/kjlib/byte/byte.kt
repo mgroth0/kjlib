@@ -23,11 +23,13 @@ data class ByteSize(val bytes: Long): Comparable<ByteSize> {
   val tera by lazy { bytes.toDouble()/KILO/KILO/KILO/KILO }
 
   val formatted by lazy {
+	println("trying to format ${bytes}")
 	when {
+//	  bytes == 0L           -> "0 B"
 	  giga > 1 || giga < -1 -> "%.3f GB".format(giga)
 	  mega > 1 || mega < -1 -> "%.3f MB".format(mega)
 	  kilo > 1 || kilo < -1 -> "%.3f KB".format(kilo)
-	  else                  -> "%.3f B".format(bytes)
+	  else                  -> "$bytes B"
 	}
   }
 
