@@ -86,9 +86,7 @@ internal fun MFile.backupWork(
   require(backupFolder.isDirectory) { "backupFolder not a dir" }
 
 
-  val backupFileWork = backupFolder
-	.resolve(name).toMFile()
-	.getNextSubIndexedFileWork(name, 100)
+  val backupFileWork = backupFolder.getNextSubIndexedFileWork(name, 100)
 
   val realText = text ?: readText()
 
