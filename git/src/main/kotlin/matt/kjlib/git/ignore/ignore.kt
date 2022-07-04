@@ -44,7 +44,7 @@ fun MFile.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
   expectedPatterns += "/bin/jar/"
   if (projectDir.name.upper() in RootProjects.flow.subRootFolders.map { it.name.upper() } || projectDir == rootDir) {
 	/*RootFiles*/
-	expectedPatterns += "/build.gradle.kts"
+	/*expectedPatterns += "/build.gradle.kts"*/ /*i know its hard linked, but I do need to get this into openmind*/
 	expectedPatterns += "/settings.gradle.kts"
 	expectedPatterns += "/gradle.properties"
 	expectedPatterns += "/shadow.gradle"
