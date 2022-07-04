@@ -71,25 +71,30 @@ fun MFile.doubleBackupWrite(s: String, thread: Boolean = false) {
 }
 
 
-fun MFile.backupWork(@Suppress("UNUSED_PARAMETER") thread: Boolean = false, text: String? = null): ()->Unit {
+internal fun MFile.backupWork(
+  @Suppress("UNUSED_PARAMETER") thread: Boolean = false,
+  text: String? = null
+): ()->Unit {
 
-  if (!this.exists()) {
-	throw Exception("cannot back up ${this}, which does not exist")
+  require(this.exists()) {
+	"cannot back up ${this}, which does not exist"
   }
 
-  val backupFolder = mFile(this.absolutePath).parentFile!!.resolve("backups")
+
+  val backupFolder = toMFile().parentFile!! + "backups"
   backupFolder.mkdir()
-  if (!backupFolder.isDirectory) {
-	throw Exception("backupFolder not a dir")
-  }
+  require(backupFolder.isDirectory) { "backupFolder not a dir" }
 
-  val backupFile = backupFolder
+
+  val backupFileWork = backupFolder
 	.resolve(name).toMFile()
-	.getNextAndClearWhenMoreThan(100, extraExt = "backup")
+	.getNextSubIndexedFileWork(name, 100)
 
   val realText = text ?: readText()
 
-  return { backupFile.text = realText }
+  return {
+	backupFileWork().text = realText
+  }
 
 }
 
