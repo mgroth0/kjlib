@@ -1,5 +1,7 @@
 package matt.kjlib.git
 
+import matt.file.MFile
+import matt.file.mFile
 import matt.kjlib.git.GitConfigDomain.Global
 import matt.kjlib.git.GitConfigDomain.System
 import matt.kjlib.git.GitModulesLineType.Path
@@ -9,11 +11,8 @@ import matt.kjlib.git.ignore.GitIgnore
 import matt.kjlib.lang.jlang.toStringBuilder
 import matt.kjlib.shell.shell
 import matt.klib.commons.thisMachine
-import matt.file.MFile
-import matt.file.mFile
 import matt.klib.lang.err
 import matt.klib.sys.WINDOWS
-import java.io.Serializable
 
 val GIT_IGNORE_FILE_NAME = ".gitignore"
 
