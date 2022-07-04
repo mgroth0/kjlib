@@ -93,7 +93,10 @@ internal fun MFile.backupWork(
   val realText = text ?: readText()
 
   return {
-	backupFileWork().text = realText
+	println("doing work")
+	val f = backupFileWork()
+	f.text = realText
+	println("did work:$f")
   }
 
 }
