@@ -166,6 +166,8 @@ fun shell(vararg args: String, debug: Boolean = false, workingDir: MFile? = null
 }
 
 
+
+
 //NOSONAR
 @SuppressWarnings("all") fun getNameOfFrontmostProcessFromKOTLIN_FUCKING_NATIVE(): String { //NOSONAR
   return shell(
