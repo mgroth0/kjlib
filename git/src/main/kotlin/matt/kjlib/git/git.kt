@@ -13,6 +13,9 @@ import matt.kjlib.shell.shell
 import matt.klib.commons.thisMachine
 import matt.klib.lang.err
 import matt.klib.sys.WINDOWS
+import matt.remote.expect.pwd
+import matt.remote.expect.sendLineAndWait
+import net.sf.expectit.Expect
 
 val GIT_IGNORE_FILE_NAME = ".gitignore"
 
@@ -78,6 +81,11 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
 	wrapGitCommand("submodule", "add", url).let { if (path == null) it else it + path }
 
   fun submoduleAdd(url: String, path: String? = null) = op(submoduleAddCommand(url = url, path = path))
+
+
+  private fun submoduleUpdateCommand() = wrapGitCommand("submodule", "update", "--init", "--recursive")
+
+  fun submoduleUpdate() = op(submoduleUpdateCommand())
 
   private fun gitRmCommand(path: String, cached: Boolean, recursive: Boolean) = wrapGitCommand(
 	"rm",
@@ -293,3 +301,18 @@ private val FILT = """
   
   
 """.trimIndent()
+
+
+class ExpectGit(val e: Expect, dotGitDir: String, debug: Boolean = false): GitProject<Unit>(dotGitDir, debug) {
+  constructor(e: Expect, projectDir: MFile, debug: Boolean = false): this(
+	e,
+	projectDir.resolve(".git").absolutePath, debug
+  )
+
+  override fun op(command: Array<String>) {
+	e.sendLineAndWait(command.joinToString(" "))
+  }
+}
+
+val Expect.git get() = ExpectGit(this, projectDir = mFile(pwd()))
+
