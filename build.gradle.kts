@@ -7,6 +7,6 @@ apis(
 dependencies {
 //  projectOrLocalMavenJVM("api", )
 //  api(projects.k.reflect)
-  api(projects.k.kjlib.kjlibLang)
+  api(projects.k.kjlib.lang)
   api(jvm(projects.k.stream))
 }
