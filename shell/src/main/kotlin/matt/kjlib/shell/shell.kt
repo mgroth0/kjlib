@@ -1,4 +1,4 @@
-@file:Suppress("FunctionName", "FunctionName")
+@file:Suppress("unused")
 
 package matt.kjlib.shell
 
@@ -13,27 +13,49 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
+import kotlin.concurrent.thread
 
 interface Shell<R: Any?> {
-  fun sendLine(line: String): R
   fun sendCommand(vararg args: String): R
+}
+
+object ExecReturner: Shell<String> {
+  override fun sendCommand(vararg args: String): String {
+	return execReturn(*args)
+  }
+}
+
+class ShellErrException(m: String): Exception(m)
+
+class ExecProcessSpawner(private val throwOnErr: Boolean = false): Shell<Process> {
+  override fun sendCommand(vararg args: String): Process {
+	val p = proc(null, args = args)
+	if (throwOnErr) {
+	  thread(isDaemon = true) {
+		p.errorReader().lines().forEach {
+		  throw ShellErrException(it)
+		}
+	  }
+	}
+	return p
+  }
 }
 
 fun proc(
   wd: MFile?, vararg args: String, env: Map<String, String> = mapOf()
 ): Process {
-  val envp = env.map {
+  val envP = env.map {
 	it.key + "=" + it.value
   }.toTypedArray()
   return if (wd == null) Runtime.getRuntime().exec(
-	args, envp
+	args, envP
   ) else Runtime.getRuntime().exec(
-	args, envp, wd
+	args, envP, wd
   )
 }
 
 fun Process.allStdOutAndStdErr() =
-  streams.joinToString("") {/*FutureTask {*/ /*no idea why i did this... it caused blocking i think*/
+  streams.joinToString("") {/*FutureTask {*/ /*no idea why I did this... it caused blocking I think*/
 	it.bufferedReader().lines().toList().joinToString("\n")
   }
 
@@ -73,9 +95,9 @@ fun Process.command(): String? = info().command().orElseGet { null }
 fun Process.arguments(): Array<String>? = info().arguments().orElseGet { null }
 fun Process.commandLine(): String? = info().commandLine().orElseGet { null }
 fun Process.directDescendents(): List<ProcessHandle> {
-  val mypid = pid()
+  val myPid = pid()
   try {
-	return descendants().filter { it.parent().orElseGet { null }?.pid() == mypid }.toList()
+	return descendants().filter { it.parent().orElseGet { null }?.pid() == myPid }.toList()
   } catch (e: RuntimeException) {
 	if (e.message != null && "Cannot allocate memory" in e.message!!) {
 	  throw ItsJavasFaultException(e)
@@ -95,11 +117,11 @@ fun ProcessHandle.command(): String? = info().command().orElseGet { null }
 fun ProcessHandle.arguments(): Array<String>? = info().arguments().orElseGet { null }
 fun ProcessHandle.commandLine(): String? = info().commandLine().orElseGet { null }
 fun ProcessHandle.directDescendents(): List<ProcessHandle> {
-  val mypid = pid()
-  return descendants().filter { it.parent().orElseGet { null }?.pid() == mypid }.toList()
+  val myPid = pid()
+  return descendants().filter { it.parent().orElseGet { null }?.pid() == myPid }.toList()
 }
 
-/*I think the oshi impl of this doesnt work*/
+/*I think the oshi impl of this doesn't work*/
 val OSProcess.command: String?
   get() {
 	val handle = ProcessHandle.of(processID.toLong()).orElseGet { null }
@@ -158,11 +180,8 @@ fun shell(vararg args: String, debug: Boolean = false, workingDir: MFile? = null
 }
 
 
-//NOSONAR
-@SuppressWarnings("all") fun getNameOfFrontmostProcessFromKOTLIN_FUCKING_NATIVE(): String { //NOSONAR
+fun getNameOfFrontmostProcessFromKotlinNative(): String {
   return shell(
-	//	"/Users/matthewgroth/registered/flow/kn/build/bin/native/debugExecutable/kn.kexe"
-	//	"/Users/matthewgroth/registered/flow/bin/kn/kn.kexe"
 	REGISTERED_FOLDER["bin"]["kn"]["kn.kexe"].absolutePath,
 	FRONTMOST_APP_NAME
   ).trim()
