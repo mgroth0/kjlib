@@ -2,25 +2,22 @@
 
 package matt.kjlib.shell
 
-import matt.key.FRONTMOST_APP_NAME
-import matt.file.commons.REGISTERED_FOLDER
 import matt.file.MFile
-import matt.file.mFile
+import matt.file.commons.REGISTERED_FOLDER
+import matt.key.FRONTMOST_APP_NAME
 import matt.klib.lang.err
 import matt.klib.lang.go
 import oshi.software.os.OSProcess
-
 import java.io.InputStream
-import java.time.Duration
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 
-//fun doSomething() {
-//  println(FRONTMOST_APP_NAME)
-//}
-
+interface Shell<R: Any?> {
+  fun sendLine(line: String): R
+  fun sendCommand(vararg args: String): R
+}
 
 fun proc(
   wd: MFile?, vararg args: String, env: Map<String, String> = mapOf()
@@ -48,12 +45,10 @@ val Process.streams: List<InputStream>
 
 fun exec(wd: MFile?, vararg args: String) = proc(wd, *args).waitFor() == 0
 fun execReturn(vararg args: String) = execReturn(null, *args)
-fun execPython(s: String) = execReturn("/usr/bin/python", "-c", s)
+fun <R> Shell<R>.pythonCommand(command: String): R = sendCommand("/usr/bin/python", "-c", command)
 
 fun execReturn(wd: MFile?, vararg args: String, verbose: Boolean = false, printResult: Boolean = false): String {
-  if (verbose) {
-	println("running ${args.joinToString(" ")}")
-  }
+  if (verbose) println("running ${args.joinToString(" ")}")
   return proc(wd, *args).allStdOutAndStdErr().also { if (printResult) println(it) }
 }
 
@@ -104,13 +99,10 @@ fun ProcessHandle.directDescendents(): List<ProcessHandle> {
   return descendants().filter { it.parent().orElseGet { null }?.pid() == mypid }.toList()
 }
 
-fun Int.seconds() = Duration.ofSeconds(toLong())
-fun Long.seconds() = Duration.ofSeconds(this)
-
 /*I think the oshi impl of this doesnt work*/
 val OSProcess.command: String?
   get() {
-	val handle = java.lang.ProcessHandle.of(processID.toLong()).orElseGet { null }
+	val handle = ProcessHandle.of(processID.toLong()).orElseGet { null }
 	return if (handle == null) {
 	  null
 	} else {
@@ -125,7 +117,7 @@ val OSProcess.command: String?
 
 val OSProcess.workingCommandLine: String?
   get() {
-	val handle = java.lang.ProcessHandle.of(processID.toLong()).orElseGet { null }
+	val handle = ProcessHandle.of(processID.toLong()).orElseGet { null }
 	return if (handle == null) {
 	  null
 	} else {
@@ -137,9 +129,9 @@ val OSProcess.workingCommandLine: String?
 	  }
 	}
   }
-val OSProcess.arguments: List<String>?
+val OSProcess.args: List<String>?
   get() {
-	val handle = java.lang.ProcessHandle.of(processID.toLong()).orElseGet { null }
+	val handle = ProcessHandle.of(processID.toLong()).orElseGet { null }
 	return if (handle == null) {
 	  null
 	} else {
@@ -166,8 +158,6 @@ fun shell(vararg args: String, debug: Boolean = false, workingDir: MFile? = null
 }
 
 
-
-
 //NOSONAR
 @SuppressWarnings("all") fun getNameOfFrontmostProcessFromKOTLIN_FUCKING_NATIVE(): String { //NOSONAR
   return shell(
@@ -176,8 +166,4 @@ fun shell(vararg args: String, debug: Boolean = false, workingDir: MFile? = null
 	REGISTERED_FOLDER["bin"]["kn"]["kn.kexe"].absolutePath,
 	FRONTMOST_APP_NAME
   ).trim()
-}
-
-fun someFunction() {
-  mFile("abc").relativeTo(mFile("123"))
 }
