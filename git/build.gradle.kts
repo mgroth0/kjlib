@@ -1,7 +1,6 @@
 
 
 import matt.klib.str.upper
-modtype = LIB
 implementations(
   ":k:klib".jvm(),
   projects.k.kjlib.lang,

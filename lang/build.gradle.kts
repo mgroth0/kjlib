@@ -1,6 +1,5 @@
 //import matt.kbuild.gbuild.projectOrLocalMavenJVM
 
-modtype = LIB
 
 
 dependencies {
