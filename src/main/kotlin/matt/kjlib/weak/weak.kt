@@ -1,7 +1,22 @@
 package matt.kjlib.weak
 
+import matt.kjlib.lang.jlang.runtime
+import matt.klib.byte.ByteSize
 import matt.klib.lang.err
 import java.lang.ref.WeakReference
+
+class MemReport {
+    val total = ByteSize(runtime.totalMemory())
+    val max = ByteSize(runtime.maxMemory())
+    val free = ByteSize(runtime.freeMemory())
+    override fun toString(): String {
+        var s = ""
+        s += "heapsize:${total}\n"
+        s += "heapmaxsize:${max}\n"
+        s += "heapFreesize:${free}"
+        return s
+    }
+}
 
 val immortals = mutableSetOf<Any>()
 fun <T: Any> T.immortal(): T {
