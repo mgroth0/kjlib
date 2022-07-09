@@ -9,6 +9,7 @@ import matt.klib.lang.err
 import matt.klib.lang.go
 import oshi.software.os.OSProcess
 import java.io.InputStream
+import java.lang.Thread.sleep
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -54,10 +55,22 @@ fun proc(
   )
 }
 
-fun Process.allStdOutAndStdErr() =
-  streams.joinToString("") {/*FutureTask {*/ /*no idea why I did this... it caused blocking I think*/
-	it.bufferedReader().lines().toList().joinToString("\n")
+fun Process.allStdOutAndStdErr(): String {
+
+  var err = ""
+  /*MUST USE THREAD. IF IS TRY TO DO THIS SEQUENTIALLY, SOMETIMES EITHER ERR OR STDOUT IS SO LARGE THAT IT PREVENTS THE OTHER ONE FROM COMING THROUGH, CAUSING BLOCKING IF I TRY TO GET EACH IN SEQUENCE.*/
+  val t = thread {
+	err = errorReader().readText()
   }
+  val out = inputReader().readText()
+  t.join()
+  return out + err
+  /*
+streams.joinToString("") {
+  it.bufferedReader().lines().toList().joinToString("\n")
+}
+*/
+}
 
 val Process.streams: List<InputStream>
   get() {
@@ -70,8 +83,35 @@ fun execReturn(vararg args: String) = execReturn(null, *args)
 fun <R> Shell<R>.pythonCommand(command: String): R = sendCommand("/usr/bin/python", "-c", command)
 
 fun execReturn(wd: MFile?, vararg args: String, verbose: Boolean = false, printResult: Boolean = false): String {
+  val verbose = true
   if (verbose) println("running ${args.joinToString(" ")}")
-  return proc(wd, *args).allStdOutAndStdErr().also { if (printResult) println(it) }
+  val p = proc(wd, *args)
+
+  thread {
+	while (p.isAlive) {
+	  println("process ${args[0]} is still alive")
+	  sleep(1000)
+	}
+  }
+/*  if (args.any { "repeat with m in every message" in it }) {
+	val t = thread {
+	  p.errorReader().forEachLine {
+		println("MAIL ERR:${it}")
+	  }
+	  println("MAIL ERR FINISHED")
+	}
+	p.inputReader().forEachLine {
+	  println("MAIL STD:${it}")
+	}
+	println("MAIL STD FINISHED")
+	t.join()
+  }*/
+  return p.allStdOutAndStdErr().also {
+	if (printResult) println(it)
+	if (verbose) {
+	  println("finished running command. Result: $it")
+	}
+  }
 }
 
 
