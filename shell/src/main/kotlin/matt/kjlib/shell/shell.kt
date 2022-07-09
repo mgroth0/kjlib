@@ -83,7 +83,6 @@ fun execReturn(vararg args: String) = execReturn(null, *args)
 fun <R> Shell<R>.pythonCommand(command: String): R = sendCommand("/usr/bin/python", "-c", command)
 
 fun execReturn(wd: MFile?, vararg args: String, verbose: Boolean = false, printResult: Boolean = false): String {
-  val verbose = true
   if (verbose) println("running ${args.joinToString(" ")}")
   val p = proc(wd, *args)
 
