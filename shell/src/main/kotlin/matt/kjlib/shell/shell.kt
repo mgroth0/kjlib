@@ -5,6 +5,22 @@ package matt.kjlib.shell
 import matt.file.MFile
 import matt.file.commons.REGISTERED_FOLDER
 import matt.key.FRONTMOST_APP_NAME
+import matt.kjlib.shell.AnsiColor.BLACK
+import matt.kjlib.shell.AnsiColor.BLACK_BACKGROUND
+import matt.kjlib.shell.AnsiColor.BLUE
+import matt.kjlib.shell.AnsiColor.BLUE_BACKGROUND
+import matt.kjlib.shell.AnsiColor.CYAN
+import matt.kjlib.shell.AnsiColor.CYAN_BACKGROUND
+import matt.kjlib.shell.AnsiColor.GREEN
+import matt.kjlib.shell.AnsiColor.GREEN_BACKGROUND
+import matt.kjlib.shell.AnsiColor.PURPLE
+import matt.kjlib.shell.AnsiColor.PURPLE_BACKGROUND
+import matt.kjlib.shell.AnsiColor.RED
+import matt.kjlib.shell.AnsiColor.RED_BACKGROUND
+import matt.kjlib.shell.AnsiColor.WHITE
+import matt.kjlib.shell.AnsiColor.WHITE_BACKGROUND
+import matt.kjlib.shell.AnsiColor.YELLOW
+import matt.kjlib.shell.AnsiColor.YELLOW_BACKGROUND
 import matt.klib.lang.err
 import matt.klib.lang.go
 import oshi.software.os.OSProcess
@@ -251,56 +267,61 @@ fun getNameOfFrontmostProcessFromKotlinNative(): String {
   ).trim()
 }
 
+enum class AnsiColor(val code: String) {
+  BLACK("\u001B[30m"),
+  RED("\u001B[31m"),
+  GREEN("\u001B[32m"),
+  YELLOW("\u001B[33m"),
+  BLUE("\u001B[34m"),
+  PURPLE("\u001B[35m"),
+  CYAN("\u001B[36m"),
+  WHITE("\u001B[37m"),
+
+  BLACK_BACKGROUND("\u001B[40m"),
+  RED_BACKGROUND("\u001B[41m"),
+  GREEN_BACKGROUND("\u001B[42m"),
+  YELLOW_BACKGROUND("\u001B[43m"),
+  BLUE_BACKGROUND("\u001B[44m"),
+  PURPLE_BACKGROUND("\u001B[46m"),
+  CYAN_BACKGROUND("\u001B[46m"),
+  WHITE_BACKGROUND("\u001B[47m");
+
+  fun wrap(s: CharSequence) = code + s + ANSI_RESET
+  fun wrap(c: Char): CharSequence = code + c + ANSI_RESET
+}
+
+fun CharSequence.ansiBlack() = BLACK.wrap(this)
+fun Char.ansiBlack() = BLACK.wrap(this)
+fun CharSequence.ansiRed() = RED.wrap(this)
+fun Char.ansiRed() = RED.wrap(this)
+fun CharSequence.ansiGreen() = GREEN.wrap(this)
+fun Char.ansiGreen() = GREEN.wrap(this)
+fun CharSequence.ansiYellow() = YELLOW.wrap(this)
+fun Char.ansiYellow() = YELLOW.wrap(this)
+fun CharSequence.ansiBlue() = BLUE.wrap(this)
+fun Char.ansiBlue() = BLUE.wrap(this)
+fun CharSequence.ansiPurple() = PURPLE.wrap(this)
+fun Char.ansiPurple() = PURPLE.wrap(this)
+fun CharSequence.ansiCyan() = CYAN.wrap(this)
+fun Char.ansiCyan() = CYAN.wrap(this)
+fun CharSequence.ansiWhite() = WHITE.wrap(this)
+fun Char.ansiWhite() = WHITE.wrap(this)
+
+fun CharSequence.ansiBlackBackground() = BLACK_BACKGROUND.wrap(this)
+fun Char.ansiBlackBackground() = BLACK_BACKGROUND.wrap(this)
+fun CharSequence.ansiRedBackground() = RED_BACKGROUND.wrap(this)
+fun Char.ansiRedBackground() = RED_BACKGROUND.wrap(this)
+fun CharSequence.ansiGreenBackground() = GREEN_BACKGROUND.wrap(this)
+fun Char.ansiGreenBackground() = GREEN_BACKGROUND.wrap(this)
+fun CharSequence.ansiYellowBackground() = YELLOW_BACKGROUND.wrap(this)
+fun Char.ansiYellowBackground() = YELLOW_BACKGROUND.wrap(this)
+fun CharSequence.ansiBlueBackground() = BLUE_BACKGROUND.wrap(this)
+fun Char.ansiBlueBackground() = BLUE_BACKGROUND.wrap(this)
+fun CharSequence.ansiPurpleBackground() = PURPLE_BACKGROUND.wrap(this)
+fun Char.ansiPurpleBackground() = PURPLE_BACKGROUND.wrap(this)
+fun CharSequence.ansiCyanBackground() = CYAN_BACKGROUND.wrap(this)
+fun Char.ansiCyanBackground() = CYAN_BACKGROUND.wrap(this)
+fun CharSequence.ansiWhiteBackground() = WHITE_BACKGROUND.wrap(this)
+fun Char.ansiWhiteBackground() = WHITE_BACKGROUND.wrap(this)
 
 const val ANSI_RESET = "\u001B[0m"
-
-
-const val ANSI_BLACK = "\u001B[30m"
-fun CharSequence.ansiBlack() = ANSI_BLACK + this + ANSI_RESET
-fun Char.ansiBlack() = ANSI_BLACK + this + ANSI_RESET
-const val ANSI_RED = "\u001B[31m"
-fun CharSequence.ansiRed() = ANSI_RED + this + ANSI_RESET
-fun Char.ansiRed() = ANSI_RED + this + ANSI_RESET
-const val ANSI_GREEN = "\u001B[32m"
-fun CharSequence.ansiGreen() = ANSI_GREEN + this + ANSI_RESET
-fun Char.ansiGreen() = ANSI_GREEN + this + ANSI_RESET
-const val ANSI_YELLOW = "\u001B[33m"
-fun CharSequence.ansiYellow() = ANSI_YELLOW + this + ANSI_RESET
-fun Char.ansiYellow() = ANSI_YELLOW + this + ANSI_RESET
-const val ANSI_BLUE = "\u001B[34m"
-fun CharSequence.ansiBlue() = ANSI_BLUE + this + ANSI_RESET
-fun Char.ansiBlue() = ANSI_BLUE + this + ANSI_RESET
-const val ANSI_PURPLE = "\u001B[35m"
-fun CharSequence.ansiPurple() = ANSI_PURPLE + this + ANSI_RESET
-fun Char.ansiPurple() = ANSI_PURPLE + this + ANSI_RESET
-const val ANSI_CYAN = "\u001B[36m"
-fun CharSequence.ansiCyan() = ANSI_CYAN + this + ANSI_RESET
-fun Char.ansiCyan() = ANSI_CYAN + this + ANSI_RESET
-const val ANSI_WHITE = "\u001B[37m"
-fun CharSequence.ansiWhite() = ANSI_WHITE + this + ANSI_RESET
-fun Char.ansiWhite() = ANSI_WHITE + this + ANSI_RESET
-
-const val ANSI_BLACK_BACKGROUND = "\u001B[40m"
-fun CharSequence.ansiBlackBackground() = ANSI_BLACK_BACKGROUND + this + ANSI_RESET
-fun Char.ansiBlackBackground() = ANSI_BLACK_BACKGROUND + this + ANSI_RESET
-const val ANSI_RED_BACKGROUND = "\u001B[41m"
-fun CharSequence.ansiRedBackground() = ANSI_RED_BACKGROUND + this + ANSI_RESET
-fun Char.ansiRedBackground() = ANSI_RED_BACKGROUND + this + ANSI_RESET
-const val ANSI_GREEN_BACKGROUND = "\u001B[42m"
-fun CharSequence.ansiGreenBackground() = ANSI_GREEN_BACKGROUND + this + ANSI_RESET
-fun Char.ansiGreenBackground() = ANSI_GREEN_BACKGROUND + this + ANSI_RESET
-const val ANSI_YELLOW_BACKGROUND = "\u001B[43m"
-fun CharSequence.ansiYellowBackground() = ANSI_YELLOW_BACKGROUND + this + ANSI_RESET
-fun Char.ansiYellowBackground() = ANSI_YELLOW_BACKGROUND + this + ANSI_RESET
-const val ANSI_BLUE_BACKGROUND = "\u001B[44m"
-fun CharSequence.ansiBlueBackground() = ANSI_BLUE_BACKGROUND + this + ANSI_RESET
-fun Char.ansiBlueBackground() = ANSI_BLUE_BACKGROUND + this + ANSI_RESET
-const val ANSI_PURPLE_BACKGROUND = "\u001B[45m"
-fun CharSequence.ansiPurpleBackground() = ANSI_PURPLE_BACKGROUND + this + ANSI_RESET
-fun Char.ansiPurpleBackground() = ANSI_PURPLE_BACKGROUND + this + ANSI_RESET
-const val ANSI_CYAN_BACKGROUND = "\u001B[46m"
-fun CharSequence.ansiCyanBackground() = ANSI_CYAN_BACKGROUND + this + ANSI_RESET
-fun Char.ansiCyanBackground() = ANSI_CYAN_BACKGROUND + this + ANSI_RESET
-const val ANSI_WHITE_BACKGROUND = "\u001B[47m"
-fun CharSequence.ansiWhiteBackground() = ANSI_WHITE_BACKGROUND + this + ANSI_RESET
-fun Char.ansiWhiteBackground() = ANSI_WHITE_BACKGROUND + this + ANSI_RESET
