@@ -1,8 +1,8 @@
 package matt.kjlib.git.ignore
 
+import matt.file.MFile
 import matt.file.commons.DS_STORE
 import matt.file.commons.RootProjects
-import matt.file.MFile
 import matt.klib.str.upper
 
 
@@ -60,7 +60,7 @@ fun MFile.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
 	expectedPatterns += "/status/"
   }
   if (projectDir.name.upper() == "ROOTFILES".upper()) {
-	expectedPatterns -= "/gradle.properties" /*shouldn't be there, just double checking*/
+	expectedPatterns -= "/gradle.properties" /*shouldn't be there, just double-checking*/
   }
   return expectedPatterns
 }
