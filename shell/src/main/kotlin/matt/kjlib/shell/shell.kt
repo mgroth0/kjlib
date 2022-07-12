@@ -45,8 +45,6 @@ interface Shell<R: Any?> {
   fun export(name: String, value: String) = sendCommand("export ${name}=${value}")
 
 
-
-
 }
 
 object ExecReturner: Shell<String> {
@@ -121,19 +119,19 @@ fun execReturn(wd: MFile?, vararg args: String, verbose: Boolean = false, printR
 	  sleep(1000)
 	}
   }
-/*  if (args.any { "repeat with m in every message" in it }) {
-	val t = thread {
-	  p.errorReader().forEachLine {
-		println("MAIL ERR:${it}")
+  /*  if (args.any { "repeat with m in every message" in it }) {
+	  val t = thread {
+		p.errorReader().forEachLine {
+		  println("MAIL ERR:${it}")
+		}
+		println("MAIL ERR FINISHED")
 	  }
-	  println("MAIL ERR FINISHED")
-	}
-	p.inputReader().forEachLine {
-	  println("MAIL STD:${it}")
-	}
-	println("MAIL STD FINISHED")
-	t.join()
-  }*/
+	  p.inputReader().forEachLine {
+		println("MAIL STD:${it}")
+	  }
+	  println("MAIL STD FINISHED")
+	  t.join()
+	}*/
   return p.allStdOutAndStdErr().also {
 	if (printResult) println(it)
 	if (verbose) {
@@ -254,3 +252,57 @@ fun getNameOfFrontmostProcessFromKotlinNative(): String {
 	FRONTMOST_APP_NAME
   ).trim()
 }
+
+
+const val ANSI_RESET = "\u001B[0m"
+
+
+const val ANSI_BLACK = "\u001B[30m"
+fun CharSequence.ansiBlack() = ANSI_BLACK + this + ANSI_RESET
+fun Char.ansiBlack() = ANSI_BLACK + this + ANSI_RESET
+const val ANSI_RED = "\u001B[31m"
+fun CharSequence.ansiRed() = ANSI_RED + this + ANSI_RESET
+fun Char.ansiRed() = ANSI_RED + this + ANSI_RESET
+const val ANSI_GREEN = "\u001B[32m"
+fun CharSequence.ansiGreen() = ANSI_GREEN + this + ANSI_RESET
+fun Char.ansiGreen() = ANSI_GREEN + this + ANSI_RESET
+const val ANSI_YELLOW = "\u001B[33m"
+fun CharSequence.ansiYellow() = ANSI_YELLOW + this + ANSI_RESET
+fun Char.ansiYellow() = ANSI_YELLOW + this + ANSI_RESET
+const val ANSI_BLUE = "\u001B[34m"
+fun CharSequence.ansiBlue() = ANSI_BLUE + this + ANSI_RESET
+fun Char.ansiBlue() = ANSI_BLUE + this + ANSI_RESET
+const val ANSI_PURPLE = "\u001B[35m"
+fun CharSequence.ansiPurple() = ANSI_PURPLE + this + ANSI_RESET
+fun Char.ansiPurple() = ANSI_PURPLE + this + ANSI_RESET
+const val ANSI_CYAN = "\u001B[36m"
+fun CharSequence.ansiCyan() = ANSI_CYAN + this + ANSI_RESET
+fun Char.ansiCyan() = ANSI_CYAN + this + ANSI_RESET
+const val ANSI_WHITE = "\u001B[37m"
+fun CharSequence.ansiWhite() = ANSI_WHITE + this + ANSI_RESET
+fun Char.ansiWhite() = ANSI_WHITE + this + ANSI_RESET
+
+const val ANSI_BLACK_BACKGROUND = "\u001B[40m"
+fun CharSequence.ansiBlackBackground() = ANSI_BLACK_BACKGROUND + this + ANSI_RESET
+fun Char.ansiBlackBackground() = ANSI_BLACK_BACKGROUND + this + ANSI_RESET
+const val ANSI_RED_BACKGROUND = "\u001B[41m"
+fun CharSequence.ansiRedBackground() = ANSI_RED_BACKGROUND + this + ANSI_RESET
+fun Char.ansiRedBackground() = ANSI_RED_BACKGROUND + this + ANSI_RESET
+const val ANSI_GREEN_BACKGROUND = "\u001B[42m"
+fun CharSequence.ansiGreenBackground() = ANSI_GREEN_BACKGROUND + this + ANSI_RESET
+fun Char.ansiGreenBackground() = ANSI_GREEN_BACKGROUND + this + ANSI_RESET
+const val ANSI_YELLOW_BACKGROUND = "\u001B[43m"
+fun CharSequence.ansiYellowBackground() = ANSI_YELLOW_BACKGROUND + this + ANSI_RESET
+fun Char.ansiYellowBackground() = ANSI_YELLOW_BACKGROUND + this + ANSI_RESET
+const val ANSI_BLUE_BACKGROUND = "\u001B[44m"
+fun CharSequence.ansiBlueBackground() = ANSI_BLUE_BACKGROUND + this + ANSI_RESET
+fun Char.ansiBlueBackground() = ANSI_BLUE_BACKGROUND + this + ANSI_RESET
+const val ANSI_PURPLE_BACKGROUND = "\u001B[45m"
+fun CharSequence.ansiPurpleBackground() = ANSI_PURPLE_BACKGROUND + this + ANSI_RESET
+fun Char.ansiPurpleBackground() = ANSI_PURPLE_BACKGROUND + this + ANSI_RESET
+const val ANSI_CYAN_BACKGROUND = "\u001B[46m"
+fun CharSequence.ansiCyanBackground() = ANSI_CYAN_BACKGROUND + this + ANSI_RESET
+fun Char.ansiCyanBackground() = ANSI_CYAN_BACKGROUND + this + ANSI_RESET
+const val ANSI_WHITE_BACKGROUND = "\u001B[47m"
+fun CharSequence.ansiWhiteBackground() = ANSI_WHITE_BACKGROUND + this + ANSI_RESET
+fun Char.ansiWhiteBackground() = ANSI_WHITE_BACKGROUND + this + ANSI_RESET
