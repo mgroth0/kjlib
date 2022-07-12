@@ -3,7 +3,6 @@
 package matt.kjlib.shell
 
 import matt.file.MFile
-import matt.file.absolutePathEnforced
 import matt.file.commons.REGISTERED_FOLDER
 import matt.key.FRONTMOST_APP_NAME
 import matt.klib.lang.err
@@ -22,23 +21,22 @@ interface Shell<R: Any?> {
 
 
   infix fun cd(dir: String) = sendCommand("cd \"$dir\"")
-  infix fun cd(file: MFile): R = cd(file.absolutePathEnforced)
+  infix fun cd(file: MFile): R = cd(file.path)
 
   fun exit() = sendCommand("exit")
   fun mkdir(name: String) = sendCommand("mkdir \"$name\"")
-  fun mkdir(file: MFile) = apply { mkdir(file.absolutePathEnforced) }
+  fun mkdir(file: MFile) = apply { mkdir(file.path) }
   fun writeFile(filename: String, s: String) =
 	sendCommand("echo \"${s.replace("\"", "\\\"")}\" > \"$filename\"")
 
-  fun writeFile(file: MFile, s: String) =
-	writeFile(filename = file.absolutePathEnforced, s = s)
+  fun writeFile(file: MFile, s: String) = writeFile(filename = file.path, s = s)
 
   fun rm(filename: String, rf: Boolean = false) {
 	if (rf) sendCommand("rm -rf \"${filename}\"")
 	else sendCommand("rm \"${filename}\"")
   }
 
-  fun rm(file: MFile, rf: Boolean = false) = rm(file.absolutePathEnforced, rf = rf)
+  fun rm(file: MFile, rf: Boolean = false) = rm(file.path, rf = rf)
 
   fun echo(s: String) = sendCommand("echo \"$s\"")
 
