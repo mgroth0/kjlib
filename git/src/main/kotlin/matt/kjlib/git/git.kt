@@ -13,9 +13,7 @@ import matt.kjlib.shell.shell
 import matt.klib.commons.thisMachine
 import matt.klib.lang.err
 import matt.klib.sys.WINDOWS
-import matt.remote.expect.pwd
-import matt.remote.expect.sendLineAndWait
-import net.sf.expectit.Expect
+import matt.remote.expect.ExpectWrapper
 
 val GIT_IGNORE_FILE_NAME = ".gitignore"
 
@@ -303,8 +301,8 @@ private val FILT = """
 """.trimIndent()
 
 
-class ExpectGit(val e: Expect, dotGitDir: String, debug: Boolean = false): GitProject<Unit>(dotGitDir, debug) {
-  constructor(e: Expect, projectDir: MFile, debug: Boolean = false): this(
+class ExpectGit(val e: ExpectWrapper, dotGitDir: String, debug: Boolean = false): GitProject<Unit>(dotGitDir, debug) {
+  constructor(e: ExpectWrapper, projectDir: MFile, debug: Boolean = false): this(
 	e,
 	projectDir.resolve(".git").absolutePath, debug
   )
@@ -314,5 +312,5 @@ class ExpectGit(val e: Expect, dotGitDir: String, debug: Boolean = false): GitPr
   }
 }
 
-val Expect.git get() = ExpectGit(this, projectDir = mFile(pwd()))
+val ExpectWrapper.git get() = ExpectGit(this, projectDir = mFile(pwd()))
 
