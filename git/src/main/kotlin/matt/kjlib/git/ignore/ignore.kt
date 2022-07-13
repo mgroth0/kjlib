@@ -28,6 +28,7 @@ fun MFile.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
   expectedPatterns += "/gradle/"
   expectedPatterns += "/gradlew"
   expectedPatterns += "/gradlew.bat"
+  expectedPatterns += "local.properties"
   expectedPatterns += "/lastversion.txt"
   expectedPatterns += DS_STORE
   expectedPatterns += ".idea/"
