@@ -25,7 +25,6 @@ import matt.klib.lang.err
 import matt.klib.lang.go
 import oshi.software.os.OSProcess
 import java.io.InputStream
-import java.lang.Thread.sleep
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -127,12 +126,12 @@ fun execReturn(wd: MFile?, vararg args: String, verbose: Boolean = false, printR
   if (verbose) println("running ${args.joinToString(" ")}")
   val p = proc(wd, *args)
 
-  thread {
+ /* thread {
 	while (p.isAlive) {
 	  println("process ${args[0]} is still alive")
 	  sleep(1000)
 	}
-  }
+  }*/
   /*  if (args.any { "repeat with m in every message" in it }) {
 	  val t = thread {
 		p.errorReader().forEachLine {
