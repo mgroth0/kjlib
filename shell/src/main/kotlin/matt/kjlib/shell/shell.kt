@@ -39,8 +39,8 @@ interface Shell<R: Any?> {
   infix fun cd(file: MFile): R = cd(file.path)
 
   fun exit() = sendCommand("exit")
-  fun mkdir(name: String) = sendCommand("mkdir \"$name\"")
-  fun mkdir(file: MFile) = apply { mkdir(file.path) }
+  fun mkdir(name: String, p: Boolean = false) = sendCommand("mkdir ${if (p) "-p " else ""}\"$name\"")
+  fun mkdir(file: MFile, p: Boolean = false) = apply { mkdir(file.path, p = p) }
   fun writeFile(filename: String, s: String) =
 	sendCommand("echo \"${s.replace("\"", "\\\"")}\" > \"$filename\"")
 
@@ -126,12 +126,12 @@ fun execReturn(wd: MFile?, vararg args: String, verbose: Boolean = false, printR
   if (verbose) println("running ${args.joinToString(" ")}")
   val p = proc(wd, *args)
 
- /* thread {
-	while (p.isAlive) {
-	  println("process ${args[0]} is still alive")
-	  sleep(1000)
-	}
-  }*/
+  /* thread {
+	 while (p.isAlive) {
+	   println("process ${args[0]} is still alive")
+	   sleep(1000)
+	 }
+   }*/
   /*  if (args.any { "repeat with m in every message" in it }) {
 	  val t = thread {
 		p.errorReader().forEachLine {
