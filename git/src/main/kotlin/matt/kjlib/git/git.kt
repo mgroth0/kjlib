@@ -12,7 +12,7 @@ import matt.kjlib.lang.jlang.toStringBuilder
 import matt.kjlib.shell.shell
 import matt.klib.commons.thisMachine
 import matt.klib.lang.err
-import matt.klib.sys.WINDOWS
+import matt.klib.sys.GAMING_WINDOWS
 import matt.remote.expect.ExpectWrapper
 
 val GIT_IGNORE_FILE_NAME = ".gitignore"
@@ -101,7 +101,7 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
   val commandStart = arrayOf("git", "--git-dir=${dotGitDir}")
 
   private fun wrapGitCommand(vararg command: String, quietApplicable: Boolean = true): Array<String> {
-	return if (thisMachine == WINDOWS) {
+	return if (thisMachine == GAMING_WINDOWS) {
 	  arrayOf(
 		"C:\\Program Files\\Git\\bin\\sh.exe", "-c", *commandStart, command.joinToString(" ").replace("\\", "/"),
 		*(if (quietApplicable && !debug) arrayOf("--quiet") else arrayOf())
@@ -192,7 +192,7 @@ class SimpleGit(gitDir: String, debug: Boolean = false): GitProject<String>(gitD
 
 
 fun gitShell(vararg c: String, debug: Boolean = false, workingDir: MFile? = null): String {
-  return if (thisMachine == WINDOWS) {
+  return if (thisMachine == GAMING_WINDOWS) {
 	shell(
 	  "C:\\Program Files\\Git\\bin\\sh.exe", "-c", c.joinToString(" ").replace("\\", "/"), workingDir = workingDir,
 	  debug = debug
