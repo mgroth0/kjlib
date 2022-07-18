@@ -20,7 +20,7 @@ import matt.remote.expect.ExpectWrapper
 
 val GIT_IGNORE_FILE_NAME = ".gitignore"
 
-abstract class GitProject<R>(val dotGitDir: String, val verbosity: ShellVerbosity) {
+abstract class GitProject<R>(val dotGitDir: String, val quiet: Boolean) {
 
   override fun toString() = toStringBuilder(::gitProjectDir)
 
@@ -104,10 +104,10 @@ abstract class GitProject<R>(val dotGitDir: String, val verbosity: ShellVerbosit
 	return if (thisMachine == GAMING_WINDOWS) {
 	  arrayOf(
 		"C:\\Program Files\\Git\\bin\\sh.exe", "-c", *commandStart, command.joinToString(" ").replace("\\", "/"),
-		*(if (quietApplicable && (!verbosity.verbose)) arrayOf("--quiet") else arrayOf())
+		*(if (quietApplicable && (quiet)) arrayOf("--quiet") else arrayOf())
 	  )
 	} else arrayOf(
-	  *commandStart, *command, *(if (quietApplicable && (!verbosity.verbose)) arrayOf("--quiet") else arrayOf())
+	  *commandStart, *command, *(if (quietApplicable && (quiet)) arrayOf("--quiet") else arrayOf())
 	)
   }
 
@@ -154,9 +154,10 @@ abstract class GitProject<R>(val dotGitDir: String, val verbosity: ShellVerbosit
   fun pull() = op(pullCommand())
 }
 
-class SimpleGit(gitDir: String, verbosity: ShellVerbosity = SILENT): GitProject<String>(gitDir, verbosity) {
-  constructor(projectDir: MFile, verbosity: ShellVerbosity = SILENT): this(
-	projectDir.resolve(".git").absolutePath, verbosity
+class SimpleGit(gitDir: String, val verbosity: ShellVerbosity = SILENT, quiet: Boolean = false):
+  GitProject<String>(gitDir, quiet) {
+  constructor(projectDir: MFile, verbosity: ShellVerbosity = SILENT, quiet: Boolean = false): this(
+	projectDir.resolve(".git").absolutePath, verbosity, quiet
   )
 
   override fun op(command: Array<String>): String {
@@ -302,10 +303,10 @@ private val FILT = """
 """.trimIndent()
 
 
-class ExpectGit(val e: ExpectWrapper, dotGitDir: String, verbosity: ShellVerbosity = SILENT):
-  GitProject<Unit>(dotGitDir, verbosity) {
-  constructor(e: ExpectWrapper, projectDir: MFile, verbosity: ShellVerbosity = SILENT): this(
-	e, projectDir.resolve(".git").absolutePath, verbosity
+class ExpectGit(val e: ExpectWrapper, dotGitDir: String, quiet: Boolean = false):
+  GitProject<Unit>(dotGitDir, quiet) {
+  constructor(e: ExpectWrapper, projectDir: MFile, quiet: Boolean = false): this(
+	e, projectDir.resolve(".git").absolutePath, quiet = quiet
   )
 
   override fun op(command: Array<String>) {
@@ -313,5 +314,5 @@ class ExpectGit(val e: ExpectWrapper, dotGitDir: String, verbosity: ShellVerbosi
   }
 }
 
-val ExpectWrapper.git get() = ExpectGit(this, projectDir = mFile(pwd()))
+val ExpectWrapper.git get() = ExpectGit(this, projectDir = mFile(pwd()), quiet = false)
 
