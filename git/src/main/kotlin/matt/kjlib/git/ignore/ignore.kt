@@ -3,6 +3,7 @@ package matt.kjlib.git.ignore
 import matt.file.MFile
 import matt.file.commons.DS_STORE
 import matt.file.commons.RootProjects
+import matt.file.commons.subRoots
 import matt.klib.log.warn
 import matt.klib.str.upper
 
@@ -29,7 +30,7 @@ fun MFile.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
   expectedPatterns += "/gradle/"
   expectedPatterns += "/gradlew"
   expectedPatterns += "/gradlew.bat"
-//  expectedPatterns += "local.properties"
+  //  expectedPatterns += "local.properties"
   expectedPatterns += "/lastversion.txt"
   expectedPatterns += DS_STORE
   expectedPatterns += ".idea/"
@@ -45,10 +46,10 @@ fun MFile.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
   expectedPatterns += "/logs/"
   expectedPatterns += "/bin/jar/"
   warn("reliance on flow project has to go")
-  if (projectDir.name.upper() in RootProjects.flow.subRootFolders.map { it.name.upper() }) {
+  if (projectDir.name.upper() in subRoots.map { it.upper() }) {
 	expectedPatterns += "/build.gradle.kts"
   }
-  if (projectDir.name.upper() in RootProjects.flow.subRootFolders.map { it.name.upper() } || projectDir == rootDir) {
+  if (projectDir.name.upper() in subRoots.map { it.upper() } || projectDir == rootDir) {
 	/*RootFiles*/
 	/*expectedPatterns += "/build.gradle.kts"*/ /*i know its hard linked, but I do need to get this into openmind*/
 	expectedPatterns += "/settings.gradle.kts"
