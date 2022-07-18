@@ -63,7 +63,7 @@ interface Shell<R: Any?> {
 
 object ExecReturner: Shell<String> {
   override fun sendCommand(vararg args: String): String {
-	return execReturn(*args)
+	return shell(*args)
   }
 }
 
@@ -124,44 +124,9 @@ val Process.streams: List<InputStream>
 
 
 fun exec(wd: MFile?, vararg args: String) = proc(wd, *args).waitFor() == 0
-fun execReturn(vararg args: String) = execReturn(null, *args)
+
+
 fun <R> Shell<R>.pythonCommand(command: String): R = sendCommand("/usr/bin/python", "-c", command)
-
-fun execReturn(
-  wd: MFile?,
-  vararg args: String,
-  verbosity: ShellVerbosity = ShellVerbosity(),
-  printResult: Boolean = false
-): String {
-  if (verbosity.printRunning) println("running ${args.joinToString(" ")}")
-  val p = proc(wd, *args)
-
-  /* thread {
-	 while (p.isAlive) {
-	   println("process ${args[0]} is still alive")
-	   sleep(1000)
-	 }
-   }*/
-  /*  if (args.any { "repeat with m in every message" in it }) {
-	  val t = thread {
-		p.errorReader().forEachLine {
-		  println("MAIL ERR:${it}")
-		}
-		println("MAIL ERR FINISHED")
-	  }
-	  p.inputReader().forEachLine {
-		println("MAIL STD:${it}")
-	  }
-	  println("MAIL STD FINISHED")
-	  t.join()
-	}*/
-  return p.allStdOutAndStdErr(verbose = verbosity.printLineSequence).also {
-	if (printResult) println(it)
-	if (verbosity.printResult) {
-	  println("finished running command. Result: $it")
-	}
-  }
-}
 
 
 fun obliterate(pid: Long) {
@@ -265,13 +230,15 @@ val OSProcess.args: List<String>?
 data class ShellVerbosity(
   val printRunning: Boolean = false,
   val printLineSequence: Boolean = false,
-  val printResult: Boolean = false,
+  val printRawOutput: Boolean = false,
+  val explainOutput: Boolean = false,
   val verbose: Boolean = false
 ) {
   companion object {
 	val SILENT = ShellVerbosity()
 	val JUST_START = ShellVerbosity(printRunning = true)
-	val START_AND_RESULT = ShellVerbosity(printRunning = true, printResult = true)
+	val START_AND_RAW_OUTPUT = ShellVerbosity(printRunning = true, printRawOutput = true)
+	val START_AND_EXPLAIN_OUTPUT = ShellVerbosity(printRunning = true, explainOutput = true)
 	val STREAM = ShellVerbosity(printRunning = true, printLineSequence = true)
   }
 }
@@ -285,14 +252,13 @@ fun shell(
   if (verbosity.printRunning) println("running command: ${args.joinToString(" ")}")
   val p = proc(wd = workingDir, args = args, env = env)
   val output = p.allStdOutAndStdErr(verbose = verbosity.printLineSequence)
-  if (verbosity.printResult) println("output: $output")
+  if (verbosity.explainOutput) println("output: $output")
   p.waitFor()
   p.exitValue().takeIf { it != 0 }?.go {
 	err("error code is $it, output is $output")
   }
   return output
 }
-
 
 fun getNameOfFrontmostProcessFromKotlinNative(): String {
   return shell(
