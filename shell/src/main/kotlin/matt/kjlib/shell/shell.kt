@@ -126,8 +126,13 @@ fun exec(wd: MFile?, vararg args: String) = proc(wd, *args).waitFor() == 0
 fun execReturn(vararg args: String) = execReturn(null, *args)
 fun <R> Shell<R>.pythonCommand(command: String): R = sendCommand("/usr/bin/python", "-c", command)
 
-fun execReturn(wd: MFile?, vararg args: String, verbose: Boolean = false, printResult: Boolean = false): String {
-  if (verbose) println("running ${args.joinToString(" ")}")
+fun execReturn(
+  wd: MFile?,
+  vararg args: String,
+  verbosity: ShellVerbosity = ShellVerbosity(),
+  printResult: Boolean = false
+): String {
+  if (verbosity.printRunning) println("running ${args.joinToString(" ")}")
   val p = proc(wd, *args)
 
   /* thread {
@@ -149,9 +154,9 @@ fun execReturn(wd: MFile?, vararg args: String, verbose: Boolean = false, printR
 	  println("MAIL STD FINISHED")
 	  t.join()
 	}*/
-  return p.allStdOutAndStdErr().also {
+  return p.allStdOutAndStdErr(verbose = verbosity.printLineSequence).also {
 	if (printResult) println(it)
-	if (verbose) {
+	if (verbosity.printOutput) {
 	  println("finished running command. Result: $it")
 	}
   }
