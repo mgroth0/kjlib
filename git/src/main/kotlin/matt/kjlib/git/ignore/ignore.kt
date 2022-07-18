@@ -3,6 +3,7 @@ package matt.kjlib.git.ignore
 import matt.file.MFile
 import matt.file.commons.DS_STORE
 import matt.file.commons.RootProjects
+import matt.klib.log.warn
 import matt.klib.str.upper
 
 
@@ -43,6 +44,7 @@ fun MFile.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
   expectedPatterns += "/log/"
   expectedPatterns += "/logs/"
   expectedPatterns += "/bin/jar/"
+  warn("reliance on flow project has to go")
   if (projectDir.name.upper() in RootProjects.flow.subRootFolders.map { it.name.upper() }) {
 	expectedPatterns += "/build.gradle.kts"
   }
