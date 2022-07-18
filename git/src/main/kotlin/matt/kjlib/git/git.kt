@@ -10,6 +10,7 @@ import matt.kjlib.git.GitModulesLineType.URL
 import matt.kjlib.git.ignore.GitIgnore
 import matt.kjlib.lang.jlang.toStringBuilder
 import matt.kjlib.shell.shell
+import matt.klib.commons.GITHUB_USERNAME
 import matt.klib.commons.thisMachine
 import matt.klib.lang.err
 import matt.klib.sys.GAMING_WINDOWS
@@ -293,7 +294,7 @@ private val FILT = """
   git filter-repo --force --path KJ/sci/stim/flicker/build --invert-paths
   git filter-repo --force --path-glob '*.wav' --invert-paths
 
-  git remote add origin https://github.com/mgroth0/flow
+  git remote add origin https://github.com/${GITHUB_USERNAME}/flow
   git push origin master --force
   
   
