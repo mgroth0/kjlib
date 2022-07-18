@@ -1,7 +1,7 @@
 
 
 implementations {
-//  remoteExpect
+  remoteExpect
   file
   kjlibLang
   kjlibShell
