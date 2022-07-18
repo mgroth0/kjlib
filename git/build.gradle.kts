@@ -2,5 +2,6 @@
 
 implementations {
 //  remoteExpect
+  file
 }
 
