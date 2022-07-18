@@ -253,9 +253,14 @@ val OSProcess.args: List<String>?
   }
 
 
-fun shell(vararg args: String, debug: Boolean = false, workingDir: MFile? = null): String {
+fun shell(
+  vararg args: String,
+  debug: Boolean = false,
+  workingDir: MFile? = null,
+  env: Map<String, String> = mapOf()
+): String {
   if (debug) println("running command: ${args.joinToString(" ")}")
-  val p = proc(wd = workingDir, args = args)
+  val p = proc(wd = workingDir, args = args, env = env)
   val output = p.allStdOutAndStdErr()
   if (debug) println("output: $output")
   p.waitFor()
