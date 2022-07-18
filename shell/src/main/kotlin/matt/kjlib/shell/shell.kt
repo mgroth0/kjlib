@@ -21,6 +21,7 @@ import matt.kjlib.shell.AnsiColor.WHITE
 import matt.kjlib.shell.AnsiColor.WHITE_BACKGROUND
 import matt.kjlib.shell.AnsiColor.YELLOW
 import matt.kjlib.shell.AnsiColor.YELLOW_BACKGROUND
+import matt.kjlib.shell.ShellVerbosity.Companion.SILENT
 import matt.klib.lang.err
 import matt.klib.lang.go
 import oshi.software.os.OSProcess
@@ -156,7 +157,7 @@ fun execReturn(
 	}*/
   return p.allStdOutAndStdErr(verbose = verbosity.printLineSequence).also {
 	if (printResult) println(it)
-	if (verbosity.printOutput) {
+	if (verbosity.printResult) {
 	  println("finished running command. Result: $it")
 	}
   }
@@ -264,19 +265,27 @@ val OSProcess.args: List<String>?
 data class ShellVerbosity(
   val printRunning: Boolean = false,
   val printLineSequence: Boolean = false,
-  val printOutput: Boolean = false
-)
+  val printResult: Boolean = false,
+  val verbose: Boolean = false
+) {
+  companion object {
+	val SILENT = ShellVerbosity()
+	val JUST_START = ShellVerbosity(printRunning = true)
+	val START_AND_RESULT = ShellVerbosity(printRunning = true, printResult = true)
+	val STREAM = ShellVerbosity(printRunning = true, printLineSequence = true)
+  }
+}
 
 fun shell(
   vararg args: String,
-  verbosity: ShellVerbosity = ShellVerbosity(),
+  verbosity: ShellVerbosity = SILENT,
   workingDir: MFile? = null,
   env: Map<String, String> = mapOf()
 ): String {
   if (verbosity.printRunning) println("running command: ${args.joinToString(" ")}")
   val p = proc(wd = workingDir, args = args, env = env)
   val output = p.allStdOutAndStdErr(verbose = verbosity.printLineSequence)
-  if (verbosity.printOutput) println("output: $output")
+  if (verbosity.printResult) println("output: $output")
   p.waitFor()
   p.exitValue().takeIf { it != 0 }?.go {
 	err("error code is $it, output is $output")

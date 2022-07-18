@@ -9,6 +9,8 @@ import matt.kjlib.git.GitModulesLineType.Submodule
 import matt.kjlib.git.GitModulesLineType.URL
 import matt.kjlib.git.ignore.GitIgnore
 import matt.kjlib.lang.jlang.toStringBuilder
+import matt.kjlib.shell.ShellVerbosity
+import matt.kjlib.shell.ShellVerbosity.Companion.SILENT
 import matt.kjlib.shell.shell
 import matt.klib.commons.GITHUB_USERNAME
 import matt.klib.commons.thisMachine
@@ -18,7 +20,7 @@ import matt.remote.expect.ExpectWrapper
 
 val GIT_IGNORE_FILE_NAME = ".gitignore"
 
-abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
+abstract class GitProject<R>(val dotGitDir: String, val verbosity: ShellVerbosity) {
 
   override fun toString() = toStringBuilder(::gitProjectDir)
 
@@ -87,10 +89,7 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
   fun submoduleUpdate() = op(submoduleUpdateCommand())
 
   private fun gitRmCommand(path: String, cached: Boolean, recursive: Boolean) = wrapGitCommand(
-	"rm",
-	*(if (cached) arrayOf("--cached") else arrayOf()),
-	*(if (recursive) arrayOf("-r") else arrayOf()),
-	path
+	"rm", *(if (cached) arrayOf("--cached") else arrayOf()), *(if (recursive) arrayOf("-r") else arrayOf()), path
   )
 
   fun gitRm(path: String, cached: Boolean = false, recursive: Boolean = false) =
@@ -105,9 +104,11 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
 	return if (thisMachine == GAMING_WINDOWS) {
 	  arrayOf(
 		"C:\\Program Files\\Git\\bin\\sh.exe", "-c", *commandStart, command.joinToString(" ").replace("\\", "/"),
-		*(if (quietApplicable && !debug) arrayOf("--quiet") else arrayOf())
+		*(if (quietApplicable && (!verbosity.verbose)) arrayOf("--quiet") else arrayOf())
 	  )
-	} else arrayOf(*commandStart, *command, *(if (quietApplicable && !debug) arrayOf("--quiet") else arrayOf()))
+	} else arrayOf(
+	  *commandStart, *command, *(if (quietApplicable && (!verbosity.verbose)) arrayOf("--quiet") else arrayOf())
+	)
   }
 
   abstract fun op(command: Array<String>): R
@@ -153,13 +154,13 @@ abstract class GitProject<R>(val dotGitDir: String, val debug: Boolean) {
   fun pull() = op(pullCommand())
 }
 
-class SimpleGit(gitDir: String, debug: Boolean = false): GitProject<String>(gitDir, debug) {
-  constructor(projectDir: MFile, debug: Boolean = false): this(
-	projectDir.resolve(".git").absolutePath, debug
+class SimpleGit(gitDir: String, verbosity: ShellVerbosity = SILENT): GitProject<String>(gitDir, verbosity) {
+  constructor(projectDir: MFile, verbosity: ShellVerbosity = SILENT): this(
+	projectDir.resolve(".git").absolutePath, verbosity
   )
 
   override fun op(command: Array<String>): String {
-	return shell(*command, verbosity = debug, workingDir = gitProjectDir)
+	return shell(*command, verbosity = verbosity, workingDir = gitProjectDir)
   }
 
   private fun isDetatched() = "detatched" in branch()
@@ -192,14 +193,14 @@ class SimpleGit(gitDir: String, debug: Boolean = false): GitProject<String>(gitD
 }
 
 
-fun gitShell(vararg c: String, debug: Boolean = false, workingDir: MFile? = null): String {
+fun gitShell(vararg c: String, verbosity: ShellVerbosity = SILENT, workingDir: MFile? = null): String {
   return if (thisMachine == GAMING_WINDOWS) {
 	shell(
 	  "C:\\Program Files\\Git\\bin\\sh.exe", "-c", c.joinToString(" ").replace("\\", "/"), workingDir = workingDir,
-	  verbosity = debug
+	  verbosity = verbosity
 	)
   } else {
-	shell(*c, workingDir = workingDir, verbosity = debug)
+	shell(*c, workingDir = workingDir, verbosity = verbosity)
   }
 }
 
@@ -267,8 +268,7 @@ enum class GitConfigDomain(val arg: String?) {
 
 private fun gitConfig(domain: GitConfigDomain) = gitShell(
   *listOfNotNull("git", "config", "--list", domain.arg).toTypedArray()
-).lines()
-  .associate { it.substringBefore("=") to it.substringAfter("=") }
+).lines().associate { it.substringBefore("=") to it.substringAfter("=") }
 
 class GitConfig private constructor(map: Map<String, String>): Map<String, String> by map {
   companion object {
@@ -302,10 +302,10 @@ private val FILT = """
 """.trimIndent()
 
 
-class ExpectGit(val e: ExpectWrapper, dotGitDir: String, debug: Boolean = false): GitProject<Unit>(dotGitDir, debug) {
-  constructor(e: ExpectWrapper, projectDir: MFile, debug: Boolean = false): this(
-	e,
-	projectDir.resolve(".git").absolutePath, debug
+class ExpectGit(val e: ExpectWrapper, dotGitDir: String, verbosity: ShellVerbosity = SILENT):
+  GitProject<Unit>(dotGitDir, verbosity) {
+  constructor(e: ExpectWrapper, projectDir: MFile, verbosity: ShellVerbosity = SILENT): this(
+	e, projectDir.resolve(".git").absolutePath, verbosity
   )
 
   override fun op(command: Array<String>) {
