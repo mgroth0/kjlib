@@ -207,12 +207,19 @@ val OSProcess.command: String?
 	return if (handle == null) {
 	  null
 	} else {
-	  val com = handle.info().command()
-	  if (com.isPresent) {
-		com.get()
-	  } else {
-		null
+	  try {
+		val com = handle.info().command()
+		if (com.isPresent) {
+		  com.get()
+		} else {
+		  null
+		}
+	  } catch (e: RuntimeException) {
+		if ("Input/output error" in (e.message ?: "")) {
+		  null
+		} else throw e
 	  }
+
 	}
   }
 
