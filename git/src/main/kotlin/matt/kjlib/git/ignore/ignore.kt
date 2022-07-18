@@ -45,7 +45,6 @@ fun MFile.expectedIgnorePatterns(rootDir: MFile): List<String> = run {
   expectedPatterns += "/log/"
   expectedPatterns += "/logs/"
   expectedPatterns += "/bin/jar/"
-  warn("reliance on flow project has to go")
   if (projectDir.name.upper() in subRoots.map { it.upper() }) {
 	expectedPatterns += "/build.gradle.kts"
   }
