@@ -1,7 +1,6 @@
 
 
 implementations {
-  klib
   kjlibLang
   remoteExpect
 }
