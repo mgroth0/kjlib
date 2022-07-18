@@ -159,7 +159,7 @@ class SimpleGit(gitDir: String, debug: Boolean = false): GitProject<String>(gitD
   )
 
   override fun op(command: Array<String>): String {
-	return shell(*command, debug = debug, workingDir = gitProjectDir)
+	return shell(*command, verbosity = debug, workingDir = gitProjectDir)
   }
 
   private fun isDetatched() = "detatched" in branch()
@@ -196,10 +196,10 @@ fun gitShell(vararg c: String, debug: Boolean = false, workingDir: MFile? = null
   return if (thisMachine == GAMING_WINDOWS) {
 	shell(
 	  "C:\\Program Files\\Git\\bin\\sh.exe", "-c", c.joinToString(" ").replace("\\", "/"), workingDir = workingDir,
-	  debug = debug
+	  verbosity = debug
 	)
   } else {
-	shell(*c, workingDir = workingDir, debug = debug)
+	shell(*c, workingDir = workingDir, verbosity = debug)
   }
 }
 

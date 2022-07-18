@@ -95,14 +95,18 @@ fun proc(
   )
 }
 
-fun Process.allStdOutAndStdErr(): String {
+fun Process.allStdOutAndStdErr(verbose: Boolean): String {
 
   var err = ""
   /*MUST USE THREAD. IF IS TRY TO DO THIS SEQUENTIALLY, SOMETIMES EITHER ERR OR STDOUT IS SO LARGE THAT IT PREVENTS THE OTHER ONE FROM COMING THROUGH, CAUSING BLOCKING IF I TRY TO GET EACH IN SEQUENCE.*/
   val t = thread {
-	err = errorReader().readText()
+	err = errorReader().lineSequence().onEach {
+	  if (verbose) println(it)
+	}.joinToString("\n")
   }
-  val out = inputReader().readText()
+  val out = inputReader().lineSequence().onEach {
+	if (verbose) println(it)
+  }.joinToString("\n")
   t.join()
   return out + err
   /*
@@ -252,17 +256,22 @@ val OSProcess.args: List<String>?
 	}
   }
 
+data class ShellVerbosity(
+  val printRunning: Boolean = false,
+  val printLineSequence: Boolean = false,
+  val printOutput: Boolean = false
+)
 
 fun shell(
   vararg args: String,
-  debug: Boolean = false,
+  verbosity: ShellVerbosity = ShellVerbosity(),
   workingDir: MFile? = null,
   env: Map<String, String> = mapOf()
 ): String {
-  if (debug) println("running command: ${args.joinToString(" ")}")
+  if (verbosity.printRunning) println("running command: ${args.joinToString(" ")}")
   val p = proc(wd = workingDir, args = args, env = env)
-  val output = p.allStdOutAndStdErr()
-  if (debug) println("output: $output")
+  val output = p.allStdOutAndStdErr(verbose = verbosity.printLineSequence)
+  if (verbosity.printOutput) println("output: $output")
   p.waitFor()
   p.exitValue().takeIf { it != 0 }?.go {
 	err("error code is $it, output is $output")
