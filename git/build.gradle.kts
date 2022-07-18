@@ -3,5 +3,6 @@
 implementations {
 //  remoteExpect
   file
+  kjlibLang
 }
 
