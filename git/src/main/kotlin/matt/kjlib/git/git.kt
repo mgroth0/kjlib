@@ -88,6 +88,9 @@ abstract class GitProject<R>(val dotGitDir: String, val quiet: Boolean) {
 
   fun submoduleUpdate() = op(submoduleUpdateCommand())
 
+  private fun submoduleForEachCommand(command: String) = wrapGitCommand("submodule", "foreach", command)
+  fun submoduleForEach(command: String) = op(submoduleForEachCommand(command))
+
   private fun gitRmCommand(path: String, cached: Boolean, recursive: Boolean) = wrapGitCommand(
 	"rm", *(if (cached) arrayOf("--cached") else arrayOf()), *(if (recursive) arrayOf("-r") else arrayOf()), path
   )
